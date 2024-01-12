@@ -1,4 +1,90 @@
 \section{Inference Rules}
-\inference[T-TASK]{\Gamma; a \vdash b : Box[C] \\ Test}{\Gamma; a \vdash task(b) {x \Rightarrow t} : Task[C]}
+\inference[T-TASK]{x:C; ocap \vdash t : \tau \\ \Gamma; a \vdash b : Q \vartriangleright Box[C]}{\Gamma; a \vdash task(b) \{x \Rightarrow t\} : Q \vartriangleright Task[C]}
+\inference[]{}{}
 
-\inference[T-TASK]{\Gamma; a \vdash b : Box[C] \\ Test}{\Gamma; a \vdash task(b) \{x \Rightarrow t\} : Q \vartriangleright Task[C]}
+\inference[T-ASYNC]{Perm[Q] \in \Gamma \\ \Gamma \setminus Perm[Q]; a \vdash s : \sigma \\ \Gamma; a \vdash t : Q \vartriangleright Task[C]}{\Gamma; a \vdash async(t) \{s\} : \bot}
+\inference[]{}{}
+
+\inference[T-FINISH]{\Gamma; a \vdash t : \tau}{\Gamma; a \vdash finish \{ t \} : null}
+\inference[]{}{}
+
+\NewDocumentCommand{\sframe}{ s O{L} m O{P} O{l} }{\langle #2, \IfBooleanT{#1}{&&} #3, \IfBooleanT{#1}{&&} #4 \IfBooleanT{#1}{&&}\rangle^#5 \IfBooleanT{#1}{&&} }
+\NewDocumentCommand{\fframe}{ s m m }{\IfBooleanT{#1}{&&} \langle FINISH (#2, #3) \rangle}
+\NewDocumentCommand{\state}{ O{H} m O{TS} }{#1, \{#2\} && \uplus #3}
+\NewDocumentCommand{\reduc}{m m}{%
+  \begin{alignedat}{7}
+    &#1\\\longrightarrow\ &#2
+  \end{alignedat}%
+}
+
+
+\inference[E-TASK]{L(b') = b(o, p)}{%
+  \reduc{%
+    \state{%
+      \sframe*{%
+        let\ x = task(b')\{x \Rightarrow t\} in\ s%
+      } \circ FS%
+    }%
+  }{%
+    \state{%
+      \sframe*[L[x \rightarrow task(b(o,p),t)]]{%
+        s
+      } \circ FS%
+    }%
+  }%
+}
+\inference[]{}{}
+
+\inference[E-ASYNC]{%
+  \nexists \fframe{\_}{f} \in FS\\
+  f' fresh \\
+  L(y) = task(b(o,p),t) \\
+  T = \sframe[[x \rightarrow o]]{t}[\emptyset][\epsilon] \circ \fframe{f}{f'}
+}{%
+  \reduc{%
+    \state{%
+      \sframe*{async(y)\{s\}}[p \uplus P] \circ FS \circ \fframe*{\_}{f} \circ FS'
+    }}{%
+    \state{%
+      \sframe*{s}[P] \circ \fframe*{\_}{f} \circ FS',%
+      T
+    }%
+  }%
+}
+\inference[]{}{}
+
+\inference[E-FINISH1]{%
+  FS = FS_1 \circ \fframe{\_}{f} \circ FS_2\\
+  \nexists \fframe{\_}{f} \in FS_1\\
+  F_1 = \sframe{t}[P][\epsilon]\\
+  F_2 = \fframe{f}{f'}\\
+  f' fresh\\
+  F_3 = \sframe[L[x\rightarrow null]]{s}
+}{%
+  \reduc{%
+    \state{%
+      \sframe{%
+        let\ x = finish \{ t \} in\ s%
+      } \circ FS%
+    }
+  }{%
+    \state{%
+      F_1 \circ F_2 \circ F_3 \circ FS%
+    }
+  }
+}
+\inference[]{}{}
+
+\inference[E-FINISH2]{%
+  \nexists T \in TS.\ T = FS' \circ \fframe{f}{\_} \circ FS''
+}{%
+  \reduc{%
+    \state{%
+      \fframe{\_}{f} \circ FS
+    }
+  }{%
+    \state{%
+      FS
+    }
+  }
+}
