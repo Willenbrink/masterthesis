@@ -1,0 +1,4 @@
+\section{Inference Rules}
+\inference[T-TASK]{\Gamma; a \vdash b : Box[C] \\ Test}{\Gamma; a \vdash task(b) {x \Rightarrow t} : Task[C]}
+
+\inference[T-TASK]{\Gamma; a \vdash b : Box[C] \\ Test}{\Gamma; a \vdash task(b) \{x \Rightarrow t\} : Q \vartriangleright Task[C]}
