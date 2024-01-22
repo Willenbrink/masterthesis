@@ -8,29 +8,44 @@
 \inference[T-FINISH]{\Gamma; a \vdash t : \tau}{\Gamma; a \vdash \mathit{finish} \{ t \} : null}
 \inference[]{}{}
 
-\NewDocumentCommand{\sframe}{ s O{L} m O{P} O{l} }{\langle #2, \IfBooleanT{#1}{&&} #3,\ \IfBooleanT{#1}{&&} #4 \IfBooleanT{#1}{&&}\rangle^#5 \IfBooleanT{#1}{&&} }
+% We have two kind of frames: The normal stack frames (sframe) and finish frames (fframe). They take a number of arguments:
+% s:aligned? OL:variable assignments m:term OP:Permissions Ol:label
+\NewDocumentCommand{\sframe}{ s O{L} m O{P} O{l} }{\langle #2,\ \IfBooleanT{#1}{&&} #3,\ \IfBooleanT{#1}{&&} #4 \IfBooleanT{#1}{&&}\rangle^#5 \IfBooleanT{#1}{&&} }
+%s:aligned? m:id
 \NewDocumentCommand{\fframe}{ s m }{\IfBooleanT{#1}{&&} \langle \mathit{FINISH} #2 \rangle}
-\NewDocumentCommand{\state}{ O{H} O{f} m O{TS} }{#1, \{(#2, #3)\} && \uplus #4}
+
+% We have three kinds of reductions: frame, stack and tasks. Each come with sensible defaults
 \NewDocumentCommand{\reducframe}{m m}{%
   \begin{alignedat}{7}
-    &#1\\\rightarrow\ &#2
+    H, &#1\\\rightarrow\ H, &#2
   \end{alignedat}%
 }
-\NewDocumentCommand{\reducstack}{m m}{%
+\NewDocumentCommand{\reducstack}{m O{FS} m O{FS}}{%
   \begin{alignedat}{7}
-    &#1\\\twoheadrightarrow\ &#2
+    H, &#1 \circ #2\\\twoheadrightarrow\ H, &#3 \circ #4
   \end{alignedat}%
 }
+\NewDocumentCommand{\reductasks}{m O{TS} m O{TS}}{%
+  \begin{alignedat}{7}
+    H, &\{#1\} && \uplus #2\\\leadsto\ H, &\{#3\} && \uplus #4
+  \end{alignedat}%
+}
+\NewDocumentCommand{\reducasync}{m m}{%
+  \begin{alignedat}{7}
+    H, & #1 \\\leadsto\ H, & #2
+  \end{alignedat}%
+}
+
 
 
 
 \inference[E-TASK]{L(b') = b(o, p)}{%
   \reducframe{%
-      H, \sframe*{%
+      \sframe*{%
         let\ x = \mathit{task}(b')\{x \Rightarrow t\} in\ s%
       }%
   }{%
-      H, \sframe*[L[x \rightarrow \mathit{task}(b(o,p),t)]]{%
+      \sframe*[L[x \rightarrow \mathit{task}(b(o,p),t)]]{%
         s
       }%
   }%
@@ -38,51 +53,42 @@
 \inference[]{}{}
 
 \inference[E-ASYNC]{%
-  \nexists \fframe{\_} \in FS\\
+  T_1 = (f, \sframe{s}[P][\epsilon])\\
   L(y) = \mathit{task}(b(o,p),t) \\
-  T = (f', \sframe[[x \rightarrow o]]{t}[\emptyset][\epsilon])\\
+  T_2 = (f, \sframe[[x \rightarrow o]]{t}[\emptyset][\epsilon])\\
 }{%
-  \reducstack{%
-    \state{%
-      \sframe*{\mathit{async}(y)\{s\}}[p \uplus P] \circ FS \circ \fframe*{f'} \circ FS'
-    }}{%
-    \state{%
-      \sframe*{s}[P] \circ \fframe*{f'} \circ FS'%
-    }[\{T\} \uplus TS]%
-  }%
+  \reducasync{
+    (f,%
+      \sframe{\mathit{async}(y)\{s\}}[p \uplus P] \circ FS
+    ) && \uplus TS%
+    }{
+    \{ T_1, T_2 \} && \uplus TS%
+    }
 }
 \inference[]{}{}
 
 \inference[E-FINISH1]{%
-  F_1 = \sframe{t}[P][\epsilon]\\
-  F_2 = \fframe{f'}\\
-  F_3 = \sframe{null}\\
+  T = (f', \sframe{t}[P][\epsilon])\\
   f' \mathit{fresh}\\
 }{%
-  \reducstack{%
-    \state{%
-      \sframe{%
-        \mathit{finish} \{\ t\ \}%
-      } \circ FS%
-    }
+  \reductasks{%
+    (f,%
+      \sframe{ \mathit{let}\ x = \mathit{finish} \{\ t\ \}\ \mathit{in}\ s} \circ FS%
+    )
   }{%
-    \state{%
-      F_1 \circ F_2 \circ F_3 \circ FS%
-    }
-  }
+    (f,%
+      \fframe{f'} \circ \sframe[L[x\rightarrow \mathit{null}]]{s} \circ FS%
+    )
+  }[\{T\} \uplus TS]
 }
 \inference[]{}{}
 
 \inference[E-FINISH2]{%
   \nexists (f', FS) \in TS
 }{%
-  \reducstack{%
-    \state{%
-      \fframe{f'} \circ FS
-    }
+  \reductasks{%
+    (f, \fframe{f'} \circ FS )%
   }{%
-    \state{%
-      FS
-    }
+    (f, FS )%
   }
 }
