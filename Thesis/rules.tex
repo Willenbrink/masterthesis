@@ -11,26 +11,28 @@
 \NewDocumentCommand{\sframe}{ s O{L} m O{P} O{l} }{\langle #2, \IfBooleanT{#1}{&&} #3, \IfBooleanT{#1}{&&} #4 \IfBooleanT{#1}{&&}\rangle^#5 \IfBooleanT{#1}{&&} }
 \NewDocumentCommand{\fframe}{ s m m }{\IfBooleanT{#1}{&&} \langle FINISH (#2, #3) \rangle}
 \NewDocumentCommand{\state}{ O{H} m O{TS} }{#1, \{#2\} && \uplus #3}
-\NewDocumentCommand{\reduc}{m m}{%
+\NewDocumentCommand{\reducframe}{m m}{%
   \begin{alignedat}{7}
-    &#1\\\longrightarrow\ &#2
+    &#1\\\rightarrow\ &#2
+  \end{alignedat}%
+}
+\NewDocumentCommand{\reducstack}{m m}{%
+  \begin{alignedat}{7}
+    &#1\\\twoheadrightarrow\ &#2
   \end{alignedat}%
 }
 
 
+
 \inference[E-TASK]{L(b') = b(o, p)}{%
-  \reduc{%
-    \state{%
-      \sframe*{%
+  \reducframe{%
+      H, \sframe*{%
         let\ x = task(b')\{x \Rightarrow t\} in\ s%
-      } \circ FS%
-    }%
+      }%
   }{%
-    \state{%
-      \sframe*[L[x \rightarrow task(b(o,p),t)]]{%
+      H, \sframe*[L[x \rightarrow task(b(o,p),t)]]{%
         s
-      } \circ FS%
-    }%
+      }%
   }%
 }
 \inference[]{}{}
@@ -41,7 +43,7 @@
   L(y) = task(b(o,p),t) \\
   T = \sframe[[x \rightarrow o]]{t}[\emptyset][\epsilon] \circ \fframe{f}{f'}
 }{%
-  \reduc{%
+  \reducstack{%
     \state{%
       \sframe*{async(y)\{s\}}[p \uplus P] \circ FS \circ \fframe*{\_}{f} \circ FS'
     }}{%
@@ -61,7 +63,7 @@
   f' fresh\\
   F_3 = \sframe[L[x\rightarrow null]]{s}
 }{%
-  \reduc{%
+  \reducstack{%
     \state{%
       \sframe{%
         let\ x = finish \{ t \} in\ s%
@@ -78,7 +80,7 @@
 \inference[E-FINISH2]{%
   \nexists T \in TS.\ T = FS' \circ \fframe{f}{\_} \circ FS''
 }{%
-  \reduc{%
+  \reducstack{%
     \state{%
       \fframe{\_}{f} \circ FS
     }
