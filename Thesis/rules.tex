@@ -1,16 +1,16 @@
 \section{Inference Rules}
-\inference[T-TASK]{x:C; ocap \vdash t : \tau \\ \Gamma; a \vdash b : Q \vartriangleright Box[C]}{\Gamma; a \vdash task(b) \{x \Rightarrow t\} : Q \vartriangleright Task[C]}
+\inference[T-TASK]{x:C; \mathit{ocap} \vdash t : \tau \\ \Gamma; a \vdash b : Q \vartriangleright \mathit{Box}[C]}{\Gamma; a \vdash \mathit{task}(b) \{x \Rightarrow t\} : Q \vartriangleright \mathit{Task}[C]}
 \inference[]{}{}
 
-\inference[T-ASYNC]{Perm[Q] \in \Gamma \\ \Gamma \setminus Perm[Q]; a \vdash s : \sigma \\ \Gamma; a \vdash t : Q \vartriangleright Task[C]}{\Gamma; a \vdash async(t) \{s\} : \bot}
+\inference[T-ASYNC]{\mathit{Perm}[Q] \in \Gamma \\ \Gamma \setminus \mathit{Perm}[Q]; a \vdash s : \sigma \\ \Gamma; a \vdash t : Q \vartriangleright \mathit{Task}[C]}{\Gamma; a \vdash \mathit{async}(t) \{s\} : \bot}
 \inference[]{}{}
 
-\inference[T-FINISH]{\Gamma; a \vdash t : \tau}{\Gamma; a \vdash finish \{ t \} : null}
+\inference[T-FINISH]{\Gamma; a \vdash t : \tau}{\Gamma; a \vdash \mathit{finish} \{ t \} : null}
 \inference[]{}{}
 
-\NewDocumentCommand{\sframe}{ s O{L} m O{P} O{l} }{\langle #2, \IfBooleanT{#1}{&&} #3, \IfBooleanT{#1}{&&} #4 \IfBooleanT{#1}{&&}\rangle^#5 \IfBooleanT{#1}{&&} }
-\NewDocumentCommand{\fframe}{ s m m }{\IfBooleanT{#1}{&&} \langle FINISH (#2, #3) \rangle}
-\NewDocumentCommand{\state}{ O{H} m O{TS} }{#1, \{#2\} && \uplus #3}
+\NewDocumentCommand{\sframe}{ s O{L} m O{P} O{l} }{\langle #2, \IfBooleanT{#1}{&&} #3,\ \IfBooleanT{#1}{&&} #4 \IfBooleanT{#1}{&&}\rangle^#5 \IfBooleanT{#1}{&&} }
+\NewDocumentCommand{\fframe}{ s m }{\IfBooleanT{#1}{&&} \langle \mathit{FINISH} #2 \rangle}
+\NewDocumentCommand{\state}{ O{H} O{f} m O{TS} }{#1, \{(#2, #3)\} && \uplus #4}
 \NewDocumentCommand{\reducframe}{m m}{%
   \begin{alignedat}{7}
     &#1\\\rightarrow\ &#2
@@ -27,10 +27,10 @@
 \inference[E-TASK]{L(b') = b(o, p)}{%
   \reducframe{%
       H, \sframe*{%
-        let\ x = task(b')\{x \Rightarrow t\} in\ s%
+        let\ x = \mathit{task}(b')\{x \Rightarrow t\} in\ s%
       }%
   }{%
-      H, \sframe*[L[x \rightarrow task(b(o,p),t)]]{%
+      H, \sframe*[L[x \rightarrow \mathit{task}(b(o,p),t)]]{%
         s
       }%
   }%
@@ -38,35 +38,31 @@
 \inference[]{}{}
 
 \inference[E-ASYNC]{%
-  \nexists \fframe{\_}{f} \in FS\\
-  f' fresh \\
-  L(y) = task(b(o,p),t) \\
-  T = \sframe[[x \rightarrow o]]{t}[\emptyset][\epsilon] \circ \fframe{f}{f'}
+  \nexists \fframe{\_} \in FS\\
+  L(y) = \mathit{task}(b(o,p),t) \\
+  T = (f', \sframe[[x \rightarrow o]]{t}[\emptyset][\epsilon])\\
 }{%
   \reducstack{%
     \state{%
-      \sframe*{async(y)\{s\}}[p \uplus P] \circ FS \circ \fframe*{\_}{f} \circ FS'
+      \sframe*{\mathit{async}(y)\{s\}}[p \uplus P] \circ FS \circ \fframe*{f'} \circ FS'
     }}{%
     \state{%
-      \sframe*{s}[P] \circ \fframe*{\_}{f} \circ FS',%
-      T
-    }%
+      \sframe*{s}[P] \circ \fframe*{f'} \circ FS'%
+    }[\{T\} \uplus TS]%
   }%
 }
 \inference[]{}{}
 
 \inference[E-FINISH1]{%
-  FS = FS_1 \circ \fframe{\_}{f} \circ FS_2\\
-  \nexists \fframe{\_}{f} \in FS_1\\
   F_1 = \sframe{t}[P][\epsilon]\\
-  F_2 = \fframe{f}{f'}\\
-  f' fresh\\
-  F_3 = \sframe[L[x\rightarrow null]]{s}
+  F_2 = \fframe{f'}\\
+  F_3 = \sframe{null}\\
+  f' \mathit{fresh}\\
 }{%
   \reducstack{%
     \state{%
       \sframe{%
-        let\ x = finish \{ t \} in\ s%
+        \mathit{finish} \{\ t\ \}%
       } \circ FS%
     }
   }{%
@@ -78,11 +74,11 @@
 \inference[]{}{}
 
 \inference[E-FINISH2]{%
-  \nexists T \in TS.\ T = FS' \circ \fframe{f}{\_} \circ FS''
+  \nexists (f', FS) \in TS
 }{%
   \reducstack{%
     \state{%
-      \fframe{\_}{f} \circ FS
+      \fframe{f'} \circ FS
     }
   }{%
     \state{%
