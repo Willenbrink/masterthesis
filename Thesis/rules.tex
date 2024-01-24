@@ -2,7 +2,7 @@
 \inference[T-TASK]{x:C; \mathit{ocap} \vdash t : \tau \\ \Gamma; a \vdash b : Q \vartriangleright \mathit{Box}[C]}{\Gamma; a \vdash \mathit{task}(b) \{x \Rightarrow t\} : Q \vartriangleright \mathit{Task}[C]}
 \inference[]{}{}
 
-\inference[T-ASYNC]{\mathit{Perm}[Q] \in \Gamma \\ \Gamma \setminus \mathit{Perm}[Q]; a \vdash s : \sigma \\ \Gamma; a \vdash t : Q \vartriangleright \mathit{Task}[C]}{\Gamma; a \vdash \mathit{async}(t) \{s\} : \bot}
+\inference[T-ASYNC]{\mathit{Perm}[Q] \in \Gamma \\ \Gamma \setminus \mathit{Perm}[Q]; a \vdash s : \sigma \\ \Gamma; a \vdash x : Q \vartriangleright \mathit{Task}[C]}{\Gamma; a \vdash \mathit{async}(x) \{s\} : \bot}
 \inference[]{}{}
 
 \inference[T-FINISH]{\Gamma; a \vdash t : \tau}{\Gamma; a \vdash \mathit{finish} \{ t \} : null}
@@ -40,27 +40,27 @@
 
 
 \inference[E-TASK]{L(b') = b(o, p)}{%
-  \reducframe{%
-      \sframe*{%
+  \reductasks{%
+      (f, \sframe*{%
         let\ x = \mathit{task}(b')\{x \Rightarrow t\} in\ s%
-      }%
+      })%
   }{%
-      \sframe*[L[x \rightarrow \mathit{task}(b(o,p),t)]]{%
+      (f, \sframe*[L[x \rightarrow \mathit{task}(b(o,p),t)]]{%
         s
-      }%
+      })%
   }%
 }
 \inference[]{}{}
 
 \inference[E-ASYNC]{%
-  T_1 = (f, \sframe{s}[P][\epsilon])\\
   L(y) = \mathit{task}(b(o,p),t) \\
+  T_1 = (f, \sframe{s}[P][\epsilon])\\
   T_2 = (f, \sframe[[x \rightarrow o]]{t}[\emptyset][\epsilon])\\
 }{%
   \reducasync{
-    (f,%
-      \sframe{\mathit{async}(y)\{s\}}[p \uplus P] \circ FS
-    ) && \uplus TS%
+    \{(f,%
+      \sframe{\mathit{async}(y)\{s\}}[\{p\} \uplus P] \circ FS
+    )\} && \uplus TS%
     }{
     \{ T_1, T_2 \} && \uplus TS%
     }
@@ -91,4 +91,9 @@
   }{%
     (f, FS )%
   }
+}
+\inference[]{}{}
+
+\inference[E-TASK-DONE]{}{
+  H,\epsilon \uplus TS \leadsto TS
 }
