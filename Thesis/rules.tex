@@ -53,13 +53,14 @@
 \inference[]{}{}
 
 \inference[E-ASYNC]{%
-  L(y) = \mathit{task}(b(o,p),t) \\
+  L(y) = \mathit{task}(b(o,p),t)\\
+  p \in P\\
   T_1 = (f, \sframe{s}[P][\epsilon])\\
   T_2 = (f, \sframe[[x \rightarrow o]]{t}[\emptyset][\epsilon])\\
 }{%
   \reducasync{
     \{(f,%
-      \sframe{\mathit{async}(y)\{s\}}[\{p\} \uplus P] \circ FS
+      \sframe{\mathit{async}(y)\{s\}} \circ FS
     )\} && \uplus TS%
     }{
     \{ T_1, T_2 \} && \uplus TS%
