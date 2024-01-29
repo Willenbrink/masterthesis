@@ -136,6 +136,37 @@
 
 
 \subsubsection{Typing}
+\inference[T-NULL]{}{\Gamma; a \vdash null : Null}
+\inference[]{}{}
+\inference[T-VAR]{x \in dom(\Gamma)}{\Gamma; a \vdash x : \Gamma(x)}
+\inference[]{}{}
+\inference[T-LET]{\Gamma; a \vdash e : \tau & \Gamma, x : \tau; a \vdash t : \sigma}{\Gamma; a \vdash let x = e in t : \sigma}
+\inference[]{}{}
+\inference[T-SELECT]{\Gamma; a \vdash x : C & ftype(C, f) = D}{\Gamma; a \vdash x.f : D}
+\inference[]{}{}
+\inference[T-ASSIGN]{\Gamma; a \vdash x : C & ftype(C, f) = D \\ \Gamma; a \vdash y : D' & D' <: D}{\Gamma; a \vdash x.f = y : D}
+\inference[]{}{}
+\inference[T-INVOKE]{\Gamma; a \vdash x : C & mtype(C,m) = \sigma \rightarrow \tau \\
+  \Gamma; a \vdash y : \sigma' & \sigma' <: \sigma \vee \\
+(\sigma = Box[D] \wedge \sigma' = Q \vartriangleright Box[D] \wedge Perm[Q] \in \Gamma)}{\Gamma; a \vdash x.m(y) : \tau}
+\inference[]{}{}
+\inference[T-NEW]{a = ocap \Longrightarrow ocap(C) & \forall var f : \sigma \in \bar{fd} . \exists D. \sigma = D}{\Gamma; a \vdash new C : C}
+\inference[]{}{}
+\inference[T-OPEN]{\Gamma; a \vdash x : Q \vartriangleright Box[C] & Perm[Q] \in \Gamma & y : C; ocap \vdash t : \sigma}{\Gamma; a \vdash x.open \{y \Rightarrow t\} : Q \vartriangleright Box[C]}
+\inference[]{}{}
+\inference[T-BOX]{ocap(C) & Q fresh & \Gamma; x : Q \vartriangleright Box[C]; Perm[Q]; a \vdash t : \sigma}{\Gamma; a \vdash box[C] \{x \Rightarrow t \} : \bot}
+\inference[]{}{}
+\inference[T-CAPTURE]{\Gamma; a \vdash x : Q \vartriangleright Box[C] & \Gamma; a \vdash y : Q' \vartriangleright Box[D] \\
+  \{Perm[Q], Perm[Q']\} \subseteq \Gamma & D <: ftype(C,f) \\
+\Gamma \ \{Perm[Q']\}, z : Q \vartriangleright Box[C]; a \vdash t : \sigma}{\Gamma; a \vdash capture(x.f,y) \{z \Rightarrow t\} : \bot}
+\inference[]{}{}
+\inference[T-SWAP]{\Gamma; a \vdash x : Q \vartriangleright Box[C] & \Gamma; a \vdash y : Q' \vartriangleright Box[D'] \\
+  \{Perm[Q], Perm[Q']\} \subseteq \Gamma & ftype(C,f) = Box[D] \\
+  D' <: D & R fresh \\
+\Gamma \ \{Perm[Q']\}, z : R \vartriangleright Box[D], Perm[R]; a \vdash t : \sigma}{\Gamma; a \vdash swap(x.f, y) \{z \Rightarrow t\} : \bot}
+\inference[]{}{}
+\inference[T-EMPFS]{}{H \vdash \epsilon}
+\inference[]{}{}
 \inference[T-FRAME1]{\Gamma; a \vdash t : \sigma & l \neq \epsilon \Longrightarrow \sigma <: C \\%
   H \vdash \Gamma; L & H \vdash \Gamma; L; P}{H \vdash \sframe{t} : \sigma}
 \inference[]{}{}
@@ -151,28 +182,6 @@
 \inference[T-FRAME-A2]{H \vdash^\tau_x F^y : \sigma & H \vdash^\sigma_y FS}{H \vdash^\tau_x F^y \circ FS}
 \inference[]{}{}
 
-\inference[]{}{}
-\inference[T-VAR]{x \in dom(\Gamma)}{\Gamma; a \vdash x : \Gamma(x)}
-\inference[]{}{}
-\inference[T-INVOKE]{\Gamma; a \vdash x : C & mtype(C,m) = \sigma \rightarrow \tau \\
-  \Gamma; a \vdash y : \sigma' & \sigma' <: \sigma \vee \\
-(\sigma = Box[D] \wedge \sigma' = Q \vartriangleright Box[D] \wedge Perm[Q] \in \Gamma)}{\Gamma; a \vdash x.m(y) : \tau}
-\inference[]{}{}
-\inference[T-NEW]{a = ocap \Longrightarrow ocap(C) & \forall var f : \sigma \in fd_with_line_above . \exists D. \sigma = D}{\Gamma; a \vdash new C : C}
-\inference[]{}{}
-\inference[T-OPEN]{\Gamma; a \vdash x : Q \vartriangleright Box[C] & Perm[Q] \in \Gamma & y : C; ocap \vdash t : \sigma}{\Gamma; a \vdash x.open \{y \Rightarrow t\} : Q \vartriangleright Box[C]}
-\inference[]{}{}
-\inference[T-BOX]{ocap(C) & Q fresh & \Gamma; x : Q \vartriangleright Box[C]; Perm[Q]; a \vdash t : sigma}{\Gamma; a \vdash box[C] \{x \Rightarrow t \} : \bot}
-\inference[]{}{}
-\inference[T-CAPTURE]{\Gamma; a \vdash x : Q \vartriangleright Box[C] & \Gamma; a \vdash y : Q' \vartriangleright Box[D] \\
-  \{Perm[Q], Perm[Q']\} \subseteq \Gamma & D <: ftype(C,f) \\
-\Gamma \ \{Perm[Q']\}, z : Q \vartriangleright Box[C]; a \vdash t : \sigma}{\Gamma; a \vdash capture(x.f,y) \{z \Rightarrow t\} : \bot}
-\inference[]{}{}
-\inference[T-SWAP]{\Gamma; a \vdash x : Q \vartriangleright Box[C] & \Gamma; a \vdash y : Q' \vartriangleright Box[D'] \\
-  \{Perm[Q], Perm[Q']\} \subseteq \Gamma & ftype(C,f) = Box[D] \\
-  D' <: D & R fresh \\
-\Gamma \ \{Perm[Q']\}, z : R \vartriangleright Box[D], Perm[R]; a \vdash t : \sigma}{\Gamma; a \vdash swap(x.f, y) \{z \Rightarrow t\} : \bot}
-\inference[]{}{}
 
 
 \subsubsection{Evaluation}
