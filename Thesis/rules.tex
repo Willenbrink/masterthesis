@@ -1,12 +1,4 @@
 \section{Inference Rules}
-\inference[T-TASK]{x:C; \mathit{ocap} \vdash t : \tau \\ \Gamma; a \vdash b : Q \vartriangleright \mathit{Box}[C]}{\Gamma; a \vdash \mathit{task}(b) \{x \Rightarrow t\} : Q \vartriangleright \mathit{Task}[C]}
-\inference[]{}{}
-
-\inference[T-ASYNC]{\mathit{Perm}[Q] \in \Gamma \\ \Gamma \setminus \mathit{Perm}[Q]; a \vdash s : \sigma \\ \Gamma; a \vdash x : Q \vartriangleright \mathit{Task}[C]}{\Gamma; a \vdash \mathit{async}(x) \{s\} : \bot}
-\inference[]{}{}
-
-\inference[T-FINISH]{\Gamma; a \vdash t : \tau}{\Gamma; a \vdash \mathit{finish} \{ t \} : null}
-\inference[]{}{}
 
 % We have two kind of frames: The normal stack frames (sframe) and finish frames (fframe). They take a number of arguments:
 % s:aligned? OL:variable assignments m:term OP:Permissions Ol:label
@@ -36,16 +28,26 @@
   \end{alignedat}%
 }
 
+\subsection{Extension}
+\subsubsection{Typing}
+\inference[T-TASK]{x:C; \mathit{ocap} \vdash t : \tau & \Gamma; a \vdash b : Q \vartriangleright \mathit{Box}[C]}{\Gamma; a \vdash \mathit{task}(b) \{x \Rightarrow t\} : Q \vartriangleright \mathit{Task}[C]}
+\inference[]{}{}
+
+\inference[T-ASYNC]{\mathit{Perm}[Q] \in \Gamma & \Gamma \setminus \mathit{Perm}[Q]; a \vdash s : \sigma & \Gamma; a \vdash x : Q \vartriangleright \mathit{Task}[C]}{\Gamma; a \vdash \mathit{async}(x) \{s\} : \bot}
+\inference[]{}{}
+
+\inference[T-FINISH]{\Gamma; a \vdash t : \tau}{\Gamma; a \vdash \mathit{finish} \{ t \} : null}
+\inference[]{}{}
 
 
-
+\subsubsection{Evaluation}
 \inference[E-TASK]{L(b') = b(o, p)}{%
   \reductasks{%
-      (f, \sframe*{%
-        let\ x = \mathit{task}(b')\{x \Rightarrow t\} in\ s%
+      (f, \sframe{%
+        let\ x = \mathit{task}(b')\{x \Rightarrow t\}\ in\ s%
       })%
   }{%
-      (f, \sframe*[L[x \rightarrow \mathit{task}(b(o,p),t)]]{%
+      (f, \sframe[L[x \rightarrow \mathit{task}(b(o,p),t)]]{%
         s
       })%
   }%
@@ -53,10 +55,10 @@
 \inference[]{}{}
 
 \inference[E-ASYNC]{%
-  L(y) = \mathit{task}(b(o,p),t)\\
-  p \in P\\
-  T_1 = (f, \sframe{s}[P][\epsilon])\\
-  T_2 = (f, \sframe[[x \rightarrow o]]{t}[\emptyset][\epsilon])\\
+  L(y) = \mathit{task}(b(o,p),t) &
+  p \in P \\
+  T_1 = (f, \sframe{s}[P][\epsilon]) &
+  T_2 = (f, \sframe[[x \rightarrow o]]{t}[\emptyset][\epsilon])
 }{%
   \reducasync{
     \{(f,%
@@ -69,8 +71,8 @@
 \inference[]{}{}
 
 \inference[E-FINISH1]{%
-  T = (f', \sframe{t}[P][\epsilon])\\
-  f' \mathit{fresh}\\
+  T = (f', \sframe{t}[P][\epsilon]) &
+  f' \mathit{fresh}
 }{%
   \reductasks{%
     (f,%
@@ -98,3 +100,90 @@
 \inference[E-TASK-DONE]{}{
   H,\epsilon \uplus TS \leadsto TS
 }
+
+
+\subsection{LaCasa}
+\subsubsection{Well-Formedness}
+
+\inference[WF-VAR]{%
+  L(x) = \mathit{null} \vee \\%
+  L(x) = o \wedge \mathit{typeof}(H,o) <: \Gamma(x) \vee \\%
+  L(x) = b(o,p) \wedge \Gamma(x) = Q \vartriangleright Box[C] \wedge \mathit{typeof}(H,o) <: C%
+}{H \vdash \Gamma ; L; x}
+
+\inference[]{}{}
+\inference[WF-PERM]{
+  \gamma : permTypes(\Gamma) \longrightarrow P injective \\
+  \forall x \in dom(\Gamma). \\
+  (\Gamma(x) = Q \vartriangleright Box[C] \wedge L(x) = b(o,p) \wedge Perm[Q] \in \Gamma \vee \\
+  \Gamma(x) = Q \vartriangleright Task[C] \wedge L(x) = task(b(o,p),t) \wedge Perm[Q] \in \Gamma) \\
+  \Longrightarrow \gamma(Q) = p}{\vdash \Gamma; L; P}
+\inference[]{}{}
+\inference[WF-ENV]{dom(\Gamma) \subseteq dom(L) \\
+\forall x \in dom(\Gamma). H \vdash \Gamma; L; x}{H \vdash \Gamma; L}
+\inference[]{}{}
+\inference[WF-METHOD1]{\Gamma_0, this : C, x : D; \epsilon \vdash t : E' & E' <: E}{C \vdash def m(x : D) : E = t}
+\inference[]{}{}
+\inference[WF-METHOD2]{\Gamma = \Gamma_0, this : C, x : Q \vartriangleright Box[D], Perm[Q] & Q fresh & \Gamma; \epsilon \vdash t : E' & E' <: E}{C \vdash def m(x : Box[D]) : E = t}
+\inference[]{}{}
+\inference[WF-PROGRAM]{p \vdash \bar{cd} & p \vdash \Gamma_0 & \Gamma_0; \epsilon \vdash t : \sigma}{p \vdash \bar{cd} \bar{vd} t}
+\inference[]{}{}
+\inference[WF-CLASS]{C \vdash \bar{md} & D = AnyRef \vee p \vdash class D ... \\
+  \forall (def m ...) \in \bar{md}. override(m, C, D) \\
+\forall var f : \sigma \in \bar{fd}. f \notin fields(D)}{p \vdash class C extends D \{\bar{fd} \bar{md}\}}
+\inference[]{}{}
+\inference[WF-OVERRIDE]{mtype(m, D) not defined \vee mtype(m, D) = mtype(m, C)}{override(m, C, D)}
+
+
+\subsubsection{Typing}
+\inference[T-FRAME1]{\Gamma; a \vdash t : \sigma & l \neq \epsilon \Longrightarrow \sigma <: C \\%
+  H \vdash \Gamma; L & H \vdash \Gamma; L; P}{H \vdash \sframe{t} : \sigma}
+\inference[]{}{}
+\inference[T-FRAME2]{\Gamma; x : \tau; a \vdash t : \sigma & l \neq \epsilon \Longrightarrow \sigma <: C \\%
+  H \vdash \Gamma; L & H \vdash \Gamma; L; P}{H \vdash^\tau_x \sframe{t} : \sigma}
+\inference[]{}{}
+\inference[T-FRAME-NA]{H \vdash F^\epsilon : \sigma & H \vdash FS}{H \vdash F^\epsilon \circ FS}
+\inference[]{}{}
+\inference[T-FRAME-NA2]{H \vdash^\tau_x F^\epsilon : \sigma & H \vdash FS}{H \vdash^\tau_x F^\epsilon \circ FS}
+\inference[]{}{}
+\inference[T-FRAME-A]{H \vdash F^x : \sigma & H \vdash^\sigma_x FS}{H \vdash F^x \circ FS}
+\inference[]{}{}
+\inference[T-FRAME-A2]{H \vdash^\tau_x F^y : \sigma & H \vdash^\sigma_y FS}{H \vdash^\tau_x F^y \circ FS}
+\inference[]{}{}
+
+\inference[]{}{}
+\inference[T-VAR]{x \in dom(\Gamma)}{\Gamma; a \vdash x : \Gamma(x)}
+\inference[]{}{}
+\inference[T-INVOKE]{\Gamma; a \vdash x : C & mtype(C,m) = \sigma \rightarrow \tau \\
+  \Gamma; a \vdash y : \sigma' & \sigma' <: \sigma \vee \\
+(\sigma = Box[D] \wedge \sigma' = Q \vartriangleright Box[D] \wedge Perm[Q] \in \Gamma)}{\Gamma; a \vdash x.m(y) : \tau}
+\inference[]{}{}
+\inference[T-NEW]{a = ocap \Longrightarrow ocap(C) & \forall var f : \sigma \in fd_with_line_above . \exists D. \sigma = D}{\Gamma; a \vdash new C : C}
+\inference[]{}{}
+\inference[T-OPEN]{\Gamma; a \vdash x : Q \vartriangleright Box[C] & Perm[Q] \in \Gamma & y : C; ocap \vdash t : \sigma}{\Gamma; a \vdash x.open \{y \Rightarrow t\} : Q \vartriangleright Box[C]}
+\inference[]{}{}
+\inference[T-BOX]{ocap(C) & Q fresh & \Gamma; x : Q \vartriangleright Box[C]; Perm[Q]; a \vdash t : sigma}{\Gamma; a \vdash box[C] \{x \Rightarrow t \} : \bot}
+\inference[]{}{}
+\inference[T-CAPTURE]{\Gamma; a \vdash x : Q \vartriangleright Box[C] & \Gamma; a \vdash y : Q' \vartriangleright Box[D] \\
+  \{Perm[Q], Perm[Q']\} \subseteq \Gamma & D <: ftype(C,f) \\
+\Gamma \ \{Perm[Q']\}, z : Q \vartriangleright Box[C]; a \vdash t : \sigma}{\Gamma; a \vdash capture(x.f,y) \{z \Rightarrow t\} : \bot}
+\inference[]{}{}
+\inference[T-SWAP]{\Gamma; a \vdash x : Q \vartriangleright Box[C] & \Gamma; a \vdash y : Q' \vartriangleright Box[D'] \\
+  \{Perm[Q], Perm[Q']\} \subseteq \Gamma & ftype(C,f) = Box[D] \\
+  D' <: D & R fresh \\
+\Gamma \ \{Perm[Q']\}, z : R \vartriangleright Box[D], Perm[R]; a \vdash t : \sigma}{\Gamma; a \vdash swap(x.f, y) \{z \Rightarrow t\} : \bot}
+\inference[]{}{}
+
+
+\subsubsection{Evaluation}
+
+\subsubsection{Other}
+\inference[]{}{}
+\inference[F-OK]{boxSep(H,F) & boxObjSep(H,F) & boxOcap(H,F) \\
+a = ocap \Longrightarrow globalOcapSep(H,F) & fieldUniqueness(H,F)}{H; a \vdash F ok}
+
+% TODO
+% auxiliary predicates (boxRoot etc) appendix
+% OCAP appendix
+% Evaluation appenix
+%
