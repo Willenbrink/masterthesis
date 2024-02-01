@@ -7,14 +7,14 @@
 \NewDocumentCommand{\fframe}{ s m }{\IfBooleanT{#1}{&&} \langle \mathit{FINISH} #2 \rangle}
 
 % We have three kinds of reductions: frame, stack and tasks. Each come with sensible defaults
-\NewDocumentCommand{\reducframe}{m m}{%
+\NewDocumentCommand{\reducframe}{O{H} m O{H} m}{%
   \begin{alignedat}{7}
-    H, &#1\\\rightarrow\ H, &#2
+    #1, &#2\\\rightarrow\ #3, &#4
   \end{alignedat}%
 }
-\NewDocumentCommand{\reducstack}{m O{FS} m O{FS}}{%
+\NewDocumentCommand{\reducstack}{O{H} m O{FS} s O{H} m O{FS}}{%
   \begin{alignedat}{7}
-    H, &#1 \circ #2\\\twoheadrightarrow\ H, &#3 \circ #4
+    #1, &#2 \circ #3\\\twoheadrightarrow\ #5, &#6 \circ #7
   \end{alignedat}%
 }
 \NewDocumentCommand{\reductasks}{m O{TS} m O{TS}}{%
@@ -36,7 +36,7 @@
 \inference[T-ASYNC]{\mathit{Perm}[Q] \in \Gamma & \Gamma \setminus \mathit{Perm}[Q]; a \vdash s : \sigma & \Gamma; a \vdash x : Q \vartriangleright \mathit{Task}[C]}{\Gamma; a \vdash \mathit{async}(x) \{s\} : \bot}
 \inference[]{}{}
 
-\inference[T-FINISH]{\Gamma; a \vdash t : \tau}{\Gamma; a \vdash \mathit{finish} \{ t \} : null}
+\inference[T-FINISH]{\Gamma; ocap \vdash t : \tau}{\Gamma; a \vdash \mathit{finish} \{ t \} : null}
 \inference[]{}{}
 
 
@@ -98,7 +98,7 @@
 \inference[]{}{}
 
 \inference[E-TASK-DONE]{}{
-  H,\epsilon \uplus TS \leadsto TS
+  H,\{ (f, \epsilon) \} \uplus TS \leadsto TS
 }
 
 
@@ -185,6 +185,61 @@
 
 
 \subsubsection{Evaluation}
+\inference[E-NULL]{}{\reducframe{\sframe{let x = null in t}}{\sframe[L[x \rightarrow null]]{t}}}
+\inference[]{}{}
+\inference[E-VAR]{}{\reducframe{\sframe{let x = y in t}}{\sframe[L[x \rightarrow L(y)]]{t}}}
+\inference[]{}{}
+\inference[E-SELECT]{H(L(y)) = \langle C, FM \rangle & f \in dom(FM)}{\reducframe{\sframe{let x = y.f in t}}{\sframe[L[x \rightarrow FM(f)]]{t}}}
+\inference[]{}{}
+\inference[E-ASSIGN]{L(y) = o & H(o) = \langle C, FM \rangle \\
+  H' = H[o \rightarrow \langle C, FM[f \rightarrow L(z)]]}{
+  \reducframe{\sframe{let x = y.f = z in t}}[H']{\sframe{let x = z in t}}}
+\inference[]{}{}
+\inference[E-NEW]{o \notin dom(H) & fields(C) = \bar{f}\\
+H' = H[o \rightarrow \langle C, f \rightarrow null \rangle]}{\reducframe{\sframe{let x = new C in t}}[H']{\sframe[L[x \rightarrow o]]{t}}}
+\inference[]{}{}
+\inference[E-INVOKE]{H(L(y)) = \langle C, FM \rangle & mbody(C, m) = x \rightarrow t'\\
+  L' = L_0[this \rightarrow L(y), x \rightarrow L(z)]\\
+P' = \emptyset \vee (L(z) = b(o, p) \wedge p \in P \wedge P' = \{ p \})}{\reducstack{\sframe{let x = y.m(z) in t}}{\sframe[L']{t'}[P'][x] \circ \sframe{t}}}
+\inference[]{}{}
+\inference[E-RETURN1]{}{\reducframe{\sframe{x}[P][y] \circ \sframe[L']{t'}[P']}{\sframe[L'[y \rightarrow L(x)]]{t'}[P']}}
+\inference[]{}{}
+\inference[E-RETURN2]{}{\reducframe{\sframe{x}[P][\epsilon] \circ \sframe[L']{t'}[P']}{\sframe[L']{t'}[P']}}
+\inference[]{}{}
+\inference[E-OPEN]{L(y) = b(o,p) & p \in P & L'= [z \rightarrow o]}{\reducstack{
+    \sframe{let x = y.open \{ z \Rightarrow t'\} in t}
+  }{
+    \sframe[L']{t'}[\emptyset][\epsilon] \circ \sframe[L[x \rightarrow L(y)]]{t}
+  }}
+\inference[]{}{}
+\inference[E-BOX]{o \notin dom(H) & fields(C) = \bar{f}\\
+  H' = H[ o \rightarrow \langle C, f \rightarrow null \rangle ] & p fresh}{
+  \reducstack{
+    \sframe{box[C]\{x \Rightarrow t\}}
+  }*[H']{
+    \sframe[L[x \rightarrow b(o,p)]]{t}[P \cup \{p\}][\epsilon]
+  }[\epsilon]
+}
+\inference[]{}{}
+\inference[E-CAPTURE]{L(x) = b(o,p) & L(y) = b(o', p') & \{p, p'\} \subseteq P\\
+  H(o) = \langle C, FM \rangle & H' = H[ \rightarrow \langle C, FM[ f \rightarrow o' ] \rangle ]}{
+  \reducstack{
+    \sframe{capture(x.f, y) \{ z \Rightarrow t\}}
+  }*[H']{
+    \sframe[L[z \rightarrow L(x)]]{t}[P \setminus \{p'\}][\epsilon]
+  }[\epsilon]
+}
+\inference[]{}{}
+\inference[E-SWAP]{L(x) = b(o,p) & L(y) = b(o', p') & \{p, p'\} \subseteq P\\
+  H(o) = \langle C, FM \rangle & FM(f) = o'' & p'' fresh\\
+  H' = H[o \rightarrow \langle C, FM[f \rightarrow o'] \rangle ]}{
+  \reducstack{
+    \sframe{swap(x.f,y) \{ z \Rightarrow t\}}
+  }*[H']{
+    \sframe[L[z \rightarrow b(o'', p'')]]{t}[(P \setminus \{ p' \}) \cup \{p''\}][\epsilon]
+  }[\epsilon]
+}
+\inference[]{}{}
 
 \subsubsection{Other}
 \inference[]{}{}
