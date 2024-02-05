@@ -32,10 +32,10 @@
 
 \subsection{Extension}
 \subsubsection{Typing}
-\inference[T-TASK]{x:C; \mathit{ocap} \vdash t : \tau & \Gamma; a \vdash b : Q \vartriangleright \mathit{Box}[C]}{\Gamma; a \vdash \mathit{task}(b) \{x \Rightarrow t\} : Q \vartriangleright \mathit{Task}[C]}
-\inference[]{}{}
-
-\inference[T-ASYNC]{\mathit{Perm}[Q] \in \Gamma & \Gamma \setminus \mathit{Perm}[Q]; a \vdash s : \sigma & \Gamma; a \vdash x : Q \vartriangleright \mathit{Task}[C]}{\Gamma; a \vdash \mathit{async}(x) \{s\} : \bot}
+\inference[T-ASYNC]{
+  \mathit{Perm}[Q] \in \Gamma & \Gamma \setminus \mathit{Perm}[Q]; a \vdash s : \sigma\\
+  \Gamma; a \vdash b : Q \vartriangleright Box[C] & x : C; ocap \vdash t : \tau\\
+}{\Gamma; a \vdash \mathit{async}(b)\{ x \Rightarrow t \} \{ s \} : \bot}
 \inference[]{}{}
 
 \inference[T-FINISH]{\Gamma; ocap \vdash t : \tau}{\Gamma; a \vdash \mathit{finish} \{ t \} : null}
@@ -43,31 +43,17 @@
 
 
 \subsubsection{Evaluation}
-\inference[E-TASK]{L(b') = b(o, p)}{%
-  \reductasks{%
-      (f, \sframe{%
-        let\ x = \mathit{task}(b')\{x \Rightarrow t\}\ in\ s%
-      })%
-  }{%
-      (f, \sframe[L[x \rightarrow \mathit{task}(b(o,p),t)]]{%
-        s
-      })%
-  }%
-}
-\inference[]{}{}
-
 \inference[E-ASYNC]{%
-  L(y) = \mathit{task}(b(o,p),t) &
-  p \in P \\
+  L(b) = b(o,p) & p \in P \\
   T_1 = (f, \sframe{s}[P\setminus \{p\}][\epsilon]) &
   T_2 = (f, \sframe[[x \rightarrow o]]{t}[\emptyset][\epsilon])
 }{%
   \reducasync{
     \{(f,%
-      \sframe{\mathit{async}(y)\{s\}} \circ FS
-    )\} && \uplus TS%
+      \sframe{\mathit{async}(b) \{ x \Rightarrow t \}\{s\}} \circ FS
+    )\} \uplus TS%
     }{
-    \{ T_1, T_2 \} && \uplus TS%
+    \{ T_1, T_2 \} \uplus TS%
     }
 }
 \inference[]{}{}
@@ -117,8 +103,7 @@
 \inference[WF-PERM]{
   \gamma : permTypes(\Gamma) \longrightarrow P injective \\
   \forall x \in dom(\Gamma). \\
-  (\Gamma(x) = Q \vartriangleright Box[C] \wedge L(x) = b(o,p) \wedge Perm[Q] \in \Gamma \vee \\
-  \Gamma(x) = Q \vartriangleright Task[C] \wedge L(x) = task(b(o,p),t) \wedge Perm[Q] \in \Gamma) \\
+  (\Gamma(x) = Q \vartriangleright Box[C] \wedge L(x) = b(o,p) \wedge Perm[Q] \in \Gamma) \\
   \Longrightarrow \gamma(Q) = p}{\vdash \Gamma; L; P}
 \inference[]{}{}
 \inference[WF-ENV]{dom(\Gamma) \subseteq dom(L) \\
@@ -264,7 +249,7 @@ A heap $H$ is well-typed, written $\vdash H : \star$, iff
 \end{definition}
 
 \subsubsection{Other}
-\inference[ACC-F]{x \rightarrow o \in L \vee ((x \rightarrow b(o,p) \in L \vee \graybox{x \rightarrow task(b(o,p),t)}) \wedge p \in P)}{accRoot(o, \langle L, t, P \rangle ^ l)}
+\inference[ACC-F]{x \rightarrow o \in L \vee (x \rightarrow b(o,p) \in L \wedge p \in P)}{accRoot(o, \langle L, t, P \rangle ^ l)}
 \inference[]{}{}
 \inference[ACC-FS]{accRoot(o, F) \vee accRoot(o, FS)}{accRoot(o, F \circ FS)}
 \inference[]{}{}
