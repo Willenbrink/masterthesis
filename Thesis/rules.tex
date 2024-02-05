@@ -1,5 +1,7 @@
 \section{Inference Rules}
 
+\NewDocumentCommand{\graybox}{ m }{\colorbox{lightgray}{$#1$}}
+
 % We have two kind of frames: The normal stack frames (sframe) and finish frames (fframe). They take a number of arguments:
 % s:aligned? OL:variable assignments m:term OP:Permissions Ol:label
 \NewDocumentCommand{\sframe}{ s O{L} m O{P} O{l} }{\langle #2,\ \IfBooleanT{#1}{&&} #3,\ \IfBooleanT{#1}{&&} #4 \IfBooleanT{#1}{&&}\rangle^#5 \IfBooleanT{#1}{&&} }
@@ -57,7 +59,7 @@
 \inference[E-ASYNC]{%
   L(y) = \mathit{task}(b(o,p),t) &
   p \in P \\
-  T_1 = (f, \sframe{s}[P][\epsilon]) &
+  T_1 = (f, \sframe{s}[P\setminus \{p\}][\epsilon]) &
   T_2 = (f, \sframe[[x \rightarrow o]]{t}[\emptyset][\epsilon])
 }{%
   \reducasync{
@@ -241,13 +243,58 @@ P' = \emptyset \vee (L(z) = b(o, p) \wedge p \in P \wedge P' = \{ p \})}{\reducs
 }
 \inference[]{}{}
 
+\subsubsection{Definitions}
+\begin{definition}[Object Type]
+  For an object identifier $o \in dom(H)$ where $H(o) = \langle C, FM \rangle$, $typeof(H, o) := C$
+\end{definition}
+
+\begin{definition}[Well-typed Heap]
+A heap $H$ is well-typed, written $\vdash H : \star$, iff
+\begin{equation}
+\begin{split}
+  \forall o \in dom(H). & H(o) = \langle C, FM \rangle \Longrightarrow\\
+                        & (dom(FM) = fields(C) \wedge\\
+                        & \forall f \in dom(FM). FM(f)= null \vee typeof(H, FM(f)) <: ftype(C, f))
+\end{split}
+\end{equation}
+\end{definition}
+
+\begin{definition}[Separation]
+  Two object identifiers $o$ and $o'$ are separate in heap $H$, written $sep(H, o, o')$, iff $\forall q, q' \in dom(H). reach(H, o, q) \wedge reach(H, o', q') \Longrightarrow q \neq q'$.
+\end{definition}
+
 \subsubsection{Other}
+\inference[ACC-F]{x \rightarrow o \in L \vee ((x \rightarrow b(o,p) \in L \vee \graybox{x \rightarrow task(b(o,p),t)}) \wedge p \in P)}{accRoot(o, \langle L, t, P \rangle ^ l)}
+\inference[]{}{}
+\inference[ACC-FS]{accRoot(o, F) \vee accRoot(o, FS)}{accRoot(o, F \circ FS)}
+\inference[]{}{}
+\inference[ISO-FS]{\forall o, o' \in dom(H). (accRoot(o, FS) \wedge accRoot(o', FS')) \Rightarrow sep(H, o, o')}{isolated(H, FS, FS')}
 \inference[]{}{}
 \inference[F-OK]{boxSep(H,F) & boxObjSep(H,F) & boxOcap(H,F) \\
 a = ocap \Longrightarrow globalOcapSep(H,F) & fieldUniqueness(H,F)}{H; a \vdash F ok}
+\inference[]{}{}
+\inference[SINGFS-OK]{H; a \vdash F ok}{H; a \vdash F \circ \epsilon ok}
+\inference[]{}{}
+\inference[FS-OK]{
+  H; b \vdash F^l ok & H; a \vdash FS ok
+}{H; b \vdash F^l \circ FS ok}
+\subsubsection{Predicates}
+\inference[]{x \rightarrow b(o,p) \in L & p \in P}{boxRoot(o, \sframe{t})}
+\inference[]{}{}
+\inference[]{boxRoot(o, F)}{boxRoot(o, F \circ \epsilon)}
+\inference[]{}{}
+\inference[]{boxRoot(o, F) \vee boxRoot(o, FS)}{boxRoot(o, F \circ FS)}
+\inference[]{}{}
+\inference[]{}{}
+\inference[]{x \rightarrow b(o,p) \in L & p \in P}{boxRoot(o, \sframe{t}, p)}
+\inference[]{}{}
+\inference[]{boxRoot(o, F, p)}{boxRoot(o, F \circ \epsilon, p)}
+\inference[]{}{}
+\inference[]{boxRoot(o, F, p) \vee boxRoot(o, FS, p)}{boxRoot(o, F \circ FS, p)}
+\inference[]{}{}
+\inference[]{boxRoot(o, FS) & x \rightarrow o' \in env(F) & reach(H, o, o')}{openbox(H, o, F, FS)}
+\inference[]{}{}
 
 % TODO
-% auxiliary predicates (boxRoot etc) appendix
 % OCAP appendix
-% Evaluation appenix
 %
