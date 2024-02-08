@@ -257,7 +257,8 @@ A heap $H$ is well-typed, written $\vdash H : \star$, iff
 \inference[]{}{}
 \graybox*{\inference[ISO-TS]{
   \forall (f, FS), (f', FS') \in TS. FS \neq FS' \Rightarrow isolated(H, FS, FS') \vee\\
-  FS = \fframe{f'} \circ GS \vee FS' = \fframe{f} \circ GS'
+  awaits(TS, (f, FS), (f', FS')) \vee\\
+  awaits(TS, (f, FS), (f', FS'))
 }{isolated(H, TS)}}
 
 \inference[]{}{}
@@ -270,6 +271,20 @@ a = ocap \Longrightarrow globalOcapSep(H,F) & fieldUniqueness(H,F)}{H; a \vdash 
   H; b \vdash F^l ok & H; a \vdash FS ok
 }{H; b \vdash F^l \circ FS ok}
 \subsubsection{Predicates}
+\graybox*{%
+\inference[]{\exists (f,FS) \in TS. FS = \fframe{f'} \circ FS & awaits(TS, f', g)}{awaits(TS, f, g)}%
+}
+
+\graybox*{%
+\inference[]{}{awaits(TS,f,f)}%
+}
+
+\graybox*{%
+\inference[]{FS = \fframe{f'} \circ FS' & awaits(TS, f', g)}{awaits(TS, (f, FS), (g, GS))}%
+}
+
+
+\inference[]{}{}
 \inference[]{x \rightarrow b(o,p) \in L & p \in P}{boxRoot(o, \sframe{t})}
 \inference[]{}{}
 \inference[]{boxRoot(o, F)}{boxRoot(o, F \circ \epsilon)}
