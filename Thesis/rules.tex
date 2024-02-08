@@ -1,6 +1,6 @@
 \section{Inference Rules}
 
-\NewDocumentCommand{\graybox}{ m }{\colorbox{lightgray}{$#1$}}
+\NewDocumentCommand{\graybox}{ s m }{\colorbox{lightgray}{\IfBooleanT{#1}{$}#2\IfBooleanT{#1}{$}}}
 
 % We have two kind of frames: The normal stack frames (sframe) and finish frames (fframe). They take a number of arguments:
 % s:aligned? OL:variable assignments m:term OP:Permissions Ol:label
@@ -32,18 +32,18 @@
 
 \subsection{Extension}
 \subsubsection{Typing}
-\inference[T-ASYNC]{
+\graybox*{\inference[T-ASYNC]{
   \mathit{Perm}[Q] \in \Gamma & \Gamma \setminus \mathit{Perm}[Q]; a \vdash s : \sigma\\
   \Gamma; a \vdash b : Q \vartriangleright Box[C] & x : C; ocap \vdash t : \tau\\
-}{\Gamma; a \vdash \mathit{async}(b)\{ x \Rightarrow t \} \{ s \} : \bot}
-\inference[]{}{}
+}{\Gamma; a \vdash \mathit{async}(b)\{ x \Rightarrow t \} \{ s \} : \bot}}
 
-\inference[T-FINISH]{\Gamma; ocap \vdash t : \tau}{\Gamma; a \vdash \mathit{finish} \{ t \} : null}
-\inference[]{}{}
+\graybox*{\inference[T-FINISH]{
+    \Gamma; ocap \vdash t : \tau
+  }{\Gamma; a \vdash \mathit{finish} \{ t \} : null}}
 
 
 \subsubsection{Evaluation}
-\inference[E-ASYNC]{%
+\graybox*{\inference[E-ASYNC]{%
   L(b) = b(o,p) & p \in P \\
   T_1 = (f, \sframe{s}[P\setminus \{p\}][\epsilon]) &
   T_2 = (f, \sframe[[x \rightarrow o]]{t}[\emptyset][\epsilon])
@@ -55,10 +55,9 @@
     }{
     \{ T_1, T_2 \} \uplus TS%
     }
-}
-\inference[]{}{}
+}}
 
-\inference[E-FINISH1]{%
+\graybox*{\inference[E-FINISH1]{%
   T = (f', \sframe{t}[P][\epsilon]) &
   f' \mathit{fresh}
 }{%
@@ -71,10 +70,9 @@
       \fframe{f'} \circ \sframe[L[x\rightarrow \mathit{null}]]{s} \circ FS%
     )
   }[\{T\} \uplus TS]
-}
-\inference[]{}{}
+}}
 
-\inference[E-FINISH2]{%
+\graybox*{\inference[E-FINISH2]{%
   \nexists (f', FS) \in TS
 }{%
   \reductasks{%
@@ -82,12 +80,12 @@
   }{%
     (f, FS )%
   }
-}
-\inference[]{}{}
+}}
 
-\inference[E-TASK-DONE]{}{
+
+\graybox*{\inference[E-TASK-DONE]{}{
   H,\{ (f, \epsilon) \} \uplus TS \leadsto TS
-}
+}}
 
 
 \subsection{LaCasa}
@@ -253,7 +251,15 @@ A heap $H$ is well-typed, written $\vdash H : \star$, iff
 \inference[]{}{}
 \inference[ACC-FS]{accRoot(o, F) \vee accRoot(o, FS)}{accRoot(o, F \circ FS)}
 \inference[]{}{}
-\inference[ISO-FS]{\forall o, o' \in dom(H). (accRoot(o, FS) \wedge accRoot(o', FS')) \Rightarrow sep(H, o, o')}{isolated(H, FS, FS')}
+\inference[ISO-FS]{
+  \forall o, o' \in dom(H). (accRoot(o, FS) \wedge accRoot(o', FS')) \Rightarrow sep(H, o, o')\\
+}{isolated(H, FS, FS')}
+\inference[]{}{}
+\graybox*{\inference[ISO-TS]{
+  \forall (f, FS), (f', FS') \in TS. FS \neq FS' \Rightarrow isolated(H, FS, FS') \vee\\
+  FS = \fframe{f'} \circ GS \vee FS' = \fframe{f} \circ GS'
+}{isolated(H, TS)}}
+
 \inference[]{}{}
 \inference[F-OK]{boxSep(H,F) & boxObjSep(H,F) & boxOcap(H,F) \\
 a = ocap \Longrightarrow globalOcapSep(H,F) & fieldUniqueness(H,F)}{H; a \vdash F ok}
