@@ -207,7 +207,7 @@ P' = \emptyset \vee (L(z) = b(o, p) \wedge p \in P \wedge P' = \{ p \})}{\reducs
 }
 \inference[]{}{}
 \inference[E-CAPTURE]{L(x) = b(o,p) & L(y) = b(o', p') & \{p, p'\} \subseteq P\\
-  H(o) = \langle C, FM \rangle & H' = H[ \rightarrow \langle C, FM[ f \rightarrow o' ] \rangle ]}{
+  H(o) = \langle C, FM \rangle & H' = H[ o \rightarrow \langle C, FM[ f \rightarrow o' ] \rangle ]}{
   \reducstack{
     \sframe{capture(x.f, y) \{ z \Rightarrow t\}}
   }*[H']{
@@ -258,7 +258,7 @@ A heap $H$ is well-typed, written $\vdash H : \star$, iff
 \graybox*{\inference[ISO-TS]{
   \forall (f, FS), (f', FS') \in TS. FS \neq FS' \Rightarrow isolated(H, FS, FS') \vee\\
   awaits(TS, (f, FS), (f', FS')) \vee\\
-  awaits(TS, (f, FS), (f', FS'))
+  awaits(TS, (f', FS'), (f, FS))
 }{isolated(H, TS)}}
 
 \inference[]{}{}
@@ -272,7 +272,7 @@ a = ocap \Longrightarrow globalOcapSep(H,F) & fieldUniqueness(H,F)}{H; a \vdash 
 }{H; b \vdash F^l \circ FS ok}
 \subsubsection{Predicates}
 \graybox*{%
-\inference[]{\exists (f,FS) \in TS. FS = \fframe{f'} \circ FS & awaits(TS, f', g)}{awaits(TS, f, g)}%
+\inference[]{\exists (f,FS) \in TS. FS = \fframe{f'} \circ FS' & awaits(TS, f', g)}{awaits(TS, f, g)}%
 }
 
 \graybox*{%
@@ -284,6 +284,15 @@ a = ocap \Longrightarrow globalOcapSep(H,F) & fieldUniqueness(H,F)}{H; a \vdash 
 }
 
 
+\inference[]{}{}
+% TODO reach-def from deterministic concurrency MA paper
+\inference[]{o \in dom(H)}{reach(H, o, o)}
+\inference[]{}{}
+\inference[]{o \in dom(H) & H(o) = \langle C, FM \rangle\\
+% TODO which formulation should be preferred?
+  \exists f \rightarrow o'' \in FM. reach(H, o'', o')\\
+  o'' \in codom(FM) & reach(H, o'', o')
+}{reach(H, o, o')}
 \inference[]{}{}
 \inference[]{x \rightarrow b(o,p) \in L & p \in P}{boxRoot(o, \sframe{t})}
 \inference[]{}{}
