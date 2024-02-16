@@ -6,7 +6,7 @@
 % s:aligned? OL:variable assignments m:term OP:Permissions Ol:label
 \NewDocumentCommand{\sframe}{ s O{L} m O{P} O{l} }{\langle #2,\ \IfBooleanT{#1}{&&} #3,\ \IfBooleanT{#1}{&&} #4 \IfBooleanT{#1}{&&}\rangle^#5 \IfBooleanT{#1}{&&} }
 %s:aligned? m:id
-\NewDocumentCommand{\fframe}{ s m }{\IfBooleanT{#1}{&&} \langle \mathit{FINISH} #2 \rangle}
+\NewDocumentCommand{\fframe}{ s m O{l} }{\IfBooleanT{#1}{&&} \langle \mathit{FINISH} #2 \rangle ^#3 }
 
 % We have three kinds of reductions: frame, stack and tasks. Each come with sensible defaults
 \NewDocumentCommand{\reducframe}{O{H} m O{H} m}{%
@@ -21,7 +21,7 @@
 }
 \NewDocumentCommand{\reductasks}{m O{TS} m O{TS}}{%
   \begin{alignedat}{7}
-    H, &\{#1\} && \uplus #2\\\leadsto\ H, &\{#3\} && \uplus #4
+    H, &\{#1\} \uplus #2\\\leadsto\ H, &\{#3\} \uplus #4
   \end{alignedat}%
 }
 \NewDocumentCommand{\reducasync}{m m}{%
@@ -67,7 +67,7 @@
     )
   }{%
     (f,%
-      \fframe{f'} \circ \sframe[L[x\rightarrow \mathit{null}]]{s} \circ FS%
+      \fframe{f'}[x] \circ \sframe{s} \circ FS%
     )
   }[\{T\} \uplus TS]
 }}
@@ -76,9 +76,9 @@
   \nexists (f', FS) \in TS
 }{%
   \reductasks{%
-    (f, \fframe{f'} \circ FS )%
+    (f, \fframe{f'}[l] \circ \sframe{t} \circ FS )%
   }{%
-    (f, FS )%
+    (f, \sframe[L[l \rightarrow \mathit{null}]]{t} \circ FS )%
   }
 }}
 
@@ -256,9 +256,9 @@ A heap $H$ is well-typed, written $\vdash H : \star$, iff
 }{isolated(H, FS, FS')}
 \inference[]{}{}
 \graybox*{\inference[ISO-TS]{
-  \forall (f, FS), (f', FS') \in TS. FS \neq FS' \Rightarrow isolated(H, FS, FS') \vee\\
-  awaits(TS, (f, FS), (f', FS')) \vee\\
-  awaits(TS, (f', FS'), (f, FS))
+  \forall (f, FS), (g, GS) \in TS. FS \neq GS \Rightarrow isolated(H, FS, GS) \vee\\
+  FS = \fframe{f'} \circ FS' \wedge awaits(TS, f', g) \vee\\
+  GS = \fframe{g'} \circ GS' \wedge awaits(TS, g', f)
 }{isolated(H, TS)}}
 
 \inference[]{}{}
@@ -279,9 +279,9 @@ a = ocap \Longrightarrow globalOcapSep(H,F) & fieldUniqueness(H,F)}{H; a \vdash 
 \inference[]{}{awaits(TS,f,f)}%
 }
 
-\graybox*{%
-\inference[]{FS = \fframe{f'} \circ FS' & awaits(TS, f', g)}{awaits(TS, (f, FS), (g, GS))}%
-}
+% \graybox*{%
+% \inference[]{FS = \fframe{f'} \circ FS' & awaits(TS, f', g)}{awaits(TS, (f, FS), (g, GS))}%
+% }
 
 
 \inference[]{}{}
