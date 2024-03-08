@@ -19,9 +19,9 @@
     #1, &#2 \circ #3\\\twoheadrightarrow\ #5, &#6 \circ #7
   \end{alignedat}%
 }
-\NewDocumentCommand{\reductasks}{m O{TS} m O{TS}}{%
+\NewDocumentCommand{\reductasks}{m O{TS} s O{H} m O{TS}}{%
   \begin{alignedat}{7}
-    H, &\{#1\} \uplus #2\\\leadsto\ H, &\{#3\} \uplus #4
+    H, &\{#1\} \uplus #2\\\leadsto\ #4, &\{#5\} \uplus #6
   \end{alignedat}%
 }
 \NewDocumentCommand{\reducasync}{m m}{%
@@ -35,22 +35,21 @@
 \graybox*{\inference[T-ASYNC]{
   \mathit{Perm}[Q] \in \Gamma & \Gamma \setminus \mathit{Perm}[Q]; a \vdash s : \sigma\\
   \Gamma; a \vdash b : Q \vartriangleright Box[C] & x : C; ocap \vdash t : \tau\\
-}{\Gamma; a \vdash \mathit{async}(b)\{ x \Rightarrow t \} \{ s \} : \bot}}
+}{\Gamma; a \vdash \mathit{async}(b, x \Rightarrow t) \{ s \} : \bot}}
 
 \graybox*{\inference[T-FINISH]{
-    \Gamma; ocap \vdash t : \tau
+    \Gamma; a \vdash t : \tau
   }{\Gamma; a \vdash \mathit{finish} \{ t \} : null}}
 
 
 \subsubsection{Evaluation}
 \graybox*{\inference[E-ASYNC]{%
-  L(b) = b(o,p) & p \in P \\
-  T_1 = (f, \sframe{s}[P\setminus \{p\}][\epsilon]) &
-  T_2 = (f, \sframe[[x \rightarrow o]]{t}[\emptyset][\epsilon])
+  T_1 = (f, false, \sframe[[x \rightarrow o]]{t}[\emptyset][\epsilon]) & L(b) = b(o,p)\\
+  T_2 = (f, true, \sframe{s}[P\setminus \{p\}][\epsilon]) & p \in P \\
 }{%
   \reducasync{
-    \{(f,%
-      \sframe{\mathit{async}(b) \{ x \Rightarrow t \}\{s\}} \circ FS
+    \{(f, k,%
+      \sframe{\mathit{async}(b, x \Rightarrow t)\{s\}} \circ FS
     )\} \uplus TS%
     }{
     \{ T_1, T_2 \} \uplus TS%
@@ -58,33 +57,33 @@
 }}
 
 \graybox*{\inference[E-FINISH1]{%
-  T = (f', \sframe{t}[P][\epsilon]) &
+  T = (f', true, \sframe{t}[P][\epsilon]) &
   f' \mathit{fresh}
 }{%
   \reductasks{%
-    (f,%
+    (f, k,%
       \sframe{ \mathit{let}\ x = \mathit{finish} \{\ t\ \}\ \mathit{in}\ s} \circ FS%
     )
   }{%
-    (f,%
-      \fframe{f'}[x] \circ \sframe{s} \circ FS%
+    (f, k,%
+      \fframe{f'}[m] \circ \sframe{s} \circ FS%
     )
   }[\{T\} \uplus TS]
 }}
 
 \graybox*{\inference[E-FINISH2]{%
-  \nexists (f', FS) \in TS
+  \nexists (f', b', FS) \in TS
 }{%
   \reductasks{%
-    (f, \fframe{f'}[l] \circ \sframe{t} \circ FS )%
+    (f, k, \fframe{f'}[l] \circ \sframe{t} \circ FS )%
   }{%
-    (f, \sframe[L[l \rightarrow \mathit{null}]]{t} \circ FS )%
+    (f, k, \sframe[L[l \rightarrow \mathit{null}]]{t} \circ FS )%
   }
 }}
 
 
 \graybox*{\inference[E-TASK-DONE]{}{
-  H,\{ (f, \epsilon) \} \uplus TS \leadsto TS
+  H,\{ (f, k, \epsilon) \} \uplus TS \leadsto TS
 }}
 
 
@@ -152,8 +151,9 @@
 \inference[]{}{}
 \inference[T-EMPFS]{}{H \vdash \epsilon}
 \inference[]{}{}
+\todo{previously: $H \vdash \Gamma; L; P$ but that rule doesn't take a heap.}
 \inference[T-FRAME1]{\Gamma; a \vdash t : \sigma & l \neq \epsilon \Longrightarrow \sigma <: C \\%
-  H \vdash \Gamma; L & H \vdash \Gamma; L; P}{H \vdash \sframe{t} : \sigma}
+  H \vdash \Gamma; L & \vdash \Gamma; L; P}{H \vdash \sframe{t} : \sigma}
 \inference[]{}{}
 \inference[T-FRAME2]{\Gamma; x : \tau; a \vdash t : \sigma & l \neq \epsilon \Longrightarrow \sigma <: C \\%
   H \vdash \Gamma; L & H \vdash \Gamma; L; P}{H \vdash^\tau_x \sframe{t} : \sigma}
@@ -166,6 +166,9 @@
 \inference[]{}{}
 \inference[T-FRAME-A2]{H \vdash^\tau_x F^y : \sigma & H \vdash^\sigma_y FS}{H \vdash^\tau_x F^y \circ FS}
 \inference[]{}{}
+\graybox*{
+  \inference[T-TS]{\forall (f, k, FS) \in TS. H \vdash FS}{H \vdash TS}
+}
 
 
 
@@ -183,9 +186,16 @@
 \inference[E-NEW]{o \notin dom(H) & fields(C) = \bar{f}\\
 H' = H[o \rightarrow \langle C, f \rightarrow null \rangle]}{\reducframe{\sframe{let x = new C in t}}[H']{\sframe[L[x \rightarrow o]]{t}}}
 \inference[]{}{}
-\inference[E-INVOKE]{H(L(y)) = \langle C, FM \rangle & mbody(C, m) = x \rightarrow t'\\
-  L' = L_0[this \rightarrow L(y), x \rightarrow L(z)]\\
-P' = \emptyset \vee (L(z) = b(o, p) \wedge p \in P \wedge P' = \{ p \})}{\reducstack{\sframe{let x = y.m(z) in t}}{\sframe[L']{t'}[P'][x] \circ \sframe{t}}}
+\inference[E-INVOKE]{
+  H(L(y)) = \langle C, FM \rangle & mbody(C, m) = x \rightarrow t'\\
+  \graybox*{
+    \neg ocap(C) \Rightarrow L' = L_0[this \rightarrow L(y), x \rightarrow L(z)]\\
+  }\\
+  \graybox*{
+    ocap(C) \Rightarrow L' = [this \rightarrow L(y), x \rightarrow L(z)]\\
+  }\\
+  P' = \emptyset \vee (L(z) = b(o, p) \wedge p \in P \wedge P' = \{ p \})
+}{\reducstack{\sframe{let x = y.m(z) in t}}{\sframe[L']{t'}[P'][x] \circ \sframe{t}}}
 \inference[]{}{}
 \inference[E-RETURN1]{}{\reducframe{\sframe{x}[P][y] \circ \sframe[L']{t'}[P']}{\sframe[L'[y \rightarrow L(x)]]{t'}[P']}}
 \inference[]{}{}
@@ -198,31 +208,37 @@ P' = \emptyset \vee (L(z) = b(o, p) \wedge p \in P \wedge P' = \{ p \})}{\reducs
   }}
 \inference[]{}{}
 \inference[E-BOX]{o \notin dom(H) & fields(C) = \bar{f}\\
-  H' = H[ o \rightarrow \langle C, f \rightarrow null \rangle ] & p fresh}{
-  \reducstack{
-    \sframe{box[C]\{x \Rightarrow t\}}
+  H' = H[ o \rightarrow \langle C, f \rightarrow null \rangle ] & p fresh\\
+  \graybox*{TS' = \{T \in TS. k \Rightarrow \neg ancestor(TS, T, f)\}}
+}{
+  \reductasks{
+    f, k, \sframe{box[C]\{x \Rightarrow t\}}
   }*[H']{
-    \sframe[L[x \rightarrow b(o,p)]]{t}[P \cup \{p\}][\epsilon]
-  }[\epsilon]
+    f, k, \sframe[L[x \rightarrow b(o,p)]]{t}[P \cup \{p\}][\epsilon] \circ \epsilon
+  }[TS']
 }
 \inference[]{}{}
 \inference[E-CAPTURE]{L(x) = b(o,p) & L(y) = b(o', p') & \{p, p'\} \subseteq P\\
-  H(o) = \langle C, FM \rangle & H' = H[ o \rightarrow \langle C, FM[ f \rightarrow o' ] \rangle ]}{
-  \reducstack{
-    \sframe{capture(x.f, y) \{ z \Rightarrow t\}}
+  H(o) = \langle C, FM \rangle & H' = H[ o \rightarrow \langle C, FM[ f \rightarrow o' ] \rangle ]\\
+  \graybox*{TS' = \{T \in TS. k \Rightarrow \neg ancestor(TS, T, f)\}}
+}{
+  \reductasks{
+    f, k, \sframe{capture(x.f, y) \{ z \Rightarrow t\}}
   }*[H']{
-    \sframe[L[z \rightarrow L(x)]]{t}[P \setminus \{p'\}][\epsilon]
-  }[\epsilon]
+    f, k, \sframe[L[z \rightarrow L(x)]]{t}[P \setminus \{p'\}][\epsilon] \circ \epsilon
+  }[TS']
 }
 \inference[]{}{}
 \inference[E-SWAP]{L(x) = b(o,p) & L(y) = b(o', p') & \{p, p'\} \subseteq P\\
   H(o) = \langle C, FM \rangle & FM(f) = o'' & p'' fresh\\
-  H' = H[o \rightarrow \langle C, FM[f \rightarrow o'] \rangle ]}{
-  \reducstack{
+  H' = H[o \rightarrow \langle C, FM[f \rightarrow o'] \rangle ]\\
+  \graybox*{TS' = \{T \in TS. k \Rightarrow \neg ancestor(TS, T, f)\}}
+}{
+  \reductasks{
     \sframe{swap(x.f,y) \{ z \Rightarrow t\}}
   }*[H']{
-    \sframe[L[z \rightarrow b(o'', p'')]]{t}[(P \setminus \{ p' \}) \cup \{p''\}][\epsilon]
-  }[\epsilon]
+    \sframe[L[z \rightarrow b(o'', p'')]]{t}[(P \setminus \{ p' \}) \cup \{p''\}][\epsilon] \circ \epsilon
+  }[TS']
 }
 \inference[]{}{}
 
@@ -247,8 +263,15 @@ A heap $H$ is well-typed, written $\vdash H : \star$, iff
 \end{definition}
 
 \subsubsection{Other}
+\graybox*{\inference[ANC-DIRECT]{T = (f', k, FS) & FS = \fframe{f} \circ FS'}{ancestor(TS, T, f)}}
+
+\inference[]{}{}
+
+\graybox*{\inference[ANC-INDIRECT]{T' = (f', true, FS) & FS = \fframe{f} \circ FS' & ancestor(TS, T, f')}{ancestor(TS, T, f)}}
+\inference[]{}{}
 \inference[ACC-F]{x \rightarrow o \in L \vee (x \rightarrow b(o,p) \in L \wedge p \in P)}{accRoot(o, \langle L, t, P \rangle ^ l)}
 \inference[]{}{}
+
 \inference[ACC-FS]{accRoot(o, F) \vee accRoot(o, FS)}{accRoot(o, F \circ FS)}
 \inference[]{}{}
 \inference[ISO-FS]{
@@ -256,9 +279,10 @@ A heap $H$ is well-typed, written $\vdash H : \star$, iff
 }{isolated(H, FS, FS')}
 \inference[]{}{}
 \graybox*{\inference[ISO-TS]{
-  \forall (f, FS), (g, GS) \in TS. FS \neq GS \Rightarrow isolated(H, FS, GS) \vee\\
+    \forall T_1, T_2 \in TS. T_1 = (f, k, FS) \wedge T_2 = (g, k', GS) \wedge T_1 \neq T_2 \Rightarrow\\
+    isolated(H, FS, GS) \vee\\
   FS = \fframe{f'} \circ FS' \wedge awaits(TS, f', g) \vee\\
-  GS = \fframe{g'} \circ GS' \wedge awaits(TS, g', f)
+  GS = \fframe{g'}[m] \circ GS' \wedge awaits(TS, g', f)
 }{isolated(H, TS)}}
 
 \inference[]{}{}
@@ -266,13 +290,31 @@ A heap $H$ is well-typed, written $\vdash H : \star$, iff
 a = ocap \Longrightarrow globalOcapSep(H,F) & fieldUniqueness(H,F)}{H; a \vdash F ok}
 \inference[]{}{}
 \inference[SINGFS-OK]{H; a \vdash F ok}{H; a \vdash F \circ \epsilon ok}
+% \inference[]{\begin{cases} a & b \\ c & d \end{cases}}{test}
 \inference[]{}{}
+\todo{I can't for the life of me figure out how to write a cases environment inside of the premises. Or dcases. Or any other solution. I mean, it should be obvious right? Just use some kind of box/frame/whatever command that hides the inner typesetting from the inference command but nope, can't figure out how to do that either. Manually typesetting brace size, phantom things etc. seems like a very brittle solution}
 \inference[FS-OK]{
-  H; b \vdash F^l ok & H; a \vdash FS ok
+  H; b \vdash F^l ok & H; a \vdash FS ok\\
+  (a = ocap \vee l = \epsilon) \Rightarrow b = ocap\\
+  \neg (a = ocap \vee l = \epsilon) \Rightarrow b = \epsilon\\
+  boxSeparation(H, F, FS)\\
+  uniqueOpenBox(H, F, FS)\\
+  openBoxPropagation(H, F^l, FS)\\
 }{H; b \vdash F^l \circ FS ok}
+\inference[]{}{}
+\todo{at most one T exists such that ancestor etc. I.e. we might not have a single non-ocap thread. We might also have only inactive threads being non-ocap. Perhaps rephrase with id instead of task?}
+\graybox*{
+  \inference[TS-OK]{
+    \forall T \in TS. T = (f, k, \fframe{f'} \circ FS) \Rightarrow \\
+    (f < f' \wedge \not \exists U \in TS \setminus \{T\}. U = (f', k', \fframe{f'} \circ FS'))\\
+    \exists T \in TS. (\{T' \in TS. ancestor(TS, T', T)\} \wedge\\
+    \forall U \in TS. U = (f, k, FS) \Rightarrow H; ocap \vdash FS ok \vee U \in TS' \wedge H; a \vdash FS ok)\\
+  }{H \vdash TS ok}
+}
+
 \subsubsection{Predicates}
 \graybox*{%
-\inference[]{\exists (f,FS) \in TS. FS = \fframe{f'} \circ FS' & awaits(TS, f', g)}{awaits(TS, f, g)}%
+\inference[]{\exists (f,k,FS) \in TS. FS = \fframe{f'} \circ FS' & awaits(TS, f', g)}{awaits(TS, f, g)}%
 }
 
 \graybox*{%
@@ -310,6 +352,13 @@ a = ocap \Longrightarrow globalOcapSep(H,F) & fieldUniqueness(H,F)}{H; a \vdash 
 \inference[]{boxRoot(o, FS) & x \rightarrow o' \in env(F) & reach(H, o, o')}{openbox(H, o, F, FS)}
 \inference[]{}{}
 
+\subsubsection{Subtyping}
+\inference[<:-BOT]{}{\bot <: \tau}
+
+\inference[<:-BOX]{C <: D}{Box[C] <: Box[D]}
+
+\inference[<:-NULL]{}{Null <: \tau}
+
 % TODO
 % OCAP appendix
-%
+% Rest of subtyping rules

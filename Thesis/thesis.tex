@@ -321,9 +321,11 @@ nopostdot]{glossaries}
 
 %% TODO Added by me
 \usepackage{semantic}
+\usepackage{mathtools}
 \usepackage{amssymb}
 \usepackage{amsthm}
 \usepackage{xparse}
+
 
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}
@@ -346,11 +348,34 @@ nopostdot]{glossaries}
 
 % Frontmatter includes the abstracts and table-of-contents
 \frontmatter
+\tableofcontents
 \setcounter{page}{1}
 
-\include{tex/related_work}
+\chapter{Introduction}
+\chapter{Background}
+\section{Type Systems}
+\section{Structured Concurrency}
+\section{Concurrent Determinism}
+\chapter{Related Work}
+\section{LaCasa}
+\section{DPJ}
+\section{Rust}
+\section{Deterministic Concurrency Using Lattices}
+\chapter{Proposed Extension}
+\section{Overview}
+\section{Formalization}
+\chapter{Properties}
+\section{Progress}
+
+\section{Preservation}
+\section{Confluence}
+\chapter{Conclusion}
+\section{Future Work}
+\chapter{Appendix}
+\section{Proofs}
 % \include{tex/introduction}
 % \include{tex/background}
+% \include{tex/related_work}
 % \include{tex/proposed_extension}
 % \include{tex/formalization}
 % \include{tex/evaluation}

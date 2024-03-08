@@ -1,3 +1,37 @@
 \chapter{Related Work}
+
 \section{Structured Concurrency}
-I.e. Determinism, performance, extension of existing languages, Expressiveness, Annotation overhead
+Structured concurrency is a programming paradigm that aims to simplify reasoning about concurrent programs. This is done by encapsulating threads in control flow constructs that ensure termination. \todo{this hsould probably be in background instead}
+
+
+I.e. Determinism, performance, extension of existing languages, Expressiveness, Annotation overhead, deadlock freedom
+
+\section{Isolation}
+A prerequisite for safe concurrency is isolation of memory areas. In LaCasa \todo{reference} by Haller a region-based approach is pursued. By encapusa
+
+
+Ownership based, region based, annotations etc.
+
+
+In DPJ \todo{reference} a region-based type and effect system is developed to guarantee deterministic semantics through static checking. It is backwards compatible with Java and supports gradually adding concurrency.
+
+To ensure this, the heap is partitioned into regions such that no overlaps between regions exist. Variables are annotated with the region they reside in.
+
+
+Reference Capabilities for Flexibe memory management
+Deterministic concurrency using lattices
+
+Consistency types for replicated data
+Philipps PhD students work
+
+LaCasa
+
+Integrating Task Parallelism with Actors
+
+
+Odersky, probably outdated:
+Scoped Capabilities
+Safer Exceptions
+
+Calculus of atomic actions
+Relevant for proving determinism, we did it simpler.
