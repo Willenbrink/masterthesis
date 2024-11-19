@@ -1,0 +1,1137 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.2 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{anyt/global//global/global}
+    \entry{arvidsson_deterministic_2018}{book}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=21d7e1af94d684794bac0981a60ed4be}{%
+           family={Arvidsson},
+           familyi={A\bibinitperiod},
+           given={Ellen},
+           giveni={E\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{21d7e1af94d684794bac0981a60ed4be}
+      \strng{fullhash}{21d7e1af94d684794bac0981a60ed4be}
+      \strng{bibnamehash}{21d7e1af94d684794bac0981a60ed4be}
+      \strng{authorbibnamehash}{21d7e1af94d684794bac0981a60ed4be}
+      \strng{authornamehash}{21d7e1af94d684794bac0981a60ed4be}
+      \strng{authorfullhash}{21d7e1af94d684794bac0981a60ed4be}
+      \field{labelalpha}{Arv18}
+      \field{sortinit}{A}
+      \field{sortinithash}{2f401846e2029bad6b3ecc16d50031e2}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Parallelization is an important part of modern data systems. However, the non-determinism of thread scheduling introduces the difficult problem of considering all different execution orders when co ...}
+      \field{title}{Deterministic Concurrency Using Lattices and the Object Capability Model}
+      \field{urlday}{15}
+      \field{urlmonth}{5}
+      \field{urlyear}{2024}
+      \field{year}{2018}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \verb{file}
+      \verb Full Text PDF:/home/sewi/Zotero/storage/5PF236G3/Arvidsson - 2018 - Deterministic Concurrency Using Lattices and the O.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://urn.kb.se/resolve?urn=urn:nbn:se:kth:diva-239917
+      \endverb
+      \verb{url}
+      \verb https://urn.kb.se/resolve?urn=urn:nbn:se:kth:diva-239917
+      \endverb
+    \endentry
+    \entry{boyapati_ownership_2002}{inproceedings}{}
+      \name{author}{3}{}{%
+        {{un=0,uniquepart=base,hash=10a087006c22d1263715c9edbf3efd8a}{%
+           family={Boyapati},
+           familyi={B\bibinitperiod},
+           given={Chandrasekhar},
+           giveni={C\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=9c797c02afea7475d450c451bbe24950}{%
+           family={Lee},
+           familyi={L\bibinitperiod},
+           given={Robert},
+           giveni={R\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=4e00e9f35a9625e61e6e9220d441bdcf}{%
+           family={Rinard},
+           familyi={R\bibinitperiod},
+           given={Martin\bibnamedelima C.},
+           giveni={M\bibinitperiod\bibinitdelim C\bibinitperiod},
+           givenun=0}}%
+      }
+      \name{editor}{2}{}{%
+        {{hash=6c7e07323014bbdfabcdebd7f63b7adb}{%
+           family={Ibrahim},
+           familyi={I\bibinitperiod},
+           given={Mamdouh},
+           giveni={M\bibinitperiod}}}%
+        {{hash=2af7d09ee10699b6e1e1d553594fe8d4}{%
+           family={Matsuoka},
+           familyi={M\bibinitperiod},
+           given={Satoshi},
+           giveni={S\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {ACM}%
+      }
+      \strng{namehash}{ed86f1356854dd4a68fdc7a43f9550f5}
+      \strng{fullhash}{ed86f1356854dd4a68fdc7a43f9550f5}
+      \strng{bibnamehash}{ed86f1356854dd4a68fdc7a43f9550f5}
+      \strng{authorbibnamehash}{ed86f1356854dd4a68fdc7a43f9550f5}
+      \strng{authornamehash}{ed86f1356854dd4a68fdc7a43f9550f5}
+      \strng{authorfullhash}{ed86f1356854dd4a68fdc7a43f9550f5}
+      \strng{editorbibnamehash}{27b5f0d4c89c38739c725c2813d2755d}
+      \strng{editornamehash}{27b5f0d4c89c38739c725c2813d2755d}
+      \strng{editorfullhash}{27b5f0d4c89c38739c725c2813d2755d}
+      \field{labelalpha}{BLR02}
+      \field{sortinit}{B}
+      \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings of the 2002 {ACM} {SIGPLAN} Conference on Object-Oriented Programming Systems, Languages and Applications, {OOPSLA} 2002, Seattle, Washington, {USA}, November 4-8, 2002}
+      \field{title}{Ownership types for safe programming: preventing data races and deadlocks}
+      \field{year}{2002}
+      \field{dateera}{ce}
+      \field{pages}{211\bibrangedash 230}
+      \range{pages}{20}
+      \verb{doi}
+      \verb 10.1145/582419.582440
+      \endverb
+      \verb{urlraw}
+      \verb https://doi.org/10.1145/582419.582440
+      \endverb
+      \verb{url}
+      \verb https://doi.org/10.1145/582419.582440
+      \endverb
+    \endentry
+    \entry{bocchino_type_2009}{inproceedings}{}
+      \name{author}{10}{}{%
+        {{un=1,uniquepart=given,hash=0dadf0258e98cf43f6d659024064f5fe}{%
+           family={Bocchino},
+           familyi={B\bibinitperiod},
+           given={Robert\bibnamedelima L.},
+           giveni={R\bibinitperiod\bibinitdelim L\bibinitperiod},
+           givenun=1}}%
+        {{un=0,uniquepart=base,hash=3058a8f609f171265b14d51759058f2d}{%
+           family={Adve},
+           familyi={A\bibinitperiod},
+           given={Vikram\bibnamedelima S.},
+           giveni={V\bibinitperiod\bibinitdelim S\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=46f9f117e6f1078f5cdc5c462fba017e}{%
+           family={Dig},
+           familyi={D\bibinitperiod},
+           given={Danny},
+           giveni={D\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=627cb129a51d4528454f6379c34746be}{%
+           family={Adve},
+           familyi={A\bibinitperiod},
+           given={Sarita\bibnamedelima V.},
+           giveni={S\bibinitperiod\bibinitdelim V\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=4e22eb63158fcccf89277c5ff589c772}{%
+           family={Heumann},
+           familyi={H\bibinitperiod},
+           given={Stephen},
+           giveni={S\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=cc818d3564a088205532b31709b596d1}{%
+           family={Komuravelli},
+           familyi={K\bibinitperiod},
+           given={Rakesh},
+           giveni={R\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=b92116c2257baf1908601a4391d184b3}{%
+           family={Overbey},
+           familyi={O\bibinitperiod},
+           given={Jeffrey},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=bc7d6556585cd6b002db23896619fdd8}{%
+           family={Simmons},
+           familyi={S\bibinitperiod},
+           given={Patrick},
+           giveni={P\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=e2e55873fab70922986a74a8ff64d142}{%
+           family={Sung},
+           familyi={S\bibinitperiod},
+           given={Hyojin},
+           giveni={H\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=1e37a81c1080a21f001aca6e762356e3}{%
+           family={Vakilian},
+           familyi={V\bibinitperiod},
+           given={Mohsen},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{location}{1}{%
+        {New York, {NY}, {USA}}%
+      }
+      \list{publisher}{1}{%
+        {Association for Computing Machinery}%
+      }
+      \strng{namehash}{35a06b8b2cc239fe46dba7478073e73d}
+      \strng{fullhash}{c48416cef9d4e91de862536ac2908f97}
+      \strng{bibnamehash}{c48416cef9d4e91de862536ac2908f97}
+      \strng{authorbibnamehash}{c48416cef9d4e91de862536ac2908f97}
+      \strng{authornamehash}{35a06b8b2cc239fe46dba7478073e73d}
+      \strng{authorfullhash}{c48416cef9d4e91de862536ac2908f97}
+      \field{labelalpha}{Boc+09}
+      \field{sortinit}{B}
+      \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Today's shared-memory parallel programming models are complex and error-prone.While many parallel programs are intended to be deterministic, unanticipated thread interleavings can lead to subtle bugs and nondeterministic semantics. In this paper, we demonstrate that a practical type and effect system can simplify parallel programming by guaranteeing deterministic semantics with modular, compile-time type checking even in a rich, concurrent object-oriented language such as Java. We describe an object-oriented type and effect system that provides several new capabilities over previous systems for expressing deterministic parallel algorithms.We also describe a language called Deterministic Parallel Java ({DPJ}) that incorporates the new type system features, and we show that a core subset of {DPJ} is sound. We describe an experimental validation showing {thatDPJ} can express a wide range of realistic parallel programs; that the new type system features are useful for such programs; and that the parallel programs exhibit good performance gains (coming close to or beating equivalent, nondeterministic multithreaded programs where those are available).}
+      \field{booktitle}{Proceedings of the 24th {ACM} {SIGPLAN} conference on Object oriented programming systems languages and applications}
+      \field{day}{25}
+      \field{isbn}{978-1-60558-766-0}
+      \field{month}{10}
+      \field{series}{{OOPSLA} '09}
+      \field{title}{A type and effect system for deterministic parallel Java}
+      \field{urlday}{14}
+      \field{urlmonth}{5}
+      \field{urlyear}{2024}
+      \field{year}{2009}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{97\bibrangedash 116}
+      \range{pages}{20}
+      \verb{doi}
+      \verb 10.1145/1640089.1640097
+      \endverb
+      \verb{file}
+      \verb Full Text PDF:/home/sewi/Zotero/storage/DN7SSZXA/Bocchino et al. - 2009 - A type and effect system for deterministic paralle.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://dl.acm.org/doi/10.1145/1640089.1640097
+      \endverb
+      \verb{url}
+      \verb https://dl.acm.org/doi/10.1145/1640089.1640097
+      \endverb
+      \keyw{commutativity,determinism,deterministic parallelism,effect systems,effects}
+    \endentry
+    \entry{boyapati_parameterized_2001}{inproceedings}{}
+      \name{author}{2}{}{%
+        {{un=0,uniquepart=base,hash=10a087006c22d1263715c9edbf3efd8a}{%
+           family={Boyapati},
+           familyi={B\bibinitperiod},
+           given={Chandrasekhar},
+           giveni={C\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=4e00e9f35a9625e61e6e9220d441bdcf}{%
+           family={Rinard},
+           familyi={R\bibinitperiod},
+           given={Martin\bibnamedelima C.},
+           giveni={M\bibinitperiod\bibinitdelim C\bibinitperiod},
+           givenun=0}}%
+      }
+      \name{editor}{2}{}{%
+        {{hash=5b712cb47df0da6eb335f18cf40d64ab}{%
+           family={Northrop},
+           familyi={N\bibinitperiod},
+           given={Linda\bibnamedelima M.},
+           giveni={L\bibinitperiod\bibinitdelim M\bibinitperiod}}}%
+        {{hash=2b6aeedad5e769e87b33158ac548a092}{%
+           family={Vlissides},
+           familyi={V\bibinitperiod},
+           given={John\bibnamedelima M.},
+           giveni={J\bibinitperiod\bibinitdelim M\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {ACM}%
+      }
+      \strng{namehash}{5dcbf01fcf38638ac9441b3650058fb4}
+      \strng{fullhash}{5dcbf01fcf38638ac9441b3650058fb4}
+      \strng{bibnamehash}{5dcbf01fcf38638ac9441b3650058fb4}
+      \strng{authorbibnamehash}{5dcbf01fcf38638ac9441b3650058fb4}
+      \strng{authornamehash}{5dcbf01fcf38638ac9441b3650058fb4}
+      \strng{authorfullhash}{5dcbf01fcf38638ac9441b3650058fb4}
+      \strng{editorbibnamehash}{47f486df0e32fa1678bb92dda659a68c}
+      \strng{editornamehash}{47f486df0e32fa1678bb92dda659a68c}
+      \strng{editorfullhash}{47f486df0e32fa1678bb92dda659a68c}
+      \field{labelalpha}{BR01}
+      \field{sortinit}{B}
+      \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings of the 2001 {ACM} {SIGPLAN} Conference on Object-Oriented Programming Systems, Languages and Applications, {OOPSLA} 2001, Tampa, Florida, {USA}, October 14-18, 2001}
+      \field{title}{A Parameterized Type System for Race-Free Java Programs}
+      \field{year}{2001}
+      \field{dateera}{ce}
+      \field{pages}{56\bibrangedash 69}
+      \range{pages}{14}
+      \verb{doi}
+      \verb 10.1145/504282.504287
+      \endverb
+      \verb{urlraw}
+      \verb https://doi.org/10.1145/504282.504287
+      \endverb
+      \verb{url}
+      \verb https://doi.org/10.1145/504282.504287
+      \endverb
+    \endentry
+    \entry{cave_habanero-java_2011}{inproceedings}{}
+      \name{author}{4}{}{%
+        {{un=0,uniquepart=base,hash=3b498dcabe0464126eacd1b556c6734b}{%
+           family={Cavé},
+           familyi={C\bibinitperiod},
+           given={Vincent},
+           giveni={V\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=ef7cda7b2de25bda1700fc327fc89e7e}{%
+           family={Zhao},
+           familyi={Z\bibinitperiod},
+           given={Jisheng},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=b83494025be21bb94f21000b65defbb9}{%
+           family={Shirako},
+           familyi={S\bibinitperiod},
+           given={Jun},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=694b6a2cda85144b301a8f45936cf9bb}{%
+           family={Sarkar},
+           familyi={S\bibinitperiod},
+           given={Vivek},
+           giveni={V\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{location}{1}{%
+        {New York, {NY}, {USA}}%
+      }
+      \list{publisher}{1}{%
+        {Association for Computing Machinery}%
+      }
+      \strng{namehash}{0882500ab002a37d4d71f017fc10e78f}
+      \strng{fullhash}{0882500ab002a37d4d71f017fc10e78f}
+      \strng{bibnamehash}{0882500ab002a37d4d71f017fc10e78f}
+      \strng{authorbibnamehash}{0882500ab002a37d4d71f017fc10e78f}
+      \strng{authornamehash}{0882500ab002a37d4d71f017fc10e78f}
+      \strng{authorfullhash}{0882500ab002a37d4d71f017fc10e78f}
+      \field{labelalpha}{Cav+11}
+      \field{sortinit}{C}
+      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{shorttitle}
+      \field{abstract}{In this paper, we present the Habanero-Java ({HJ}) language developed at Rice University as an extension to the original Java-based definition of the X10 language. {HJ} includes a powerful set of task-parallel programming constructs that can be added as simple extensions to standard Java programs to take advantage of today's multi-core and heterogeneous architectures. The language puts a particular emphasis on the usability and safety of parallel constructs. For example, no {HJ} program using async, finish, isolated, and phaser constructs can create a logical deadlock cycle. In addition, the future and data-driven task variants of the async construct facilitate a functional approach to parallel programming. Finally, any {HJ} program written with async, finish, and phaser constructs that is data-race free is guaranteed to also be deterministic. {HJ} also features two key enhancements that address well known limitations in the use of Java in scientific computing --- the inclusion of complex numbers as a primitive data type, and the inclusion of array-views that support multidimensional views of one-dimensional arrays. The {HJ} compiler generates standard Java class-files that can run on any {JVM} for Java 5 or higher. The {HJ} runtime is responsible for orchestrating the creation, execution, and termination of {HJ} tasks, and features both work-sharing and work-stealing schedulers. {HJ} is used at Rice University as an introductory parallel programming language for second-year undergraduate students. A wide variety of benchmarks have been ported to {HJ}, including a full application that was originally written in Fortran 90. {HJ} has a rich development and runtime environment that includes integration with {DrJava}, the addition of a data race detection tool, and service as a target platform for the Intel Concurrent Collections coordination language}
+      \field{booktitle}{Proceedings of the 9th International Conference on Principles and Practice of Programming in Java}
+      \field{day}{24}
+      \field{isbn}{978-1-4503-0935-6}
+      \field{month}{8}
+      \field{series}{{PPPJ} '11}
+      \field{shorttitle}{Habanero-Java}
+      \field{title}{Habanero-Java: the new adventures of old X10}
+      \field{urlday}{13}
+      \field{urlmonth}{5}
+      \field{urlyear}{2024}
+      \field{year}{2011}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{51\bibrangedash 61}
+      \range{pages}{11}
+      \verb{doi}
+      \verb 10.1145/2093157.2093165
+      \endverb
+      \verb{file}
+      \verb Full Text PDF:/home/sewi/Zotero/storage/F83ENDZN/Cavé et al. - 2011 - Habanero-Java the new adventures of old X10.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://dl.acm.org/doi/10.1145/2093157.2093165
+      \endverb
+      \verb{url}
+      \verb https://dl.acm.org/doi/10.1145/2093157.2093165
+      \endverb
+      \keyw{data-race detection,language,parallel programming}
+    \endentry
+    \entry{charles_x10_2005}{inproceedings}{}
+      \name{author}{8}{}{%
+        {{un=0,uniquepart=base,hash=0c7e9d7cafc4ef24fbd14357ca5fd34a}{%
+           family={Charles},
+           familyi={C\bibinitperiod},
+           given={Philippe},
+           giveni={P\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=3192c436d38b8838cf2d39d52fc9320a}{%
+           family={Grothoff},
+           familyi={G\bibinitperiod},
+           given={Christian},
+           giveni={C\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=bbd47ba039c3d10fc68d871d73d00390}{%
+           family={Saraswat},
+           familyi={S\bibinitperiod},
+           given={Vijay},
+           giveni={V\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=69a8b93856a535859ba6e2a9d5762dd2}{%
+           family={Donawa},
+           familyi={D\bibinitperiod},
+           given={Christopher},
+           giveni={C\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=ffaff2a928d76af0a653c2cd0b59467c}{%
+           family={Kielstra},
+           familyi={K\bibinitperiod},
+           given={Allan},
+           giveni={A\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=9188db228746d37c98246584b581eeab}{%
+           family={Ebcioglu},
+           familyi={E\bibinitperiod},
+           given={Kemal},
+           giveni={K\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=5b17e0ed63fbd132011a55c978f8f4a4}{%
+           family={Praun},
+           familyi={P\bibinitperiod},
+           given={Christoph},
+           giveni={C\bibinitperiod},
+           givenun=0,
+           prefix={von},
+           prefixi={v\bibinitperiod},
+           prefixun=0}}%
+        {{un=0,uniquepart=base,hash=694b6a2cda85144b301a8f45936cf9bb}{%
+           family={Sarkar},
+           familyi={S\bibinitperiod},
+           given={Vivek},
+           giveni={V\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{location}{1}{%
+        {New York, {NY}, {USA}}%
+      }
+      \list{publisher}{1}{%
+        {Association for Computing Machinery}%
+      }
+      \strng{namehash}{436d261afe44b6502787d5bc9c3164d3}
+      \strng{fullhash}{b7f83de92a33361bbfae442d112cbebf}
+      \strng{bibnamehash}{b7f83de92a33361bbfae442d112cbebf}
+      \strng{authorbibnamehash}{b7f83de92a33361bbfae442d112cbebf}
+      \strng{authornamehash}{436d261afe44b6502787d5bc9c3164d3}
+      \strng{authorfullhash}{b7f83de92a33361bbfae442d112cbebf}
+      \field{labelalpha}{Cha+05}
+      \field{sortinit}{C}
+      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{shorttitle}
+      \field{booktitle}{Proceedings of the 20th annual {ACM} {SIGPLAN} conference on Object-oriented programming, systems, languages, and applications}
+      \field{day}{12}
+      \field{isbn}{978-1-59593-031-6}
+      \field{month}{10}
+      \field{series}{{OOPSLA} '05}
+      \field{shorttitle}{X10}
+      \field{title}{X10: an object-oriented approach to non-uniform cluster computing}
+      \field{urlday}{13}
+      \field{urlmonth}{5}
+      \field{urlyear}{2024}
+      \field{year}{2005}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{519\bibrangedash 538}
+      \range{pages}{20}
+      \verb{doi}
+      \verb 10.1145/1094811.1094852
+      \endverb
+      \verb{urlraw}
+      \verb https://doi.org/10.1145/1094811.1094852
+      \endverb
+      \verb{url}
+      \verb https://doi.org/10.1145/1094811.1094852
+      \endverb
+      \keyw{atomic blocks,clocks,data distribution,Java,multithreading,non-uniform cluster computing ({NUCC}),partitioned global address space ({PGAS}),places,productivity,scalability,X10}
+    \endentry
+    \entry{clarke_external_2003}{inproceedings}{}
+      \name{author}{2}{}{%
+        {{un=0,uniquepart=base,hash=1ff670bdd1d79f51fcdde4866a0d8275}{%
+           family={Clarke},
+           familyi={C\bibinitperiod},
+           given={Dave},
+           giveni={D\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=36449bee61599fb05d9d413c8a4a3db6}{%
+           family={Wrigstad},
+           familyi={W\bibinitperiod},
+           given={Tobias},
+           giveni={T\bibinitperiod},
+           givenun=0}}%
+      }
+      \name{editor}{1}{}{%
+        {{hash=081a17a005a2ab94a60ccd76c206e9f0}{%
+           family={Cardelli},
+           familyi={C\bibinitperiod},
+           given={Luca},
+           giveni={L\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {Berlin, Heidelberg}%
+      }
+      \list{publisher}{1}{%
+        {Springer}%
+      }
+      \strng{namehash}{61018ccd4ac11973779984f92924e422}
+      \strng{fullhash}{61018ccd4ac11973779984f92924e422}
+      \strng{bibnamehash}{61018ccd4ac11973779984f92924e422}
+      \strng{authorbibnamehash}{61018ccd4ac11973779984f92924e422}
+      \strng{authornamehash}{61018ccd4ac11973779984f92924e422}
+      \strng{authorfullhash}{61018ccd4ac11973779984f92924e422}
+      \strng{editorbibnamehash}{081a17a005a2ab94a60ccd76c206e9f0}
+      \strng{editornamehash}{081a17a005a2ab94a60ccd76c206e9f0}
+      \strng{editorfullhash}{081a17a005a2ab94a60ccd76c206e9f0}
+      \field{labelalpha}{CW03}
+      \field{sortinit}{C}
+      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{External uniqueness is a surprising new way to add unique references to an {OOPL}. The idea is that an externally unique reference is the only reference into an aggregate from outside the aggregate. Internal references which do not escape the boundary of the aggregate are innocuous and therefore permitted. Based on ownership types, our proposal not only overcomes an abstraction problem from which existing uniqueness proposals suffer, it also enables many examples which are inherently not unique, such as a unique reference to a set of links in a doubly-linked list, without losing the benefits of uniqueness.}
+      \field{booktitle}{{ECOOP} 2003 – Object-Oriented Programming}
+      \field{isbn}{978-3-540-45070-2}
+      \field{langid}{english}
+      \field{title}{External Uniqueness Is Unique Enough}
+      \field{year}{2003}
+      \field{dateera}{ce}
+      \field{pages}{176\bibrangedash 200}
+      \range{pages}{25}
+      \verb{doi}
+      \verb 10.1007/978-3-540-45070-2_9
+      \endverb
+      \verb{file}
+      \verb Accepted Version:/home/sewi/Zotero/storage/FVRSU8L4/Clarke and Wrigstad - 2003 - External Uniqueness Is Unique Enough.pdf:application/pdf
+      \endverb
+    \endentry
+    \entry{goetz_java_2006}{book}{}
+      \name{author}{6}{}{%
+        {{un=0,uniquepart=base,hash=b89f7fb252580be87461612961dda918}{%
+           family={Goetz},
+           familyi={G\bibinitperiod},
+           given={Brian},
+           giveni={B\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=730e9754551b47f99392df455eee437e}{%
+           family={Peierls},
+           familyi={P\bibinitperiod},
+           given={Tim},
+           giveni={T\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=7968896cd629d7d36fcdf0b16f16dafa}{%
+           family={Bloch},
+           familyi={B\bibinitperiod},
+           given={Joshua\bibnamedelima J.},
+           giveni={J\bibinitperiod\bibinitdelim J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=f4f8d35bdf639379619689fa086e346d}{%
+           family={Bowbeer},
+           familyi={B\bibinitperiod},
+           given={Joseph},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=07af06897ce3b138dd5c866419ab8b45}{%
+           family={Holmes},
+           familyi={H\bibinitperiod},
+           given={David},
+           giveni={D\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=b4071ff1af912d3c66b7b4b5ffed8956}{%
+           family={Lea},
+           familyi={L\bibinitperiod},
+           given={Doug},
+           giveni={D\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {Addison-Wesley}%
+      }
+      \strng{namehash}{2309061701f2359a8b47f71a43a6ef71}
+      \strng{fullhash}{afff4c1ef4af29b90aca50a5f58b5f74}
+      \strng{bibnamehash}{afff4c1ef4af29b90aca50a5f58b5f74}
+      \strng{authorbibnamehash}{afff4c1ef4af29b90aca50a5f58b5f74}
+      \strng{authornamehash}{2309061701f2359a8b47f71a43a6ef71}
+      \strng{authorfullhash}{afff4c1ef4af29b90aca50a5f58b5f74}
+      \field{labelalpha}{Goe+06}
+      \field{sortinit}{G}
+      \field{sortinithash}{32d67eca0634bf53703493fb1090a2e8}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{isbn}{978-0-321-34960-6}
+      \field{title}{Java Concurrency in Practice}
+      \field{year}{2006}
+      \field{dateera}{ce}
+    \endentry
+    \entry{haller_reactive_2016}{inproceedings}{}
+      \name{author}{4}{}{%
+        {{un=0,uniquepart=base,hash=6987cf8ce0f10540abc8b54a10c06420}{%
+           family={Haller},
+           familyi={H\bibinitperiod},
+           given={Philipp},
+           giveni={P\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=15334a9237325730aac8d3910f492aaf}{%
+           family={Geries},
+           familyi={G\bibinitperiod},
+           given={Simon},
+           giveni={S\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=e77e62582d6fe3e666bf2a384ee0f3dc}{%
+           family={Eichberg},
+           familyi={E\bibinitperiod},
+           given={Michael},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=e402b2ae11147cc53c2a5cd57fb4e2b4}{%
+           family={Salvaneschi},
+           familyi={S\bibinitperiod},
+           given={Guido},
+           giveni={G\bibinitperiod},
+           givenun=0}}%
+      }
+      \name{editor}{4}{}{%
+        {{hash=60c2da527b9c82a4a59edef033bceb02}{%
+           family={Biboudis},
+           familyi={B\bibinitperiod},
+           given={Aggelos},
+           giveni={A\bibinitperiod}}}%
+        {{hash=7b5ada919f793500a2a597e5e2e6f262}{%
+           family={Jonnalagedda},
+           familyi={J\bibinitperiod},
+           given={Manohar},
+           giveni={M\bibinitperiod}}}%
+        {{hash=292ac47d2604b287b5e73690df3ba19b}{%
+           family={Stucki},
+           familyi={S\bibinitperiod},
+           given={Sandro},
+           giveni={S\bibinitperiod}}}%
+        {{hash=b1f15e851e313c9d19dc1e0aa925a393}{%
+           family={Ureche},
+           familyi={U\bibinitperiod},
+           given={Vlad},
+           giveni={V\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {ACM}%
+      }
+      \strng{namehash}{ccfb44f51b988ca64f1c9c8ce4afc666}
+      \strng{fullhash}{ccfb44f51b988ca64f1c9c8ce4afc666}
+      \strng{bibnamehash}{ccfb44f51b988ca64f1c9c8ce4afc666}
+      \strng{authorbibnamehash}{ccfb44f51b988ca64f1c9c8ce4afc666}
+      \strng{authornamehash}{ccfb44f51b988ca64f1c9c8ce4afc666}
+      \strng{authorfullhash}{ccfb44f51b988ca64f1c9c8ce4afc666}
+      \strng{editorbibnamehash}{7d66ef3066df9dd87e33f575c32192b9}
+      \strng{editornamehash}{7d66ef3066df9dd87e33f575c32192b9}
+      \strng{editorfullhash}{7d66ef3066df9dd87e33f575c32192b9}
+      \field{labelalpha}{Hal+16}
+      \field{sortinit}{H}
+      \field{sortinithash}{23a3aa7c24e56cfa16945d55545109b5}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings of the 7th {ACM} {SIGPLAN} Symposium on Scala, {SCALA}@{SPLASH} 2016, Amsterdam, Netherlands, October 30 - November 4, 2016}
+      \field{title}{Reactive Async: expressive deterministic concurrency}
+      \field{year}{2016}
+      \field{dateera}{ce}
+      \field{pages}{11\bibrangedash 20}
+      \range{pages}{10}
+      \verb{doi}
+      \verb 10.1145/2998392.2998396
+      \endverb
+      \verb{urlraw}
+      \verb https://doi.org/10.1145/2998392.2998396
+      \endverb
+      \verb{url}
+      \verb https://doi.org/10.1145/2998392.2998396
+      \endverb
+    \endentry
+    \entry{haller_lacasa_2016}{inproceedings}{}
+      \name{author}{2}{}{%
+        {{un=0,uniquepart=base,hash=6987cf8ce0f10540abc8b54a10c06420}{%
+           family={Haller},
+           familyi={H\bibinitperiod},
+           given={Philipp},
+           giveni={P\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=303436f9042e71d851f83dfa740ded20}{%
+           family={Loiko},
+           familyi={L\bibinitperiod},
+           given={Alex},
+           giveni={A\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{location}{1}{%
+        {New York, {NY}, {USA}}%
+      }
+      \list{publisher}{1}{%
+        {Association for Computing Machinery}%
+      }
+      \strng{namehash}{afea60fd8e2811c4135d889db94a83f0}
+      \strng{fullhash}{afea60fd8e2811c4135d889db94a83f0}
+      \strng{bibnamehash}{afea60fd8e2811c4135d889db94a83f0}
+      \strng{authorbibnamehash}{afea60fd8e2811c4135d889db94a83f0}
+      \strng{authornamehash}{afea60fd8e2811c4135d889db94a83f0}
+      \strng{authorfullhash}{afea60fd8e2811c4135d889db94a83f0}
+      \field{labelalpha}{HL16}
+      \field{sortinit}{H}
+      \field{sortinithash}{23a3aa7c24e56cfa16945d55545109b5}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{shorttitle}
+      \field{abstract}{Aliasing is a known source of challenges in the context of imperative object-oriented languages, which have led to important advances in type systems for aliasing control. However, their large-scale adoption has turned out to be a surprisingly difficult challenge. While new language designs show promise, they do not address the need of aliasing control in existing languages. This paper presents a new approach to isolation and uniqueness in an existing, widely-used language, Scala. The approach is unique in the way it addresses some of the most important obstacles to the adoption of type system extensions for aliasing control. First, adaptation of existing code requires only a minimal set of annotations. Only a single bit of information is required per class. Surprisingly, the paper shows that this information can be provided by the object-capability discipline, widely-used in program security. We formalize our approach as a type system and prove key soundness theorems. The type system is implemented for the full Scala language, providing, for the first time, a sound integration with Scala's local type inference. Finally, we empirically evaluate the conformity of existing Scala open-source code on a corpus of over 75,000 {LOC}.}
+      \field{booktitle}{Proceedings of the 2016 {ACM} {SIGPLAN} International Conference on Object-Oriented Programming, Systems, Languages, and Applications}
+      \field{day}{19}
+      \field{isbn}{978-1-4503-4444-9}
+      \field{month}{10}
+      \field{series}{{OOPSLA} 2016}
+      \field{shorttitle}{{LaCasa}}
+      \field{title}{{LaCasa}: lightweight affinity and object capabilities in Scala}
+      \field{urlday}{13}
+      \field{urlmonth}{5}
+      \field{urlyear}{2024}
+      \field{year}{2016}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{272\bibrangedash 291}
+      \range{pages}{20}
+      \verb{doi}
+      \verb 10.1145/2983990.2984042
+      \endverb
+      \verb{file}
+      \verb Submitted Version:/home/sewi/Zotero/storage/3MUI4N2C/Haller and Loiko - 2016 - LaCasa lightweight affinity and object capabiliti.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://doi.org/10.1145/2983990.2984042
+      \endverb
+      \verb{url}
+      \verb https://doi.org/10.1145/2983990.2984042
+      \endverb
+      \keyw{Aliasing,object capabilities,Scala,uniqueness}
+    \endentry
+    \entry{honda_multiparty_2016}{article}{}
+      \name{author}{3}{}{%
+        {{un=0,uniquepart=base,hash=ea701ac812666ce5b51a87944fec6986}{%
+           family={Honda},
+           familyi={H\bibinitperiod},
+           given={Kohei},
+           giveni={K\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=dd15efe878ded803fb2ab56512b2179e}{%
+           family={Yoshida},
+           familyi={Y\bibinitperiod},
+           given={Nobuko},
+           giveni={N\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=d8ab0cd1fcb7372644d79210aa3fb3c0}{%
+           family={Carbone},
+           familyi={C\bibinitperiod},
+           given={Marco},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{d3ae76381f35006b1a040a68ea91e556}
+      \strng{fullhash}{d3ae76381f35006b1a040a68ea91e556}
+      \strng{bibnamehash}{d3ae76381f35006b1a040a68ea91e556}
+      \strng{authorbibnamehash}{d3ae76381f35006b1a040a68ea91e556}
+      \strng{authornamehash}{d3ae76381f35006b1a040a68ea91e556}
+      \strng{authorfullhash}{d3ae76381f35006b1a040a68ea91e556}
+      \field{labelalpha}{HYC16}
+      \field{sortinit}{H}
+      \field{sortinithash}{23a3aa7c24e56cfa16945d55545109b5}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{J. {ACM}}
+      \field{number}{1}
+      \field{title}{Multiparty Asynchronous Session Types}
+      \field{volume}{63}
+      \field{year}{2016}
+      \field{dateera}{ce}
+      \field{pages}{9:1\bibrangedash 9:67}
+      \range{pages}{-1}
+      \verb{doi}
+      \verb 10.1145/2827695
+      \endverb
+      \verb{file}
+      \verb Submitted Version:/home/sewi/Zotero/storage/IAGR7BJ3/Honda et al. - 2016 - Multiparty Asynchronous Session Types.pdf:application/pdf
+      \endverb
+    \endentry
+    \entry{imam_habanero-scala_2012}{inproceedings}{}
+      \name{author}{2}{}{%
+        {{un=1,uniquepart=given,hash=e8172e8ca1b1e348bfb13fad8aeee9b7}{%
+           family={Imam},
+           familyi={I\bibinitperiod},
+           given={Shams},
+           giveni={S\bibinitperiod},
+           givenun=1}}%
+        {{un=0,uniquepart=base,hash=694b6a2cda85144b301a8f45936cf9bb}{%
+           family={Sarkar},
+           familyi={S\bibinitperiod},
+           given={Vivek},
+           giveni={V\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{b78c3e5e7b200e1431dc0f028bf17ed3}
+      \strng{fullhash}{b78c3e5e7b200e1431dc0f028bf17ed3}
+      \strng{bibnamehash}{b78c3e5e7b200e1431dc0f028bf17ed3}
+      \strng{authorbibnamehash}{b78c3e5e7b200e1431dc0f028bf17ed3}
+      \strng{authornamehash}{b78c3e5e7b200e1431dc0f028bf17ed3}
+      \strng{authorfullhash}{b78c3e5e7b200e1431dc0f028bf17ed3}
+      \field{extraname}{1}
+      \field{labelalpha}{IS12}
+      \field{sortinit}{I}
+      \field{sortinithash}{8d291c51ee89b6cd86bf5379f0b151d8}
+      \field{extraalpha}{1}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{The Third Scala Workshop (Scala Days 2012)}
+      \field{title}{Habanero-scala: Async-finish programming in scala}
+      \field{year}{2012}
+      \field{dateera}{ce}
+    \endentry
+    \entry{imam_integrating_2012}{inproceedings}{}
+      \name{author}{2}{}{%
+        {{un=1,uniquepart=given,hash=24f521b8b4111cf9a663830a3515f8a8}{%
+           family={Imam},
+           familyi={I\bibinitperiod},
+           given={Shams\bibnamedelima M.},
+           giveni={S\bibinitperiod\bibinitdelim M\bibinitperiod},
+           givenun=1}}%
+        {{un=0,uniquepart=base,hash=694b6a2cda85144b301a8f45936cf9bb}{%
+           family={Sarkar},
+           familyi={S\bibinitperiod},
+           given={Vivek},
+           giveni={V\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{location}{1}{%
+        {New York, {NY}, {USA}}%
+      }
+      \list{publisher}{1}{%
+        {Association for Computing Machinery}%
+      }
+      \strng{namehash}{1108508a2c7a43e2bb844e934155bf87}
+      \strng{fullhash}{1108508a2c7a43e2bb844e934155bf87}
+      \strng{bibnamehash}{1108508a2c7a43e2bb844e934155bf87}
+      \strng{authorbibnamehash}{1108508a2c7a43e2bb844e934155bf87}
+      \strng{authornamehash}{1108508a2c7a43e2bb844e934155bf87}
+      \strng{authorfullhash}{1108508a2c7a43e2bb844e934155bf87}
+      \field{labelalpha}{IS12}
+      \field{sortinit}{I}
+      \field{sortinithash}{8d291c51ee89b6cd86bf5379f0b151d8}
+      \field{extraalpha}{2}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{This paper introduces a unified concurrent programming model combining the previously developed Actor Model ({AM}) and the task-parallel Async-Finish Model ({AFM}). With the advent of multi-core computers, there is a renewed interest in programming models that can support a wide range of parallel programming patterns. The proposed unified model shows how the divide-and-conquer approach of the {AFM} and the no-shared mutable state and event-driven philosophy of the {AM} can be combined to solve certain classes of problems more efficiently and productively than either of the aforementioned models individually. The unified model adds actor creation and coordination to the {AFM}, while also enabling parallelization within actors. This paper describes two implementations of the unified model as extensions of Habanero-Java and Habanero-Scala. The unified model adds to the foundations of parallel programs, and to the tools available for the programmer to aid in productivity and performance while developing parallel software.}
+      \field{booktitle}{Proceedings of the {ACM} international conference on Object oriented programming systems languages and applications}
+      \field{day}{19}
+      \field{isbn}{978-1-4503-1561-6}
+      \field{month}{10}
+      \field{series}{{OOPSLA} '12}
+      \field{title}{Integrating task parallelism with actors}
+      \field{urlday}{13}
+      \field{urlmonth}{5}
+      \field{urlyear}{2024}
+      \field{year}{2012}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{753\bibrangedash 772}
+      \range{pages}{20}
+      \verb{doi}
+      \verb 10.1145/2384616.2384671
+      \endverb
+      \verb{urlraw}
+      \verb https://doi.org/10.1145/2384616.2384671
+      \endverb
+      \verb{url}
+      \verb https://doi.org/10.1145/2384616.2384671
+      \endverb
+      \keyw{actor model,async-finish model,fork-join model,habanero-java,habanero-scala,parallel programming}
+    \endentry
+    \entry{imam_habanero-java_2014}{inproceedings}{}
+      \name{author}{2}{}{%
+        {{un=1,uniquepart=given,hash=e8172e8ca1b1e348bfb13fad8aeee9b7}{%
+           family={Imam},
+           familyi={I\bibinitperiod},
+           given={Shams},
+           giveni={S\bibinitperiod},
+           givenun=1}}%
+        {{un=0,uniquepart=base,hash=694b6a2cda85144b301a8f45936cf9bb}{%
+           family={Sarkar},
+           familyi={S\bibinitperiod},
+           given={Vivek},
+           giveni={V\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{location}{1}{%
+        {New York, {NY}, {USA}}%
+      }
+      \list{publisher}{1}{%
+        {Association for Computing Machinery}%
+      }
+      \strng{namehash}{b78c3e5e7b200e1431dc0f028bf17ed3}
+      \strng{fullhash}{b78c3e5e7b200e1431dc0f028bf17ed3}
+      \strng{bibnamehash}{b78c3e5e7b200e1431dc0f028bf17ed3}
+      \strng{authorbibnamehash}{b78c3e5e7b200e1431dc0f028bf17ed3}
+      \strng{authornamehash}{b78c3e5e7b200e1431dc0f028bf17ed3}
+      \strng{authorfullhash}{b78c3e5e7b200e1431dc0f028bf17ed3}
+      \field{extraname}{2}
+      \field{labelalpha}{IS14}
+      \field{sortinit}{I}
+      \field{sortinithash}{8d291c51ee89b6cd86bf5379f0b151d8}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{shorttitle}
+      \field{abstract}{With the advent of the multicore era, it is clear that future growth in application performance will primarily come from increased parallelism. We believe parallelism should be introduced early into the Computer Science curriculum to educate students on the fundamentals of parallel computation. In this paper, we introduce the newly-created Habanero-Java library ({HJlib}), a pure Java 8 library implementation of the pedagogic parallel programming model [12]. {HJlib} has been used in teaching a sophomore-level course titled "Fundamentals of Parallel Programming" at Rice University. {HJlib} adds to the Java ecosystem a powerful and portable task parallel programming model that can be used to parallelize both regular and irregular applications. By relying on simple orthogonal parallel constructs with important safety properties, {HJlib} allows programmers with a basic knowledge of Java to get started with parallel programming concepts by writing or refactoring applications to harness the power of multicore architecture. The {HJlib} {APIs} make extensive use of lambda expressions and can run on any Java 8 {JVM}. {HJlib} runtime feedback capabilities, such as the abstract execution metrics and the deadlock detector, help the programmer to obtain feedback on theoretical performance as well as the presence of potential bugs in their program. Being an implementation of a pedagogic programming model, {HJlib} is also an attractive tool for both educators and researchers. {HJlib} is actively being used in multiple research projects at Rice and also by external independent collaborators. These projects include exploitation of homogeneous and heterogeneous multicore parallelism in big data applications written for the Hadoop platform [20, 43].}
+      \field{booktitle}{Proceedings of the 2014 International Conference on Principles and Practices of Programming on the Java platform: Virtual machines, Languages, and Tools}
+      \field{day}{23}
+      \field{isbn}{978-1-4503-2926-2}
+      \field{month}{9}
+      \field{series}{{PPPJ} '14}
+      \field{shorttitle}{Habanero-Java library}
+      \field{title}{Habanero-Java library: a Java 8 framework for multicore programming}
+      \field{urlday}{13}
+      \field{urlmonth}{5}
+      \field{urlyear}{2024}
+      \field{year}{2014}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{75\bibrangedash 86}
+      \range{pages}{12}
+      \verb{doi}
+      \verb 10.1145/2647508.2647514
+      \endverb
+      \verb{file}
+      \verb Full Text PDF:/home/sewi/Zotero/storage/EZK8UIYC/Imam and Sarkar - 2014 - Habanero-Java library a Java 8 framework for mult.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://dl.acm.org/doi/10.1145/2647508.2647514
+      \endverb
+      \verb{url}
+      \verb https://dl.acm.org/doi/10.1145/2647508.2647514
+      \endverb
+      \keyw{Habanero-Java library,Java task parallel library,lambda expressions,task parallelism}
+    \endentry
+    \entry{kuper_lvars_2013}{inproceedings}{}
+      \name{author}{2}{}{%
+        {{un=0,uniquepart=base,hash=bbde74b5b79aa1d4b79215d375325d8a}{%
+           family={Kuper},
+           familyi={K\bibinitperiod},
+           given={Lindsey},
+           giveni={L\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=921b02de077231634ad5943b4c9e5c9f}{%
+           family={Newton},
+           familyi={N\bibinitperiod},
+           given={Ryan\bibnamedelima R.},
+           giveni={R\bibinitperiod\bibinitdelim R\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{location}{1}{%
+        {New York, {NY}, {USA}}%
+      }
+      \list{publisher}{1}{%
+        {Association for Computing Machinery}%
+      }
+      \strng{namehash}{645580621053586a7c850503c06d0a7d}
+      \strng{fullhash}{645580621053586a7c850503c06d0a7d}
+      \strng{bibnamehash}{645580621053586a7c850503c06d0a7d}
+      \strng{authorbibnamehash}{645580621053586a7c850503c06d0a7d}
+      \strng{authornamehash}{645580621053586a7c850503c06d0a7d}
+      \strng{authorfullhash}{645580621053586a7c850503c06d0a7d}
+      \field{labelalpha}{KN13}
+      \field{sortinit}{K}
+      \field{sortinithash}{c02bf6bff1c488450c352b40f5d853ab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{shorttitle}
+      \field{abstract}{Programs written using a deterministic-by-construction model of parallel computation are guaranteed to always produce the same observable results, offering programmers freedom from subtle, hard-to-reproduce nondeterministic bugs that are the scourge of parallel software. We present {LVars}, a new model for deterministic-by-construction parallel programming that generalizes existing single-assignment models to allow multiple assignments that are monotonically increasing with respect to a user-specified lattice. {LVars} ensure determinism by allowing only monotonic writes and "threshold" reads that block until a lower bound is reached. We give a proof of determinism and a prototype implementation for a language with {LVars} and describe how to extend the {LVars} model to support a limited form of nondeterminism that admits failures but never wrong answers.}
+      \field{booktitle}{Proceedings of the 2nd {ACM} {SIGPLAN} workshop on Functional high-performance computing}
+      \field{day}{23}
+      \field{isbn}{978-1-4503-2381-9}
+      \field{month}{9}
+      \field{series}{{FHPC} '13}
+      \field{shorttitle}{{LVars}}
+      \field{title}{{LVars}: lattice-based data structures for deterministic parallelism}
+      \field{urlday}{14}
+      \field{urlmonth}{5}
+      \field{urlyear}{2024}
+      \field{year}{2013}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{71\bibrangedash 84}
+      \range{pages}{14}
+      \verb{doi}
+      \verb 10.1145/2502323.2502326
+      \endverb
+      \verb{file}
+      \verb Full Text PDF:/home/sewi/Zotero/storage/NFIRPNR2/Kuper and Newton - 2013 - LVars lattice-based data structures for determini.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://dl.acm.org/doi/10.1145/2502323.2502326
+      \endverb
+      \verb{url}
+      \verb https://dl.acm.org/doi/10.1145/2502323.2502326
+      \endverb
+      \keyw{deterministic parallelism,lattices}
+    \endentry
+    \entry{miller_robust_2006}{book}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=580008ae5fd939ace197530f8142e6f9}{%
+           family={Miller},
+           familyi={M\bibinitperiod},
+           given={Mark},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {Johns Hopkins University}%
+      }
+      \strng{namehash}{580008ae5fd939ace197530f8142e6f9}
+      \strng{fullhash}{580008ae5fd939ace197530f8142e6f9}
+      \strng{bibnamehash}{580008ae5fd939ace197530f8142e6f9}
+      \strng{authorbibnamehash}{580008ae5fd939ace197530f8142e6f9}
+      \strng{authornamehash}{580008ae5fd939ace197530f8142e6f9}
+      \strng{authorfullhash}{580008ae5fd939ace197530f8142e6f9}
+      \field{labelalpha}{Mil06}
+      \field{sortinit}{M}
+      \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Robust composition: Towards a unified approach to access control and concurrency control}
+      \field{year}{2006}
+      \field{dateera}{ce}
+    \endentry
+    \entry{matsakis_rust_2014}{article}{}
+      \name{author}{2}{}{%
+        {{un=0,uniquepart=base,hash=b9ab334450ee042b091f8f30fe01d877}{%
+           family={Matsakis},
+           familyi={M\bibinitperiod},
+           given={Nicholas\bibnamedelima D.},
+           giveni={N\bibinitperiod\bibinitdelim D\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=6feb88497518ddaf6a77915bf7ad8ea8}{%
+           family={Klock},
+           familyi={K\bibinitperiod},
+           given={Felix\bibnamedelima S.},
+           giveni={F\bibinitperiod\bibinitdelim S\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{f9252f0169f4af867d643bb0f2cfc0dd}
+      \strng{fullhash}{f9252f0169f4af867d643bb0f2cfc0dd}
+      \strng{bibnamehash}{f9252f0169f4af867d643bb0f2cfc0dd}
+      \strng{authorbibnamehash}{f9252f0169f4af867d643bb0f2cfc0dd}
+      \strng{authornamehash}{f9252f0169f4af867d643bb0f2cfc0dd}
+      \strng{authorfullhash}{f9252f0169f4af867d643bb0f2cfc0dd}
+      \field{labelalpha}{MK14}
+      \field{sortinit}{M}
+      \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Rust is a new programming language for developing reliable and efficient systems. It is designed to support concurrency and parallelism in building applications and libraries that take full advantage of modern hardware. Rust's static type system is safe1 and expressive and provides strong guarantees about isolation, concurrency, and memory safety. Rust also offers a clear performance model, making it easier to predict and reason about program efficiency. One important way it accomplishes this is by allowing fine-grained control over memory representations, with direct support for stack allocation and contiguous record storage. The language balances such controls with the absolute requirement for safety: Rust's type system and runtime guarantee the absence of data races, buffer overflows, stack overflows, and accesses to uninitialized or deallocated memory.}
+      \field{day}{18}
+      \field{issn}{1094-3641}
+      \field{journaltitle}{{ACM} {SIGAda} Ada Letters}
+      \field{month}{10}
+      \field{number}{3}
+      \field{shortjournal}{Ada Lett.}
+      \field{title}{The rust language}
+      \field{urlday}{13}
+      \field{urlmonth}{5}
+      \field{urlyear}{2024}
+      \field{volume}{34}
+      \field{year}{2014}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{103\bibrangedash 104}
+      \range{pages}{2}
+      \verb{doi}
+      \verb 10.1145/2692956.2663188
+      \endverb
+      \verb{file}
+      \verb Full Text PDF:/home/sewi/Zotero/storage/DKKSH6SY/Matsakis and Klock - 2014 - The rust language.pdf:application/pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://dl.acm.org/doi/10.1145/2692956.2663188
+      \endverb
+      \verb{url}
+      \verb https://dl.acm.org/doi/10.1145/2692956.2663188
+      \endverb
+      \keyw{affine type systems,memory management,rust,systems programming}
+    \endentry
+    \entry{vakilian_inferring_2009}{inproceedings}{}
+      \name{author}{6}{}{%
+        {{un=0,uniquepart=base,hash=1e37a81c1080a21f001aca6e762356e3}{%
+           family={Vakilian},
+           familyi={V\bibinitperiod},
+           given={Mohsen},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=46f9f117e6f1078f5cdc5c462fba017e}{%
+           family={Dig},
+           familyi={D\bibinitperiod},
+           given={Danny},
+           giveni={D\bibinitperiod},
+           givenun=0}}%
+        {{un=1,uniquepart=given,hash=dc83402ab311c362e24fe280ee16561f}{%
+           family={Bocchino},
+           familyi={B\bibinitperiod},
+           given={Robert},
+           giveni={R\bibinitperiod},
+           givenun=1}}%
+        {{un=0,uniquepart=base,hash=b92116c2257baf1908601a4391d184b3}{%
+           family={Overbey},
+           familyi={O\bibinitperiod},
+           given={Jeffrey},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=1bbfd49b96c18edb5a0c84c94c3fa6c4}{%
+           family={Adve},
+           familyi={A\bibinitperiod},
+           given={Vikram},
+           giveni={V\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=fd79e5e249b219ff553fc2d811104d78}{%
+           family={Johnson},
+           familyi={J\bibinitperiod},
+           given={Ralph},
+           giveni={R\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {IEEE}%
+      }
+      \strng{namehash}{a65d8fd4df237c4c47104f5366313bfe}
+      \strng{fullhash}{7158e352b68c0bf532b122e65281b57b}
+      \strng{bibnamehash}{7158e352b68c0bf532b122e65281b57b}
+      \strng{authorbibnamehash}{7158e352b68c0bf532b122e65281b57b}
+      \strng{authornamehash}{a65d8fd4df237c4c47104f5366313bfe}
+      \strng{authorfullhash}{7158e352b68c0bf532b122e65281b57b}
+      \field{labelalpha}{Vak+09}
+      \field{sortinit}{V}
+      \field{sortinithash}{afb52128e5b4dc4b843768c0113d673b}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{2009 {IEEE}/{ACM} International Conference on Automated Software Engineering}
+      \field{title}{Inferring method effect summaries for nested heap regions}
+      \field{year}{2009}
+      \field{dateera}{ce}
+      \field{pages}{421\bibrangedash 432}
+      \range{pages}{12}
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+

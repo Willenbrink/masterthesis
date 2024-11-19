@@ -1,0 +1,43 @@
+\babel@toc {english}{}\relax
+\babel@toc {english}{}\relax
+\babel@toc {swedish}{}\relax
+\babel@toc {english}{}\relax
+\babel@toc {swedish}{}\relax
+\babel@toc {english}{}\relax
+\babel@toc {swedish}{}\relax
+\babel@toc {english}{}\relax
+\babel@toc {ngerman}{}\relax
+\babel@toc {english}{}\relax
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {1.1}{\ignorespaces Sequential tree sum and a safe parallel translation}}{3}{figure.caption.5}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {3.1}{\ignorespaces A sequential tree sum implementation}}{8}{figure.caption.6}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Tree sum using the basic Async Finish Model}}{9}{figure.caption.7}%
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Tree sum using boxes to improve isolation}}{10}{figure.caption.8}%
+\contentsline {figure}{\numberline {3.4}{\ignorespaces Tree sum with explicit permissions and continuations. Normally, they are implicit.}}{12}{figure.caption.9}%
+\contentsline {figure}{\numberline {3.5}{\ignorespaces Safe and parallel tree sum with explicit permissions and continuations}}{14}{figure.caption.10}%
+\contentsline {figure}{\numberline {3.6}{\ignorespaces Safe and parallel tree sum with implicit permissions and continuations}}{15}{figure.caption.11}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Syntax of \plc }}{18}{figure.caption.12}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Terms and expressions of \plc }}{20}{figure.caption.13}%
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Single frame evaluation rules}}{23}{figure.caption.14}%
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Frame stack evaluation rules}}{24}{figure.caption.15}%
+\contentsline {figure}{\numberline {4.5}{\ignorespaces Task set evaluation rules introduced by \plc }}{25}{figure.caption.16}%
+\contentsline {figure}{\numberline {4.6}{\ignorespaces Task set evaluation rules adapted from LaCasa}}{26}{figure.caption.17}%
+\contentsline {figure}{\numberline {4.7}{\ignorespaces Well-formed programs}}{30}{figure.caption.18}%
+\contentsline {figure}{\numberline {4.8}{\ignorespaces Object capability rules}}{32}{figure.caption.19}%
+\contentsline {figure}{\numberline {4.9}{\ignorespaces Standard term typing rules}}{33}{figure.caption.20}%
+\contentsline {figure}{\numberline {4.10}{\ignorespaces Non-standard term typing rules}}{34}{figure.caption.21}%
+\contentsline {figure}{\numberline {4.11}{\ignorespaces Subtyping rules}}{36}{figure.caption.22}%
+\contentsline {figure}{\numberline {4.12}{\ignorespaces Well-formedness rules}}{36}{figure.caption.23}%
+\contentsline {figure}{\numberline {4.13}{\ignorespaces Frame typing rules}}{37}{figure.caption.24}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {5.1}{\ignorespaces Definitions for isolation}}{42}{figure.caption.25}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {6.1}{\ignorespaces Properties of related work}}{45}{figure.caption.26}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {A.1}{\ignorespaces Predicates}}{53}{figure.caption.27}%
+\contentsline {figure}{\numberline {A.2}{\ignorespaces Invariants}}{54}{figure.caption.28}%
+\addvspace {10\p@ }

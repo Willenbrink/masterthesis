@@ -1,0 +1,15 @@
+[0] Config.pm:307> INFO - This is Biber 2.19
+[0] Config.pm:310> INFO - Logfile is 'build/main_kth.blg'
+[79] biber:342> INFO - === Mon Sep  2, 2024, 19:07:21
+[98] Biber.pm:419> INFO - Reading 'build/main_kth.bcf'
+[170] Biber.pm:979> INFO - Found 18 citekeys in bib section 0
+[187] Biber.pm:4419> INFO - Processing section 0
+[196] Biber.pm:4610> INFO - Looking for bibtex file 'bibliography.bib' for section 0
+[199] bibtex.pm:1713> INFO - LaTeX decoding ...
+[237] bibtex.pm:1519> INFO - Found BibTeX data source 'bibliography.bib'
+[461] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[461] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[461] Biber.pm:4239> INFO - Sorting list 'anyt/global//global/global' of type 'entry' with template 'anyt' and locale 'en-US'
+[461] Biber.pm:4245> INFO - No sort tailoring available for locale 'en-US'
+[486] bbl.pm:661> INFO - Writing 'build/main_kth.bbl' with encoding 'UTF-8'
+[496] bbl.pm:764> INFO - Output to build/main_kth.bbl

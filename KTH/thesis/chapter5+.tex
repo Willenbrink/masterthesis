@@ -1,0 +1,248 @@
+\chapter{Properties}\label{proper}
+
+\section{Progress}
+The progress theorem states that we can always take a step as long as we are in a well-formed state or that we have reached a final state. A consequence of progress is that there are no deadlocks as a \textit{finish} never blocks forever. One exception to progress are \textit{null} values as calling the method or assigning to fields of a null object is not well-defined. We define the final state as both the active and waiting task sets $TS$ and $WS$ being empty. We can thus state Progress follows:
+
+\begin{futuretheorem}{progress}[Progress]
+\begin{alignat}{2}
+    &\vdash H : \star \label{prog-prem-1}\\
+    &\wedge\ H \vdash TS, WS \label{prog-prem-2}\\
+    &\wedge\ H \vdash TS, WS \bn{ok} \label{prog-prem-3}\\
+    &\Rightarrow \reductasks{}*[H']{}[TS', WS']* \label{prog-concl-1}\\
+    &\vee\ TS = \emptyset \wedge WS = \emptyset \label{prog-concl-2}\\
+    &\vee\ \exists (i_f, i_a, FS) \in TS.\ FS = F \circ FS' \text{where $F = \langle L, \text{let $x = t$ in $t'$}, P \rangle^l$ and}\\
+\nonumber& \text{$t \in \{y.f, y.f = z, y.m(z),
+y.\vn{async}(b, z \rightarrow s)\{t''\},$}\\
+\nonumber& \text{$\vn{capture}(y.f, x)\{z \Rightarrow t''\}, \vn{swap}(y.f, x)\{z \Rightarrow t''\}\}$ and $L(y) = \mn{null}$.}\label{prog-concl-3} 
+\end{alignat}
+\end{futuretheorem}
+
+To prove this, we first must have a task in $TS$ that can be reduced or that we can resume a waiting task to obtain one. To resume a waiting task, we must show that, assuming $TS$ is empty, at least one task in $WS$ can be resumed. This is equivalent to stating that at least one task in $WS$ has no task it waits on. We call this property deadlock freedom as it states that there cannot be a cycle of tasks waiting on each other.
+
+To show this, we rely on the \textit{idOrdering} invariant which states that a waiting task always waits on tasks created after it or equivalently: $i_f < j_f$ for a waiting task $((i_f, i_a, FS), j_f) \in WS$.
+\begin{definition}[ID Ordering]
+    We say that a set of waiting tasks $WS$ has ordered IDs iff all tasks await IDs created after their own ID, that is:
+
+    \[\vn{idOrdering}(WS) := \forall ((i_f, i_a, FS),j_f) \in WS.\ i_f < j_f\]
+\end{definition}
+
+\begin{lemma}[Deadlock Freedom] \label{resumable-task}
+\begin{alignat}{2}
+&H \vdash \TS, \WS \bn{ok} \label{resumable-prem-1}\\
+\wedge\ &\vn{idOrdering}(WS) \label{resumable-prem-2}\\
+\wedge\ &\WS \neq \emptyset \label{resumable-prem-3}\\
+\wedge\ &\TS = \emptyset \label{resumable-prem-4}\\
+\Rightarrow\ &\exists (T, i_f) \in \WS.\ \reductasks{}[TS, \{(T,i_f)\} \uplus \WS]{T}* \label{resumable-concl}
+\end{alignat}
+\end{lemma}
+\begin{proof}[Proof: Deadlock Freedom]
+We proceed with a proof by contradiction:
+
+Assume that no such $(T,i_f) \in \WS$ exists. It follows that every task in $\WS$ is waiting on another task in either $\TS$ or $\WS$:
+\begin{equation}
+    \forall (T,i_f) \in WS.\ \exists (j_f, i_a, FS) \in TS \cup \vn{tasks}(WS).\ i_f = j_f
+\end{equation}
+From \cref{resumable-prem-2,resumable-prem-4} we obtain that every task awaits a task with a higher id:
+\begin{equation}
+    \forall (T,i_f) \in WS.\ \exists ((i_f,i_a,FS),j_f) \in WS.\ i_f < j_f
+\end{equation}
+
+At the same time, \cref{resumable-prem-3} and the fact that $WS$ is finite implies that there must exist a maximal element. Assuming finiteness of $WS$ is valid as a finite program can only create a finite number of tasks:
+\begin{equation}
+    \exists (T_{\vn{max}},i_f) \in WS.\ \forall (T',j_f) \in WS.\ j_f \leq i_f
+\end{equation}
+We obtain a contradiction as this maximal element $(T_{\vn{max}}, i_f)$ has an id $i_f$ larger than the id of all other tasks.
+\end{proof}
+
+We can now proceed with progress.
+\begin{proof}[Proof: Progress]
+We distinguish three cases for $TS$ and $WS$:
+\begin{enumerate}
+    \item $TS = \emptyset$ and $WS = \emptyset$: We can immediately conclude with \cref{prog-concl-2}.
+    \item $TS = \emptyset$ and $WS \neq \emptyset$: We apply E-RESUME to one of the waiting tasks obtained via \cref{resumable-task}.
+    \item $TS \neq \emptyset$: We continue with an arbitrary task $(i_f, i_a, FS) \in TS$
+\end{enumerate}
+
+We distinguish three cases for $FS$:
+\begin{enumerate}
+    \item $FS = \epsilon$: We can apply rule E-TASK-DONE
+    \item $FS = \sframe{x} \circ \epsilon$: We can apply rule E-TASK-DONE
+    \item $FS = F \circ FS'$ where $F = \sframe{t}$
+\end{enumerate}
+
+For the last case, we continue with a case distinction on $t$. This is relatively straightforward as the evaluation rules are syntax directed. A detailed proof for the premises of each rule with all intermediate steps can be found in the appendix.
+\end{proof}
+
+\section{Isolation}
+The isolation theorem states that no two active tasks can access the same object in the heap. Intuitively, this ensures that no data race can occur as a prerequisite for data races is two tasks concurrently accessing the same object. Note that waiting tasks are not strictly required to be isolated from the active tasks as they are not able to access the memory while waiting. One issue with this is the resumption of waiting tasks. If a waiting task is not isolated from all active tasks, resuming it will break isolation. We thus require each waiting task to be isolated from, or awaiting the termination of, each active task.
+
+\begin{figure}
+    \centering
+\infrule[\graybox{ISO-TS}]
+    { \forall T, T' \in TS \cup tasks(WS).\ \vn{isolated}(H, WS, T, T')}
+    {\vn{isolated}(H, TS, WS)}
+\vspace{3mm}
+\infrule[\graybox{ISO-T}]
+    {T = (i_f, i_a, FS) \andalso T' = (j_f, j_a, FS')\\
+    \vn{reachables}(H, FS) \cap \vn{reachables}(H, FS') = \emptyset \vee awaits(WS, T, T') \vee awaits(WS, T', T)
+    }
+    {\vn{isolated}(H, WS, T, T')}
+\vspace{3mm}
+\infrule[Awaits-Base]
+    {(T, i_f) \in WS \wedge id_f(T') = i_f}
+    {awaits(WS, T, T')}
+\vspace{3mm}
+\infrule[Awaits-Step]
+    {(U, k_f) \in WS \andalso awaits(WS, T, U) \andalso awaits(WS, U, T')}
+    {awaits(WS, T, T')}
+
+    \caption{Definitions for isolation}
+    \label{fig:isolation-def}
+\end{figure}
+
+Based on these requirements, we can define isolation as shown in \cref{fig:isolation-def}. ISO-TS states that the current program state is isolated, $\vn{isolated}(H, TS, WS)$, if each pair of tasks, whether active or waiting, is isolated from each other. ISO-T, in turn, defines two tasks to be isolated from each other if the set of objects they can reach is disjoint or one awaits the other. Finally, AWAITS-BASE and AWAITS-STEP define the transitive $\vn{awaits}(WS, T, T')$ relation. Either $T$ directly awaits the termination of $T'$ by its id or $T$ awaits a task $U$ that in turn awaits the task $T$.
+
+The initial state is trivially isolated as we only have one task. By showing that isolation is preserved when taking a reduction step we can show that any reachable program state is isolated.
+
+We define the isolation preservation as follows: Assuming we take a step from a state $H, TS, WS$ to $H', TS', WS'$ and that the initial state is well-typed, fulfills all invariants and is isolated the final state will also be isolated. This can be formulated as follows: 
+
+\begin{theorem}[Isolation]
+\begin{alignat}{3}
+    &\reductasks{}*[H']{}[TS',WS']* \label{iso-prem-reduc}\\
+    \wedge\ & H \vdash TS, WS\\
+    \wedge\ & H \vdash TS, WS \bn{ok} \label{iso-prem-ok}\\
+    \wedge\ & \vn{isolated}(H, TS, WS) \label{iso-prem-iso}\\
+    \Rightarrow\ & \vn{isolated}(H', TS', WS') \label{iso-concl}
+\end{alignat}
+\end{theorem}
+
+Before we can prove the theorem, we make three observation about \textit{isolated}. Firstly, removing a task $T$ that does not await any other task preserves \textit{isolated}. This follows from the definition of \textit{isolated} and \textit{awaits} as a task $U$ awaiting a task $U'$ before removing $T$ will also await $U'$ after $T$ has been removed and the \textit{reachables} of other tasks unaffected by $T$.
+
+Secondly, if a task $T$ is \textit{isolated} from all other tasks in $TS$ and $WS$, adding this task to either $TS$ or $WS$, with some finish id $i_f$, preserves \textit{isolated}. This follows immediately from the definition of \textit{isolated}.
+
+We can now prove isolation by analysing the reduction rules individually. The rules can affect the proof in two ways: (a) adding or removing tasks from either $TS$ or $WS$ and (b) affect the \textit{reachables} set of a preexisting task. The first is covered by the two observations about task sets. The second is, for the most part, trivial as the \textit{reachables} set is preserved by most rules. We provide a detailed analysis of the rules in the appendix.
+
+\section{Preservation}
+Preservation states that welltyped terms and tasks retain the same type after a reduction step. Furthermore, a set of invariants is preserved by the reduction. Due to time constraints, we do not provide a proof of preservation.
+Preservation can be stated as three theorems, one for each reduction relation:
+
+\begin{theorem}[Preservation: Frame Reduction]
+    \begin{alignat}{3}
+    & \vdash H : \star \label{pres-prem-1}\\
+    &\wedge\ H \vdash F : \sigma \label{pres-prem-2}\\
+    &\wedge\ H; a \vdash F\ \bn{ok}\\
+    &\wedge\ \reducframe{F}*[H']{F'}*\\
+    &\Longrightarrow \vdash H' : \star\\
+    &\wedge\ H' \vdash F' : \sigma\\
+    &\wedge\ H'; a \vdash F'\ \bn{ok}
+    \end{alignat}
+\end{theorem}
+
+\begin{theorem}[Preservation: Frame Stack Reduction]
+    \begin{alignat}{3}
+    & \vdash H : \star\\
+    &\wedge\ H \vdash FS\\
+    &\wedge\ H; a \vdash FS\ \bn{ok}\\
+    &\wedge\ \reducstack{}*[H']{}[FS']*\\
+    &\Longrightarrow \vdash H' : \star\\
+    &\wedge\ H' \vdash FS'\\
+    &\wedge\ H'; a \vdash FS'\ \bn{ok}
+    \end{alignat}
+\end{theorem}
+
+\begin{theorem}[Preservation: Task Set Reduction]
+    \begin{alignat}{3}
+    & \vdash H : \star \label{pres-ts-prem-hstar}\\
+    &\wedge\  H \vdash TS, WS \label{pres-ts-prem-tsws}\\
+    &\wedge\  H \vdash TS, WS\ \bn{ok} \label{pres-ts-prem-tswsok}\\
+    &\wedge\  \reductasks{}*[H']{}[TS', WS']* \label{pres-ts-prem-reduc}\\
+    &\Longrightarrow \vdash H' : \star \label{pres-ts-concl-hstar}\\
+    &\wedge\  H' \vdash TS', WS' \label{pres-ts-concl-tsws}\\
+    &\wedge\  H' \vdash TS', WS'\ \bn{ok} \label{pres-ts-concl-tswsok}
+    \end{alignat}
+\end{theorem}
+
+Most of the invariants we require are identical to those of LaCasa and can be found in the appendix. We define only a single additional invariant for the progress theorem, \textit{idOrdering}$(WS)$, which is a property on a specific waiting task set $WS$. As such, to show that it is preserved, we only need to examine rules that modify $WS$, i.e. E-RESUME, E-CAPTURE, E-SWAP, E-FINISH. Of these, the first three only remove tasks from $WS$, that is $\reductasks{}*{}[TS, WS']*$ where $WS' \subseteq WS$. It follows that $\vn{idOrdering}(WS) \Longrightarrow \vn{idOrdering}(WS')$. E-FINISH also preserves ID ordering as the ID $j_f$ is fresh and therefore larger than all other defined IDs. 
+
+\chapter{Related Work}\label{related}
+\begin{figure}
+    \centering
+\begin{tabular}{ c | c c c c }
+        & \makecell{Data race \\ freedom}
+        & \makecell{Deadlock \\ freedom}
+        & Determinism
+        & \makecell{Requires \\ annotations}\\
+        \hline
+ \plc & Yes & Yes & Yes & No \\
+ LaCasa & Yes & No & No & No \\  
+ X10 & Yes & Yes & No & Yes   \\
+ Habanero-Java/Scala & Diagnostic & Yes* & Yes* & No \\
+ DPJ & Yes & Yes & Yes & Yes \\
+ Rust & Yes & No & No & Yes
+\end{tabular}
+    \caption{Properties of related work}
+    \label{related-work}
+\end{figure}
+
+In this chapter, we compare \plc with a selected number of different approaches. \Cref{related-work} summarizes the differences. Note that Habanero-Java is only deadlock-free if a limited set of constructs is used and only deterministic if it is data race free.
+ 
+\section{LaCasa}
+LaCasa~\cite{haller_lacasa_2016} is an extension to the Scala programming language that uses object capabilities, unique pointers and affine types to provide encapsulation and data-race freedom in an actor-based concurrency model. LaCasa focuses on being a minimal extension to the Scala language, requiring only a single bit of information per class to encode whether it follows the object capability model or not. In addition, it interacts soundly with the local type inference and requires no annotations of existing code, supporting a gradual transition. It has also been implemented as a compiler plugin.
+
+LaCasa and, more specifically, $CLC^2$ form the basis for this thesis and \plc. The main difference is that LaCasa adds an actor-based extension in $CLC^3$, whereas \plc uses the Async Finish model. As a consequence, the formalization of \plc adds sets of active and waiting tasks with the main difficulty being \textit{swap} and \textit{capture} and how they interact with tasks. We improve on it in two significant ways.
+
+First, LaCasa opts for an actor-based concurrency model which is inherently nondeterministic due to asynchronous message passing. Furthermore, deadlocks are possible and difficult to reason about due to the decentralized program logic in the actors. Finally, translating sequential algorithms to using actors is often not trivial. We solve these problems by adopting the Async Finish Model.
+
+Second, we provide a proof of isolation, showing that tasks stay isolated and do not interfere with each other. This shows the absence of data races. Although LaCasa also ensures isolation, it only gives a high-level intuition for its correctness.
+
+\section{X10}
+X10~\cite{charles_x10_2005} is a programming language designed for systems with Non-Uniform Memory Access, that is, systems where memory access time depends on which processor is accessing it,  and has three goals: (a) achieve high performance by colocating computations with the data they operate on; (b) achieve high developer productivity by supporting a variety of lightweight concurrency primitives such as async, finish and foreach; and (c) ensure deadlock freedom.
+
+X10 uses a partitioned global address space, separating the heap into different areas, called \textit{places}, each associated with a different compute node. Each asynchronous expression also takes a place in which it should be executed. By running asynchronous tasks in the same area as the memory they access performance can be increased at the cost of a few annotations.
+
+Note that places have some similarity with boxes in that both partition the heap. But in contrast to boxes, places do not enforce strict isolation and separation as they are primarily a tool for ensuring that a program accesses data in an efficient manner. Furthermore, the number of places is arbitrary but fixed on program start and objects residing in one place permanently reside there. 
+
+\section{Habanero-Java}
+Habanero-Java~\cite{cave_habanero-java_2011} is a programming language based on X10 which transpiles to standard Java classfiles. It focuses on safe concurrent programming with flexible constructs. It supports the Async-Finish model and some additional constructs such as \textit{futures} in addition to integrating actors. A Habanero Scala version also exists \cite{imam_integrating_2012,imam_habanero-scala_2012}.
+
+Programs limiting themselves to the AFM are guaranteed to be deadlock free. Furthermore, if a program is data-race free and uses only the AFM, it is also deterministic. In a way, this is the best of both worlds, as it makes nondeterminism a choice for specific problems ill-suited to the AFM while making the majority of programs deterministic. To ensure data-race freedom, it supports diagnostic tools but does not provide static guarantees. Unfortunately, these tools can only show the presence of data races, not their absence.
+
+Note that Habanero-Java is heavily inspired by X10 and aims to stay closer to Java, being almost a superset of the Java 5 language. This move aims to ease adoption. Since then, Habanero-Java has even been ported to a Java library called HJlib, lowering the hurdles to adoption even further. This comes with a trade-off, as HJlib does not possess the same safeguards due to not having special compiler support. Some lexical and scoping errors, for example, are not detected statically \cite{imam_habanero-java_2014}.
+
+
+\section{Deterministic Parallel Java}
+Deterministic Parallel Java (DPJ)~\cite{bocchino_type_2009} is an extension of the Java programming language that supports the Fork-Join model. The primary focus of the project is ensuring deterministic behavior. This requires that DPJ is also data-race free.
+
+DPJ partitions the heap into regions and annotates classes with the region in which they reside. Regions share many similarities with boxes such as being hierarchical and non-overlapping. The key difference is that boxes encapsulate their content, whereas regions do not require this. Instead, a class might have different member variables that reside in different regions.
+
+Explicit effect annotations of methods describe the regions accessed by the method. These annotations are then checked to ensure that no two concurrently executed methods both write or write and read to/from the same region. Concurrent reads are possible, enabling DPJ to implement some algorithms efficiently that \plc cannot, for example the Barnes-Hut algorithm presented in \cite{bocchino_type_2009}.
+
+Both region and method effect annotations are necessary. The annotations are challenging to write and difficult to infer. Although some progress has been made towards inferring method effect annotations, it has not yet been possible to completely eliminate them and region annotations \cite{vakilian_inferring_2009}.
+
+
+\section{Rust}
+Rust~\cite{matsakis_rust_2014} is probably the most well-known attempt at realizing memory safety, including data races. It is a completely new programming language with significant differences to any other mainstream language. Deadlock freedom and determinism are not guaranteed by the language. Instead, the language includes a future-based concurrency model.
+
+The safety of Rust is based on a notion of \textit{ownership} where the owner of an object encapsulates it similar to boxes. One difference is that the owner can create \textit{borrowed references} to the owned object or any of its transitive references. This is different from \plc that only allows transferring ownership via e.g. \textit{swap} of complete boxes.
+
+One other important difference is that a borrow can be immutable: This allows the user to turn a mutable object temporarily immutable, which in turn relaxes the need for alias control. This is not possible in \plc as the permission protecting a box may never be duplicated.
+
+\section{LVars}
+LVars~\cite{kuper_lvars_2013} pursues a completely different approach to determinism. Instead of controlling aliasing, it instead limits the operations on shared memory as operations that commute, producing the same result irrespective of order. More specifically, LVars requires writes to be monotonic, that is, shared data structures may grow but not shrink and that previous information is not invalidated. As an intuitive example, this means that a dictionary might be shared and that entries can be added but that no entries can be removed. In addition, the shared data cannot be read in its entirety; only blocking queries for specific keys are allowed.
+
+This approach is quite powerful for suitable problems as it is not coupled to any specific concurrency model. Actors, futures or the AFM can theoretically all be used in combination with such a system. Unfortunately, it places heavy restrictions on the kind of operation as many operations are not monotonic. In fact, mutability often refers to overwriting of data which LVars does not support. Instead, monotonic writes can be seen as a middle ground between immutability and mutability as no key-value pair in a dictionary can be made inaccessible by monotonic writes.
+
+These shared data structures allowing only monotonic writes, called \textit{cells}, may depend on other cells through e.g. blocking reads awaiting a write. This allows even cyclic dependencies which where not handled correctly by LVars. Reactive Async~\cite{haller_reactive_2016} builds on LVars and handles cyclic dependencies and fallbacks correctly, but introduces nondeterminism through shared state. Reactive Async was, in turn, built upon by RACL~\cite{arvidsson_deterministic_2018} to reintroduce determinism by combining it with LaCasa boxes and object capabilities.
+
+
+\chapter{Conclusion}\label{concl}
+In this thesis, we introduced \plc, a programming language based on LaCasa~\cite{haller_lacasa_2016}, that supports the Async Finish model and guarantees data race freedom as well as deadlock freedom and determinism. We furthermore formalized a core language. While we also proved the properties progress and isolation, we fell short of proving preservation and confluence. This means that we cannot be certain that the system is completely sound.
+
+\section{Future Work}
+Naturally, finishing the proofs of preservation and confluence is an obvious next step. Defining the invariants necessary for showing both can also provide additional insights into how the system can be further adapted and simplified. For example, tasks are currently divided into two sets, one active and one waiting. Alternatively, the tasks could be organised in a tree structure where the leaves are active tasks. We did not adopt this structure as we were not certain whether or not the tree structure could be as easily adapted as changes were made.
+
+An interesting extension would be integrating actors into the model. While determinism is a very desirable property, the AFM places some constraints on the program structure. A less structured model such as actors might be able to complement the AFM nicely. Even though LaCasa already introduced actors unforeseen complications might arise from combining them with the AFM.
+
+Another observation we made is that a box cannot be unwrapped in \plc: Its content will never be available within the main task. Instead, we can \textit{capture} a box in another box. This is more limiting than it should be. Instead, replacing \textit{capture} by an \textit{unwrap(x : \mn{Box}[C]) : C} expression would allow the contents of a box to be made available even in the main task without requiring another box into which the contents are merged. It is not clear whether other complications arise.
+
+Last but not least, this thesis is purely theoretical. Implementing the language as a compiler plugin for Scala is necessary before the language can actually be used. It would also allow gathering more real-world data on its strengths and weaknesses compared to other approaches. Building on the work of LaCasa, which is already implemented as a plugin, should reduce the effort required.

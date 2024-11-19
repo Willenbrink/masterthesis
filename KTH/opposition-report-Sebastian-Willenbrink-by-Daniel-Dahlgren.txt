@@ -1,0 +1,15 @@
+IV. METHOD
+
+Is the choice of method for tackling the problem justified (including discussing alternative methods)?
+
+    No. Depending on what the research question is the Method part would be different. As the two example research questions I had, if the goal is to extend LaCasa, are there other ways to extend LaCasa? If the research questions is how to make parallellism in Scala easier, why was LaCasa picked, and not
+somethings else?
+
+    "For example, tasks are currently divided into two sets, one active and one waiting. Alternatively, the tasks could be organised in a tree structure where the leaves are active tasks. We did not adopt this structure as we were not certain whether or not the tree structure could be as easily adapted as changes were made." Is in related works. This is a really good explaination of a method issue, but is in related works."
+
+VIII. OUTLOOK AND CONCLUDING ASSESSMENT
+
+Does the report put the project into a larger perspective, considering e.g., societal impact, (economical, ecological and/or societal) sustainability, ethics?
+
+    No.
+

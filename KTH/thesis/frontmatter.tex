@@ -1,0 +1,121 @@
+% Frontmatter includes the abstracts and table-of-contents
+\setcounter{page}{1}
+\begin{abstract}
+% The first abstract should be in the language of the thesis.
+% Abstract fungerar på svenska också.
+  \markboth{\abstractname}{}
+\begin{scontents}[store-env=lang]
+eng
+\end{scontents}
+%%% The contents of the abstract (between the begin and end of scontents) will be saved in LaTeX format
+%%% and output on the page(s) at the end of the thesis with information for DiVA facilitating the correct
+%%% entry of the meta data for your thesis.
+%%% These page(s) will be removed before the thesis is inserted into DiVA.
+\begin{scontents}[store-env=abstracts,print-env=true]
+  Concurrent programming brings many pitfalls, such as data races, deadlocks and nondeterminism. Designing programming languages to eliminate these classes of bugs is an active area of research. Previous attempts at this focused on creating completely new languages, hampering adoption and reuse of existing code, or were either insufficient to address all of data races, deadlocks and nondeterminism or required annotating code, complicating reuse of existing libraries.
+
+  In this thesis, we present a new approach to integrating safe concurrency into an existing mainstream programming language, Scala. To do so, we combine two approaches: We represent concurrency in code using the Async Finish Model, a variant of the widely used Fork Join Model. It is inherently free of deadlocks and deterministic. To ensure data race freedom, we isolate subgraphs of the heap by building on the work of LaCasa \cite{haller_lacasa_2016}. LaCasa requires no annotations as the compiler can automatically verify that this isolation is preserved.
+
+  We provide an informal overview of a language combining these two approaches along with a formalization of the operational semantics. In addition, we show the progress of our reduction and preservation of the necessary invariants as well as isolation of asynchronous tasks. Progress implies deadlock freedom and isolation of asynchronous tasks implies data race freedom. We also formally state and provide an argument for determinism.
+  \todo{Actually write preservation down}
+\end{scontents}
+
+\subsection*{Keywords}
+\begin{scontents}[store-env=keywords,print-env=true]
+% If you set the EnglishKeywords earlier, you can retrieve them with:
+\InsertKeywords{english}
+% If you did not set the EnglishKeywords earlier then simply enter the keywords here:
+% comma separate keywords, such as: Canvas Learning Management System, Docker containers, Performance tuning
+\end{scontents}
+\end{abstract}
+\cleardoublepage
+\babelpolyLangStart{swedish}
+\begin{abstract}
+    \markboth{\abstractname}{}
+\begin{scontents}[store-env=lang]
+swe
+\end{scontents}
+\begin{scontents}[store-env=abstracts,print-env=true]
+  Samtidig programmering medför många fallgropar, t.ex. samtidiga åtkomst till samma minne, baklås och nondeterminism. Att utforma programmeringsspråk för att eliminera dessa typer av buggar är ett aktivt forskningsområde. Tidigare försök har fokuserat på att skapa helt nya språk, vilket försvårar användning och återanvändning av befintlig kod, eller så har de antingen inte varit tillräckliga för att hantera alla nämnda problem eller så har de krävt att koden annoteras, vilket försvårar återanvändning av befintliga bibliotek.
+
+  I den här avhandlingen presenterar vi en ny metod för att integrera säker samtidighet i ett befintligt vanligt programmeringsspråk, Scala. För att göra detta kombinerar vi två metoder: Vi representerar samtidighet i kod med hjälp av det så kallade Async Finish Model, en variant av den allmänt använda Fork Join Model. Den är i sig själv fri från baklås och deterministisk. För att säkerställa frihet från samtidiga minneståkomster isolerar vi delgrafer av heapen genom att bygga vidare på LaCasas arbete \cite{haller_lacasa_2016}. LaCasa kräver inga annotationer eftersom kompilatorn automatiskt kan verifiera att denna isolering bevaras.
+
+  Vi ger en informell översikt över ett språk som kombinerar dessa två tillvägagångssätt tillsammans med en formalisering av den operativa semantiken. Dessutom visar vi reduktionens framsteg och bevarande av semantikens invarianter samt isolering av asynkrona tråder. Reduktionens framsteg innebär frihet från baklås och isolering av asynkrona tråder innebär frihet från samtidiga minnesåtkomster. Vi formaliserar och ger dessutom ett argument för determinism.
+\end{scontents}
+\subsection*{Nyckelord}
+\begin{scontents}[store-env=keywords,print-env=true]
+% SwedishKeywords were set earlier, hence we can use alternative 2
+\InsertKeywords{swedish}
+\end{scontents}
+\end{abstract}
+\babelpolyLangStop{swedish}
+
+\cleardoublepage
+% note that a command is used to avoid Overleaf parsing problems
+\babelpolyLangStart{ngerman}
+\begin{abstract}
+    \markboth{\abstractname}{}
+\begin{scontents}[store-env=lang]
+ger
+\end{scontents}
+\begin{scontents}[store-env=abstracts,print-env=true]
+  Parallele Programmierung birgt viele Stolperfallen, wie zum Beispiel gleichzeitige Speicherzugriffe, Deadlocks und Nichtdeterminismus. Die Entwicklung von Programmiersprachen zur Vermeidung dieser Fehlerklassen ist ein aktives Forschungsgebiet. Bisherige Versuche konzentrierten sich auf die Entwicklung völlig neuer Sprachen, was die Übernahme und Wiederverwendung von bestehendem Code erschwert, oder sie waren entweder unzureichend, um alle genannten Probleme zu verhindern, oder sie erforderten die Annotierung von Code, was die Wiederverwendung bestehender Bibliotheken erschwert.
+
+  In dieser Arbeit stellen wir einen neuen Ansatz zur Integration von sicherer Parallelität in eine bestehende Mainstream-Programmiersprache, Scala, vor. Zu diesem Zweck kombinieren wir zwei Ansätze: Wir stellen die Nebenläufigkeit im Code mithilfe des Async Finish Model dar, einer Variante des weit verbreiteten Fork Join Model. Es ist von Natur aus frei von Deadlocks und deterministisch. Um die Freiheit von gleichzeitigen Speicherzugriffen zu gewährleisten, isolieren wir Teilgraphen des Heaps, indem wir auf der Arbeit von LaCasa \cite{haller_lacasa_2016} aufbauen. LaCasa erfordert dabei keine Anmerkungen, da der Compiler automatisch überprüfen kann, dass diese Isolation erhalten bleibt.
+
+  Wir geben einen informellen Überblick über eine Sprache, die diese beiden Ansätze kombiniert, sowie eine Formalisierung der operativen Semantik dieser Sprache. Darüber hinaus zeigen wir den Fortschritt der Reduktion und die Erhaltung der Invarianten der Semantik sowie die Isolierung asynchroner Ausführungseinheiten. Fortschritt der Reduktion impliziert Deadlock-Freiheit und die Isolierung asynchroner Aufgaben impliziert die Abwesenheit paralleler Speicherzugriffe. Wir formalisieren und liefern außerdem ein Argument für Determinismus.
+\end{scontents}
+\subsection*{Schlüsselwörter}
+\begin{scontents}[store-env=keywords,print-env=true]
+Parallele Programmierung, Objekt-orientierte Programmierung, Operative Semantik, Scala
+\end{scontents}
+\end{abstract}
+\babelpolyLangStop{ngerman}
+\cleardoublepage
+
+\section*{Acknowledgments}
+\markboth{Acknowledgments}{}
+I would like to thank my supervisor at KTH, Philipp Haller, for his reliable and extensive support over the course of the thesis. I would also like to thank my supervisor at TUM, Kevin Kappelmann, for the valuable discussions.
+
+\acknowlegmentssignature
+
+\fancypagestyle{plain}{}
+\renewcommand{\chaptermark}[1]{ \markboth{#1}{}} 
+\tableofcontents
+  \markboth{\contentsname}{}
+
+\cleardoublepage
+\listoffigures
+
+\cleardoublepage
+
+%\listoftables
+%\cleardoublepage
+%\lstlistoflistings\engExpl{If you have listings in your thesis. If not, then remove this preface page.}
+%\cleardoublepage
+% Align the text expansion of the glossary entries
+%\newglossarystyle{mylong}{%
+%  \setglossarystyle{long}%
+%  \renewenvironment{theglossary}%
+%     {\begin{longtable}[l]{@{}p{\dimexpr 2cm-\tabcolsep}p{0.8\hsize}}}% <-- change the value here
+%     {\end{longtable}}%
+% }
+%\glsaddall
+%\printglossaries[type=\acronymtype, title={List of acronyms}]
+%\printglossary[style=mylong, type=\acronymtype, title={List of acronyms and abbreviations}]
+%\printglossary[type=\acronymtype, title={List of acronyms and abbreviations}]
+
+%\printnoidxglossary[style=mylong, title={List of acronyms and abbreviations}]
+%\engExpl{The list of acronyms and abbreviations should be in alphabetical order based on the spelling of the acronym or abbreviation.
+%}
+
+% if the nomenclature option was specified, then include the nomenclature page(s)
+\ifnomenclature
+    \cleardoublepage
+    % Output the nomenclature list
+    \printnomenclature
+\fi
+
+%% The following label is essential to know the page number of the last page of the preface
+%% It is used to computer the data for the "For DIVA" pages
+\label{pg:lastPageofPreface}

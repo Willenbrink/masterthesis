@@ -1,0 +1,322 @@
+\chapter{Introduction}
+Concurrent programming brings many pitfalls, such as data races, deadlocks and livelocks. In addition, common software development tasks, including reproducing program executions and finding sources of bugs, are typically harder due to various sources of nondeterminism introduced by concurrent programming models. For example, shared-memory threads commonly permit large numbers of thread inter-leavings. \cite{goetz_java_2006}
+
+In order to increase the safety of concurrent programs, a substantial body of prior work has explored the static prevention of data races~\cite{boyapati_parameterized_2001,haller_lacasa_2016} and deadlocks, using session types~\cite{honda_multiparty_2016} or other type systems~\cite{boyapati_ownership_2002}.
+
+Pervasive mutability and aliasing as typical in imperative object-oriented programming languages pose a major challenge. To prevent data races, we either limit mutation, which negatively impacts performance and is thus not desirable, or control aliasing which does not have this drawback. Doing this statically requires more advanced type systems.
+
+Many approaches to alias control rely on creating a new language such as X10~\cite{charles_x10_2005} or Rust~\cite{matsakis_rust_2014} while others require extensive annotations of the classes and methods used in concurrent programs~\cite{bocchino_type_2009}. Due to the wealth of existing programs and the impact of existing libraries on developer productivity, these approaches severely impact adoption.
+
+Prior work on lightweight concurrency extensions of existing programming languages exists but has some shortcomings. For example, while LaCasa~\cite{haller_lacasa_2016} ensures data race freedom, it does not ensure deadlock freedom or provide a deterministic concurrency model. Habanero-Java~\cite{cave_habanero-java_2011} does provide deadlock freedom and determinism in the absence of data races but only integrates with diagnostic tools to analyse data race freedom. Deadlocks and nondeterminism, especially in combination with each other, result in bugs that are hard to reason about. Data races are even worse as they are sensitive to minor changes and may remain undetected.
+
+Finally, a language providing safe concurrency requires trust in its soundness. A formalization of core concepts can help understand the mechanisms involved. Proofs of properties such as progress and isolation are also important as they establish deadlock freedom and data-race freedom, respectively.
+
+In this thesis, we present a new approach to integrating safe concurrency into the existing mainstream programming language Scala. Our language uses the Async Finish model for concurrency that is inherently free of deadlocks and deterministic~\cite{charles_x10_2005}. Furthermore, we build on LaCasa~\cite{haller_lacasa_2016} to ensure isolation and uniqueness without requiring annotations of program code. We successfully combine (a) the semantics of unique references as introduced by LaCasa's boxes and (b) concurrent tasks that temporarily have exclusive ownership of them.
+
+\begin{figure}
+%\begin{multicols}{2}
+\begin{lstlisting}
+class Node {
+	var children: Option[(Node, Node)]
+	var v: Int
+	var sum: Int
+
+	def compute() {
+		children match
+			case None =>
+				sum = v
+			case Some (left, right) =>
+				left.compute()
+				right.compute()
+				sum = v + left.sum + right.sum
+}	}
+\end{lstlisting}
+%\break
+\begin{lstlisting}
+class Node {
+	var children: Option[(Box[Node], Box[Node])]
+	var v: Int
+	var sum: Int
+
+	def compute() {
+ 		children match
+			case None =>
+				sum = v
+			case Some (left, right) =>
+				var boxL = swap(left, null)
+				var boxR = swap(right, null)
+
+				finish {
+					async(boxL, node => node.compute())
+					async(boxR, node => node.compute())
+				}
+
+				sum = v + boxL.sum + boxR.sum
+				swap(left, boxL)
+				swap(right, boxR)
+}	}
+\end{lstlisting}
+%\end{multicols}
+    \caption{Sequential tree sum and a safe parallel translation}
+    \label{fig:example-before-after}
+\end{figure}
+
+\Cref{fig:example-before-after} shows how a simple sequential programming calculating the sum of a tree can be safely parallelized by wrapping the children in boxes as in LaCasa, starting isolated parallel tasks in these boxes via \textit{async} and awaiting their termination via \textit{finish}. Note that a class used in a concurrent task requires no annotations to indicate its safety. Instead, it only has to avoid global variables.
+
+\section{Contribution}
+This thesis makes the following contributions:
+\begin{itemize}
+    \item We extend $CLC^2$, a core language formalizing LaCasa, with the Async Finish model to obtain a language that is deterministic, data-race free and deadlock free without requiring annotations of existing code. We provide a formalization of the operational semantics for this language.
+    \item We provide a type system using object capabilities and unique pointers to ensure encapsulation. We emulate affine types using continuation-passing-style.
+    \item We make formal statements of key properties such as progress, preservation, isolation and confluence\todo{state confluence}. We also provide complete proofs of progress and isolation.
+\end{itemize}
+
+%\section{Structure}
+%The thesis is structured as follows: \Cref{bg} describes some preliminary knowledge required for the remaining thesis. \Cref{overview} gives a high-level overview of the language and an intuition for its design. \Cref{formal} formalizes a core language. \Cref{proper} states core properties and proofs for progress and isolation. \Cref{related} compares this thesis with related work. \Cref{concl} concludes the thesis and gives an overview over potential future work.
+
+\chapter{Background}\label{bg}
+\section{Scala}
+Scala is a mainstream programming language that is statically typed and supports both object-oriented and functional programming. Its most commonly used execution environment is the Java Virtual Machine (JVM) and its design decisions provide interoperability with Java. Its type system includes subtyping to properly support inheritance. This poses a challenge when extending the type system as it increases the complexity of the type system.
+
+\section{Object Capabilities}
+The object capabilities model~\cite{miller_robust_2006} is a model originating in computer security research. It places constraints on the interaction with objects by requiring a user to hold a capability giving this right. This requires that a user cannot circumvent these capabilities by ignoring the reference graph as this would allow an object to obtain a reference to the protected object without holding the capability.
+
+In the context of this thesis, we say that a class $C$ or a method $m$ adheres to the object capabilities model, written as \textit{ocap(C)} or \textit{ocap(m)}, if it only accesses explicitly passed objects and their transitive references. In particular, global variables are not accessible unless explicitly passed. In addition, an \textit{ocap} method may not create non-\textit{ocap} objects as this would then allow it to call a method accessing global variables.
+
+\section{Boxes}
+LaCasa~\cite{haller_lacasa_2016} introduced the concept of boxes where a box encapsulates an object. This means that it holds an externally unique reference of that object where externally refers to the fact that the object may have an internal reference to itself, i.e. a circular reference. Unique states that no other external reference to this object exists, i.e. it prevents aliasing. External uniqueness is sufficient for the guarantees required in this thesis~\cite{clarke_external_2003}.
+
+A box dominates all transitive references of the encapsulated object. This means that a sequence of references from an object outside the box must go \say{through} the box to reach any object inside. An object is inside a box if it is reachable from the box. No reference is allowed to cross the boundary of a box, thereby ensuring that the box itself remains the only reference pointing into its isolated graph.
+
+Accessing global variables would break this encapsulation. As such, every object contained in a box must adhere to the \textit{ocap} constraint. A box can be thought of as a capability describing the right to interact with the encapsulated object and its transitive references.
+
+\section{Affinity through CPS}
+In mainstream type systems, values cannot be consumed. A variable $x$ containing some value will continue to be accessible even if we refer to $x$ somewhere else. Even if $x$ is mutable and its value changed, the variable itself is still available.
+
+Affine types provide a notion of consumption, allowing some operations to invalidate variables and make them inaccessible. This is enforced at compile time. A common example where affine types provide safety are file descriptors which should be consumed by closing them, preventing invalid accesses. We use affine types to ensure safe concurrency: Starting a concurrent task invalidates the object on which it operates in the callers scope.
+
+Most mainstream programming languages, among them Scala, do not support affine types. Nevertheless, we can simulate them by using continuation passing style. Every expression that consumes a value takes a continuation within which this value is no longer available. It is possible to implement this as a compiler plugin for Scala. For more details, refer to LaCasa~\cite{haller_lacasa_2016}.
+
+\section{Concurrency Models}
+There exist multiple ways of representing parallel programs. One of the oldest is the Fork-Join Model (FJM) which allows the creation of a process via the \textit{fork} systemcall which can then access the same memory while running in parallel. Later, the original process, termed parent, can await the termination of the copy, or child, via the \textit{join} systemcall \cite{noauthor_forkjoin_2023}. To this day, the FJM is widely spread due to its conceptual simplicity and expressiveness.
+
+At the same time, it is in its most common form unsafe as all memory is shared between the two processes, making data races an omnipresent threat. It is also fundamentally unstructured: A process spawned via \textit{fork} can spawn its own children who might outlive their parent. This creates hard-to-follow concurrency patterns as a \textit{fork} followed by a \textit{join} might leave some grandchild process alive.
+
+In the FJM, processes are identified by ids which can be passed around. This allows any process to await any others termination, providing great flexibility. At the same time, this makes the expected termination order of processes opaque. A child is not guaranteed to terminate before its parent and cycles of processes awaiting each others termination, that is a deadlock, are hard to spot from only analysing the code.
+
+An alternative is the Async Finish Model (AFM), a variant of the Fork Join model (FJM). The AFM mostly keeps the semantics of fork, called \textit{async}, modifying it to take a closure that is evaluated in parallel. In the following we call these parallel processes tasks as it better represents their intended usage and to distinguish them from the FJM. The AFM also modifies join, named \textit{finish}. Instead of awaiting a single task by id, it delimits a scope and awaits all tasks started within, making it obvious when a specific task will have terminated. Furthermore, instead of only blocking until all tasks started in the block terminate, it awaits the termination of the descendants of these tasks too. This guarantees that a data structure modified by a task can be accessed safely after exiting the enclosing \textit{finish}.
+
+This approach has two main advantages over the FJM. It is deterministic, as \textit{finish} awaits all tasks spawned inside of it once, making it impossible for the execution time of a task to affect the parent task as long as concurrent reads and writes are prevented \cite{lee_featherweight_2010}. Furthermore, it guarantees deadlock freedom as a task cannot await a task spawned earlier, ensuring that children always terminate before parents.
+
+At the same time, these advantages can be seen as disadvantages. The FJM can be seen as a generalization of the AFM, making it capable of representing patterns that the AFM does not support. Sometimes, non-deterministic concurrency is desired or the structure enforced by the AFM too restrictive. We nevertheless think that these tradeoffs are worth the safety and structure provided by the AFM and use it in our language.
+
+\chapter{Overview of Parallel LaCasa}\label{overview}
+We explain Parallel LaCasa, the language we have designed, via a toy problem. We solve it sequentially in a Scala-like base language and add stepwise onto this base until we obtain a language that supports safe and structured concurrency.
+
+Assume we have a tree with integer values stored in each node. We want to compute the sum of all values and, while doing so, we also want to store the sum of each subtree in the corresponding node. We assume for the sake of simplicity that each node either has no or two children as it reduces the number of pattern matches. While the example is quite simple, it is similar to many parallel algorithms with a tree structure and expensive operations at each node. It also showcases the most important parts of Parallel LaCasa.
+
+A straightforward sequential algorithm is shown in \cref{fig:sum-1}. The $\mn{compute}$ method sequentially descends into both the left and right subtree, computing their results first, before adding the results together with the node's own value. This code is not as fast as it could be as it does not take advantage of the problem structure to execute the program in parallel. Each subtree is inherently isolated from the other due to the tree structure which enables trivial parallelization.
+
+\begin{figure}
+\begin{lstlisting}
+class Node {
+	var children: Option[(Node, Node)]
+	var v: Int
+	var sum: Int
+
+	def compute() {
+		children match
+			case None =>
+				sum = v
+			case Some (left, right) =>
+				left.compute()
+				right.compute()
+				sum = v + left.sum + right.sum
+	}
+}
+\end{lstlisting}
+    \caption{A sequential tree sum implementation}
+    \label{fig:sum-1}
+\end{figure}
+
+\section{First Step: Async Finish Model}
+As a first step, we parallelize the example using the Async Finish Model (AFM) introduced in the background. \Cref{fig:sum-2} shows the adapted code. Instead of two direct calls to the left and right node, we use \textit{async} to create tasks that perform the computation in parallel. In addition, we wrap both calls in a \textit{finish} to ensure that they terminate before we finally access their results and sum them up.
+
+\begin{figure}
+\begin{lstlisting}
+class Node {
+	var children: Option[(Node, Node)]
+	var v: Int
+	var sum: Int
+
+	def compute() {
+		children match
+			case None =>
+				sum = v
+			case Some (left, right) =>
+				!\graybox{finish \{}*!
+					!\graybox{async(() => }*!left.compute()!\graybox{)}*!
+					!\graybox{async(() => }*!right.compute()!\graybox{)}*!
+				!\graybox{\}}*!
+				sum = v + left.sum + right.sum
+}	}
+\end{lstlisting}
+    \caption{Tree sum using the basic Async Finish Model}
+    \label{fig:sum-2}
+\end{figure}
+
+\section{Second Step: Boxes and Object Capabilities}
+This form of concurrency is not safe in general: a task may operate on different subgraphs of the heap. In particular, global variables make it possible for a task to mutate data in unexpected places. We eliminate this problem by restricting parallel tasks to subgraphs of the heap and completely forbidding global variables inside them.
+
+Note that if a task has only access to one object, it can only affect this object and all its transitive references, isolating the rest of the heap. Although a new object may be created, it is isolated from all preexisting objects. As described in the background, we use boxes in combination with the object capabilities model to provide this guarantee.
+
+\Cref{fig:sum-boxes} shows the example with boxes. The children field now contains a tuple of boxed nodes. More importantly, \textit{async} now takes a box whose content is made available in the task. While not shown in the example, the expression \textit{box[C]} creates a guarded box containing an object of class $C$. The expressions is similar to and exists in addition to \textit{new}, which can only be used to create classes and not boxes.
+
+\begin{figure}
+\begin{lstlisting}
+class Node {
+	var children: Option[(!\graybox{Box[}*!Node!\graybox{]}*!, !\graybox{Box[}*!Node!\graybox{]}*!)]
+	var v: Int
+	var sum: Int
+
+	def compute() {
+		children match
+			case None =>
+				sum = v
+			case Some (left, right) =>
+				finish {
+					async(!\graybox{left, node => node}*!.compute())
+					async(!\graybox{right, node => node}*!.compute())
+				}
+				sum = v + left.sum + right.sum
+}	}
+\end{lstlisting}
+    \caption{Tree sum using boxes to improve isolation}
+    \label{fig:sum-boxes}
+\end{figure}
+
+\section{Third Step: Permissions}
+Two major problems are still open: First, two asynchronously spawned tasks may be started in the same box, interfering with each other and leading to data races. Second, it is possible for a parent task to forget wrapping an \textit{async} in a \textit{finish}, leaving the child task free to mutate data while the parent accesses it.
+
+To prevent the first problem, we ensure that only one task can operate on a certain box at once. Every box is guarded by one permission that is created together with the box. An \textit{async} requires the permissions of the box it acts on to be available in the context. In addition, it consumes the permission, preventing another \textit{async} from being started on the same box. Note that \textit{async} may not capture variables from the environment for the task as this would also break isolation. Accessing the contents of a box to read or write non-reference values requires the permission to be available, to ensure that no other task can modify the contents of the box, but does not consume the permission.
+
+Permissions consumed within the scope introduced by \textit{finish} are still available outside. \textit{finish} ensures that the scope is only left after all tasks started inside have terminated, guaranteeing that all boxes that were available before the \textit{finish}-scope are safe to be accessed afterwards.
+
+Permissions are affine types, as they can be consumed at most once after their creation. Unfortunately, Scala does not support affine types. Instead, we can use CPS to simulate permissions, entering a new scope that does not contain a consumed permission when necessary.
+
+\Cref{fig:sum-permissions} shows an example of how CPS and implicits can be used to implement permissions in Scala. We create two boxes using the \textit{box} expression, which takes a continuation in which the respective box is available and an implicit permission for that box. \textit{finish} wraps a scope and takes a continuation. Inside of the scope, we start two tasks with \textit{async}. The permissions for the boxes are provided and made unavailable in the continuations of the \textit{asyncs}. These permissions are available after the scope introduced by \textit{finish} is left, allowing us to access the integer fields of the boxes afterwards to compute the sum.
+
+Note that we do not use the \lstinline{children} field as there are no \textit{implicits} to introduce their permissions. This makes fields containing boxes impossible to use without explicitly passing permissions, which we want to avoid. In the next section, we will explore which changes are necessary to make fields containing boxes work with permissions.
+
+\begin{figure}
+\centering
+\begin{lstlisting}
+class Node {
+	var children: Option[(Box[Node], Box[Node])]
+	var v: Int
+	var sum: Int
+
+	def compute(!\graybox{contAfterMethod: Continuation}*!) {
+		!\graybox{box[Node] \{ boxL =>}*!
+			!\graybox{implicit boxLPerm = ...}*!
+			!\graybox{box[Node] \{ boxR =>}*!
+				!\graybox{implicit boxRPerm = ...}*!
+				finish { !\graybox{contAfterFinish =>}*!
+					async(!\graybox{boxL}*!, node => node.compute())!\graybox{(boxLPerm) \{}*!
+     					async(!\graybox{boxR}*!, node => node.compute())!\graybox{(boxRPerm) \{}*!
+							!\graybox{contAfterFinish()}*!
+						!\graybox{\}}*!
+					!\graybox{\}}*!
+				}
+				sum = v + !\graybox{(boxL.sum)(boxLPerm)}*! + !\graybox{(boxR.sum)(boxRPerm)}*!
+				!\graybox{contAfterMethod()}*!
+}	}	}	}
+\end{lstlisting}
+    \caption{Tree sum with explicit permissions and continuations. Normally, they are implicit.}
+    \label{fig:sum-permissions}
+\end{figure}
+
+\section{Fourth Step: Unique Fields}
+In the previous example, we did not store boxes in fields.
+Since permissions cannot be stored in fields (they could easily be duplicated through multiple reads), boxes in fields are impractical: we can only obtain the box, not the permission, when reading the fields content.
+
+To improve this, we want to ensure that a field containing a box is the only reference to that box. We do so by consuming the permission on writes to a field. As this permission cannot be recreated, this invalidates all variables that hold a reference to the box. To access the field, we employ destructive reads which at the same time guards the box with a new permission. These so-called unique fields are able to contain boxes without requiring explicit permission passing to access these boxes.
+
+We introduce a new expression for reads and writes of unique fields, called \textit{swap}. This expression takes a unique field and a box, replacing the content of the field by the box and returning the previous content as a box with a newly created permission, consuming the permission for the written box in the process.
+
+\Cref{fig:sum-swap-explicit} shows the final solution for the example problem. We first obtain the boxes from the fields by first swapping them with $\mn{null}$. Afterwards, we proceed as previously, ultimately storing the boxes in the fields again. \Cref{fig:sum-swap-implicit} shows the same solution but without the implicit permissions as they can be inferred by the compiler.
+
+Note that \textit{swap} cannot be nested inside of \textit{finish} as one would expect. Instead of the \textit{finish} returning once all tasks have terminated, it will never return. This is necessary as the \textit{swap} permanently consumes the permission of the box it stored in the field. Normally, the \textit{finish} scope is exited after the expressions inside of it are evaluated and all tasks have terminated. This is sound as all permissions consumed inside of the scope are once again safe to use at this point. This does not apply if a permission was permanently consumed by \textit{swap}. This is not a major problem as the \textit{swap} can instead be performed outside of the \textit{finish} or in one of the tasks spawned inside of the \textit{finish}.
+
+\begin{figure}
+\centering
+%\begin{multicols}{2}
+\begin{lstlisting}
+class Node {
+	var children: Option[(Box[Node], Box[Node])]
+	var v: Int
+	var sum: Int
+
+	def compute(!\graybox{contAfterMethod: Continuation}*!) {
+ 		children match
+			case None =>
+				sum = v
+			case Some (left, right) =>
+				!\graybox{swap(left, null)}*! { boxL =>
+					implicit boxLPerm = ...
+					!\graybox{swap(right, null)}*! { boxR =>
+						implicit boxRPerm = ...
+
+
+						finish { contAfterFinish =>
+							async(boxL, node => node.compute())(boxLPerm) {
+     							async(boxR, node => node.compute())(boxRPerm) {
+									contAfterFinish()
+						}	}	}
+						sum = v + (boxL.sum)(boxLPerm) + (boxR.sum)(boxRPerm)
+						!\graybox{swap(left, boxL)(boxLPerm) \{}*!
+							!\graybox{swap(right, boxR)(boxRPerm) \{}*!
+								contAfterMethod()
+}	}	}	}	}	}
+\end{lstlisting}
+
+    \caption{Safe and parallel tree sum with explicit permissions and continuations}
+    \label{fig:sum-swap-explicit}
+\end{figure}
+\begin{figure}
+%\break
+\centering
+
+\begin{lstlisting}
+class Node {
+	var children: Option[(Box[Node], Box[Node])]
+	var v: Int
+	var sum: Int
+
+	def compute() {
+ 		children match
+			case None =>
+				sum = v
+			case Some (left, right) =>
+				var boxL = swap(left, null)
+				var boxR = swap(right, null)
+
+				finish {
+					async(boxL, node => node.compute())
+					async(boxR, node => node.compute())
+				}
+
+				sum = v + boxL.sum + boxR.sum
+				swap(left, boxL)
+				swap(right, boxR)
+}	}
+\end{lstlisting}
+%\end{multicols}
+    \caption{Safe and parallel tree sum with implicit permissions and continuations}
+    \label{fig:sum-swap-implicit}
+\end{figure}
+
+\section{Merging Boxes}
+An object stored in a box cannot be easily accessed. Firstly, a permission is always required. Secondly, the manner of access depends on the type of the field. We distinguish three different types of fields. For non-reference typed fields, accessing the object inside of a box and reading or writing the fields is safe as we hold the permission and no other task may access the box at the same time. Unique fields, containing boxes, cannot be modified as freely and have to be replaced by another box to obtain them via a \textit{swap}. The last category of fields, containing unboxed objects, cannot be read or modified at all while contained within a boxed object. Instead, the box has to be first opened through an \textit{async}. This is due to the fact that boxes represent isolated areas of the heap and adding or copying references might break that isolation.
+
+Sometimes, it is necessary to access the contents of a box $x$ anyway. This can be done by removing the box completely, merging its isolated area with the isolated area of another box. After starting a task via \textit{async} within this other box, this task can freely access the contents of the box it was started in and the box that was merged into it. To merge two boxes, we introduce another expression, $\vn{capture}(y.f, x)$. It stores the content of box $x$ in a normal class-typed field $f$ inside of box $y$, effectively unwrapping box $x$.

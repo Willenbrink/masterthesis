@@ -1,0 +1,818 @@
+
+\chapter{Proofs}
+\section{Progress}
+\begin{proof}[Proof: Case Distinction for Progress]
+We continue with a case distinction on $t$ assuming we have reduce a task $(i_f, i_a, FS) \in TS$ where $FS = F \circ FS'$ and $F = \sframe{t}$.
+
+\paragraph{Finish}
+Assume $t = \text{let } \vn{finish}\{s\} \text{ in } s$. We define $T_1$, $T_2$ and $j_f$ according to E-FINISH and can directly apply the rule.
+
+\paragraph{Async}
+Assume $t = \vn{async}(b, x \Rightarrow s)\{ u \}$. To apply E-ASYNC, we must show that $L(b) = b(o,p)$ and $p \in P$:
+
+\begin{proof}
+\begin{alignat}{2}
+        &H \vdash F : \tau && \text{ by T-TS, T-FS-A, T-FS-NA, \cref{prog-prem-2}} \label{prog-1}\\
+        &H \vdash \Gamma; L && \text{ by previous, T-FRAME1}\\
+        &\forall x \in dom(\Gamma).\ H \vdash \Gamma; L; x && \text{ by previous, WF-ENV}\label{prog-2}\\
+        &\Gamma; a \vdash \vn{async}(b, x \Rightarrow s) \{ u \} : \tau && \text{ by T-FRAME1, \cref{prog-1}}\\
+        &\Gamma; a \vdash b : Q \vartriangleright \text{Box}[C] && \text{ by previous, T-ASYNC}\label{prog-3}\\
+        &b \in dom(\Gamma) && \text{ by previous, T-VAR}\\
+        &H \vdash \Gamma; L; b && \text{ by previous, \cref{prog-2}}\\
+\nonumber&L(b) = null\\
+\nonumber&\ \vee L(b) = o \wedge typeof(H, o) <: \Gamma(b)\\
+\nonumber&\ \vee (L(b) = b(o, p) \wedge \Gamma(b) = Q \vartriangleright \text{Box}[C]\\
+        &\ \wedge typeof(H, o) <: C) && \text{ by previous, WF-VAR}\\
+        &L(b) = null \vee L(b) = b(o,p) && \text{ by previous, T-VAR, \cref{prog-3}}
+\end{alignat}
+
+We conclude that either $L(b)$ is null and we are done by \cref{prog-concl-3} or that $L(b) = b(o,p)$ in which case we proceed to show $p \in P$:
+
+\begin{alignat}{2}
+        &\forall \text{ Perm}[Q] \in \Gamma.\ \gamma(Q) \in P && \text{ by WF-PERM, injective $\gamma$}\\
+        &(\Gamma(b) = Q \vartriangleright \text{Box}[C] \wedge L(b) = b(o, p) \wedge \text{Perm}[Q] \in \Gamma) \Rightarrow p \in P && \text{ by previous, WF-PERM}\\
+        &L(b) = b(o,p) \Rightarrow p \in P && \text{ by previous, T-VAR, T-ASYNC, \cref{prog-1}, \cref{prog-3}}
+\end{alignat}
+\end{proof}
+
+We define $T_1$, $T_2$ and $j_a$ according to E-ASYNC and apply the rule.
+
+\paragraph{Capture}
+Assume $t = \vn{capture}(x.f, y)\{ z \Rightarrow t' \}$. To apply rule E-CAPTURE, we must show the following:
+\begin{alignat}{3}
+    & L(x) = b(o,p) \label{prog-capt-c1}\\
+    & \wedge L(y) = b(o',p') \label{prog-capt-c2}\\
+    & \wedge \{p, p'\} \subseteq P \label{prog-capt-c3}
+\end{alignat}
+
+Note that we do not show that $H(o) = \langle C, FM \rangle$ as $o$ is by definition of $L$ not $\mn{null}$. As such, this premise is trivial to fulfill by defining $C$ and $FM$ accordingly.
+
+TODO This proof is directly based on LaCasa.
+
+\begin{proof}
+\begin{alignat}{3}
+& \Gamma ; a \vdash \vn{capture}(x.f, y) \{ z \Rightarrow t' : \sigma \} \label{prog-capt-2a}\\
+& \wedge H \vdash \Gamma; L \label{prog-capt-2b}\\
+& \wedge \vdash \Gamma; L; P \label{prog-capt-2c} && \text{ by \cref{prog-prem-2}, T-FS-A, T-FS-NA}\\
+& \Gamma; a \vdash x : Q \vartriangleright \mn{Box}[C] \label{prog-capt-4a}\\
+& \wedge \Gamma; a \vdash y : Q' \vartriangleright \mn{Box}[D] \label{prog-capt-4b}\\
+& \wedge \{\mn{Perm}[Q], \mn{Perm}[Q']\} \subseteq \Gamma \label{prog-capt-4c}
+%TODO unused?\\& \wedge D <: \vn{ftype}(C, f) \label{prog-capt-4d}
+&& \text{ by T-CAPTURE, \cref{prog-capt-2a}}\\
+%TODO Unused?& \vn{dom}(\Gamma) \subseteq \vn{dom}(L)\\
+& \wedge \forall x \in \vn{dom}(\Gamma).\ H \vdash \Gamma; L; x \label{prog-capt-5b} && \text{ by WF-ENV, \cref{prog-capt-2b}}\\
+& L(x) = b(o,p) \wedge L(y) = b(o', p') \vee L(x) = \mn{null} \vee L(y) = \mn{null} \label{prog-capt-end}&& \text{ by WF-VAR, \cref{prog-capt-4a,prog-capt-4b,prog-capt-5b}}
+\end{alignat}
+\Cref{prog-capt-end} states that either one of $L(x)$ and $L(y)$ are $\mn{null}$, in which case we conclude by \cref{prog-concl-3}, or that both are boxes as in \cref{prog-capt-c1,prog-capt-c2}. The availability of their permissions as required by \cref{prog-capt-c3} is shown by WF-PERM and \cref{prog-capt-2c,prog-capt-4a,prog-capt-4b,prog-capt-4c,prog-capt-end}.
+\end{proof}
+
+We define $C$, $FM$, $H'$ and $WS'$ according to E-CAPTURE and apply the rule.
+
+\paragraph{Swap}
+Analogous to Capture.
+
+\begin{lemma}\label{prog-select-lemma-4}
+    If $C' <: C$ and $f \in \vn{fields}(C)$, then $f \in \vn{fields}(C') \wedge \vn{ftype}(C, f) = \vn{ftype}(C', f)$
+\end{lemma}
+\begin{proof}
+    Directly by <:-Ext and WF-CLASS.
+    \todo{directly based on LaCasa which does not define <:-Ext. Look in Featherweight Java?}
+\end{proof}
+
+\paragraph{Select}
+Assume $t = \text{let } x = y.f \text{ in } t'$. To apply rule E-SELECT with help of E-STACK and E-FRAME, we have to show that $f \in dom(FM)$ where $H(L(y)) = \langle C, FM, \rangle$. Alternatively, $L(y) = \mn{null}$ in which case evaluation gets stuck.
+
+TODO This proof is directly based on LaCasa.
+
+\begin{proof}
+\begin{alignat}{3}
+    &H \vdash F : \sigma
+        && \text{ by T-TS, T-FS-NA, T-FS-A, \cref{prog-prem-2}}\\
+    &\Gamma; a \vdash t : \sigma
+    \wedge H \vdash \Gamma; L \label{prog-select-3}
+        && \text{ by T-FRAME1, previous}\\
+    &\Gamma(y) = C
+    \wedge \vn{ftype}(C, F) = D \label{prog-select-4}
+        && \text{ by T-LET, T-SELECT, T-VAR, previous}\\
+    &\vn{dom}(\Gamma) \subseteq \vn{dom}(L)
+    \wedge \forall x \in \vn{dom}(\Gamma).\ H \vdash \Gamma; L; x
+        && \text{ by WF-ENV, \cref{prog-select-3}}\\
+    &L(y) = \mn{null} \vee L(y) = o \wedge \vn{typeof}(H, o) <: C
+        && \text{ by WF-VAR, previous, \cref{prog-select-4}}
+\end{alignat}
+If $L(y) = \mn{null}$, we immediately conclude by \cref{prog-concl-3}. Otherwise, we continue with proving our original goal:
+\begin{alignat}{3}
+    &L(y) = o \wedge \vn{typeof}(H, o) <: C \label{prog-select-7}
+        && \text{ by previous}\\
+    &f \in \vn{fields}(C) \label{prog-select-8}
+        && \text{ by \cref{prog-select-4}}\\
+    &o \in \vn{dom}(H) 
+        && \text{ by \cref{prog-select-7}}\\
+    &\text{Define } \langle C', FM \rangle := H(o)
+        && \text{ by previous}\\
+    &\vn{dom}(FM) = \vn{fields}(C')
+        && \text{ by previous, \cref{prog-prem-1,well-typed-heap}}\\
+    &f \in \vn{dom}(FM)
+        && \text{ by previous, \cref{prog-select-7,prog-select-8,prog-select-lemma-4}}
+\end{alignat}
+\end{proof}
+
+\paragraph{Assign}
+Assume $t = \text{let } x = y.f = z \text{ in } t'$. To apply rule E-ASSIGN with help of E-STACK and E-FRAME, we must show that $L(y)$ is not null. The proof is analogous to the previous case.
+
+\paragraph{Remaining rules}
+For the following terms nothing has to be shown. We can trivially define the necessary variables and then apply the corresponding rule in combination with E-STACK and/or E-FRAME.
+\begin{itemize}
+    \item $t = \text{let } x = \text{ null in } t'$: E-NULL
+    \item $t = \text{let } x = y \text{ in } t'$: E-VAR
+    \item $t = \text{let } x = \text{ new } C \text{ in } t'$: E-NEW
+    \item $t = x$: E-RETURN1 or E-RETURN2
+    \item $t = \vn{box}[C]\{ x \Rightarrow t' \}$: E-BOX
+\end{itemize}
+\end{proof} % Progress
+
+
+\section{Isolation}
+
+lemma: await preserve: removing a task not waiting on anything preserves await for all other tasks.
+
+lemma: remove task not waiting on any other task. follows by await preserve
+
+\begin{lemma} \label{iso-subset}
+    $TS' \subseteq TS \wedge WS' \subseteq WS \wedge isolated(H,TS,WS) \Rightarrow isolated(H, TS', WS')$
+\end{lemma}
+\begin{proof}
+TODO Doesn't hold in exactly this form due to change to isolation (awaits). If only tasks without a finish pointing to a different async group are dropped its fine.
+\end{proof}
+
+\begin{lemma}[Isolation-Step-TS]\label{iso-step-ts}
+Assuming we have isolated sets of tasks $TS, WS$ and that a task $U$ is isolated from each task in these sets, we know that the task sets $TS \cup \{U\}, WS$ are also isolated.
+\begin{alignat*}{2}
+    &isolated(H, TS, WS)\\
+    \wedge\ &\forall T \in TS \cup tasks(WS).\ isolated(H, T, U)\\
+    \Rightarrow\ &isolated(H, TS \cup \{U\}, WS)
+\end{alignat*}
+\end{lemma}
+\begin{proof}
+This follows directly from the definition of isolation.
+\end{proof}
+
+\begin{lemma}[Isolation-Step-WS]\label{iso-step-ws}
+Assuming we have isolated sets of tasks $TS, WS$ and that a waiting task $(U,i_f)$ is isolated from each task in these sets we know that the task sets $TS, WS \cup \{(U,i_f)\}$ are also isolated.
+\begin{alignat*}{2}
+    &isolated(H, TS, WS)\\
+    \wedge\ &\forall T \in TS \cup tasks(WS).\ isolated(H, T, U)\\
+    \Rightarrow\ &isolated(H, TS,WS \cup \{(U, i_f)\})
+\end{alignat*}
+\end{lemma}
+\begin{proof}
+This follows directly from the definition of isolation.
+\end{proof}
+
+\begin{theorem}[Isolation]
+\begin{alignat}{3}
+    &\reductasks{}*[H']{}[TS',WS']* \label{iso-prem-reduc}\\
+    \wedge\ & H \vdash TS, WS\\
+    \wedge\ & H \vdash TS, WS \bn{ok} \label{iso-prem-ok}\\
+    \wedge\ & \vn{isolated}(H, TS, WS) \label{iso-prem-iso}\\
+    \Rightarrow\ & \vn{isolated}(H', TS', WS') \label{iso-concl}
+\end{alignat}
+\end{theorem}
+
+\begin{proof}
+We analyse the rules individually to proof the theorem. The rules can be divided into two categories: Firstly, the rules added by \plc that handle tasks and have to ensure that no two unisolated tasks run concurrently. Secondly, the rules from LaCasa which modify the $\vn{reachables}$ set of frame stacks.
+
+\paragraph{E-TASK-DONE}
+Assume that \cref{iso-prem-reduc} uses rule E-TASK-DONE and that $TS = \{T\} \uplus TS'$, i.e. that the task T is removed by application of rule E-TASK-DONE, $H = H'$ and $WS = WS'$. $\vn{isolated}(H, TS', WS)$ immediately follows from \cref{iso-subset}.
+
+\paragraph{E-RESUME}
+Assume that \cref{iso-prem-reduc} uses rule E-RESUME and that $WS = \{ (T, j_f) \} \uplus WS'$, that $TS' = \{ T \} \uplus TS$ and $H = H'$. Let $T = (i_f, i_a, FS)$. We know from E-RESUME that $T$ does not await any task, i.e. $\nexists(i_f, j_a, FS) \in TS \vn{tasks}(WS)$. Combined with $\vn{isolated}(H, TS, WS)$, we obtain:
+\[
+    \forall T' \in TS \cup \vn{tasks}.\ T' = (j_f, j_a, FS') \Rightarrow \vn{isolated}(H, FS, FS') \vee \vn{awaits}(WS, T', T)
+\]
+
+\todo{we can drop T safely, still isolated. And now we can add T again, still isolated.}
+
+
+
+Furthermore, we know from isolation that:
+\[
+    \forall T' \in TS \cup tasks(WS').\ isolated(H, T, T')
+\]
+
+Isolation follows from \cref{iso-step-ts,iso-subset}.
+
+\paragraph{E-FINISH}
+Assume that \cref{iso-prem-reduc} uses rule E-FINISH and that $TS = \{ T \} \uplus TS''$, $TS' = \{ T_1 \} \uplus TS''$ and $WS' = \{(T_2, j_f)\} \uplus WS$. Let $T_1 = (j_f, i_a, \sframe{t})$ and $T_2 = (i_f, i_a, \sframe[L[x = null]]{s}[P][m] \circ FS)$.
+
+To show that E-FINISH preserves isolation, we first show that both $T_1$ and $T_2$ are isolated from all other tasks and secondly that $T_1$ and $T_2$ are isolated from each other (as one awaits the other).
+
+Due to \cref{iso-subset,iso-prem-iso}, we obtain $\vn{isolated}(H, TS'', WS)$.
+
+Using $reachables(H, T_1) = reachables(H, T_2) = reachables(H, T)$ and $id_a(T) = id_a(T_1) = id_a(T_2)$ and $id_f(T_1) > id_f(T_2)$, we obtain TODO phrasing. Any task $U$ whose frame stack isolated from $T$'s frame stack is also isolated from $T_1, T_2$ as they have the same $reachables$. If $U$ instead awaited $T$, it will now await $T_2$ (and $T_1$ transitively).:
+\[
+    isolated(H, T_1, T_2) \wedge \forall U \in TS'' \cup tasks(WS).\ isolated(H, U, T_2) \wedge isolated(H, U, T_1)
+\]
+
+We can thus apply \cref{iso-step-ts,iso-step-ws} to obtain $isolated(H, TS', WS')$.
+
+\paragraph{E-ASYNC}
+Assume that \cref{iso-prem-reduc} uses rule E-ASYNC and that $TS = \{ T \} \uplus TS''$, $TS' = \{ T_1, T_2 \} \uplus TS''$ and $WS' = WS$. Let $T_1 = (i_f, j_a, \sframe[[x \rightarrow o]]{t}[\emptyset][\epsilon])$ and $T_2 = (i_f, i_a, \sframe{s}[P\setminus \{p\}][\epsilon])$.
+
+Similar to E-FINISH, we can show isolation of $T_1$ and $T_2$ with all other tasks and that $T_1$ and $T_2$ are isolated from each other.
+
+Due to \cref{iso-subset,iso-prem-iso}, we obtain $\vn{isolated}(H, TS'', WS)$.
+
+As $accRoots(T_1) = \{o\}$, we know that $reachables(H, T_1) \subseteq reachables(H, T)$. Using this and ISO-FS, we obtain that all tasks $U$ whose frame stack is isolated from $T$ are also isolated from $T_1$. If $U$ awaited $T$ it will also await $T_1$ as $id_f(T) = id_f(T_1)$:
+\[
+    \forall U \in TS'' \cup tasks(WS).\ isolated(H, U, T_1)
+\]
+
+As $T_2$ has only the variable bindings from $T$'s top frame, we know that $reachables(H, T_2) \subseteq reachables(H, T)$. Furthermore, a task awaiting $T$ will also await $T_2$ as $id_f(T_2) = id_f(T)$. Using this, we obtain:
+\[
+    \forall U \in TS'' \cup tasks(WS).\ isolated(H, U, T_2)
+\]
+
+Furthermore, $reachables(H, T_1) \cap reachables(H, T_2) = \emptyset$ as $T_2$ does not have the permission $p$. This implies $isolated(H, T_1, T_2)$.\todo{more rigorous?} Thus we can apply \cref{iso-step-ws,iso-step-ts} to obtain $isolated(H, TS', WS)$.
+
+TODO previous paragraph is wrong: accRoots dont intersect. Due to boxObjSep and boxSep this implies reachables also dont intersect.
+
+\paragraph{E-CAPTURE}
+Assume that \cref{iso-prem-reduc} uses rule E-CAPTURE and that $TS = \{ T \} \uplus TS''$, $TS' = \{ T' \} \uplus TS''$ and $WS'' = \{((i_f, i_a, GS), j_f)\ |\ ((i_f, i_a, FS) \in WS \wedge (i_a = id_a(T) \Longrightarrow GS = \epsilon) \wedge (i_a \neq id_a(T) \Longrightarrow GS = FS)\}$. Furthermore, let $T = (i_f, i_a, \sframe{\vn{capture}(x.f, y) \{z \Rightarrow t\}} \circ FS$ and $T' = (i_f, i_a, \sframe[L[z \rightarrow L(x)]]{t}[P \setminus \{p'\}][\epsilon] \circ \epsilon)$.
+
+Firstly, every task in $WS''$ has the same ids as some task in $WS$ while their frame stack is either identical or $\epsilon$. As each pair of tasks in $WS$ is isolated, the corresponding pair in $WS''$ is also isolated, i.e. $\vn{isolation}(H, TS, WS) \Longrightarrow \vn{isolation}(H, TS, WS'')$.
+
+As $\vn{reachables}(H, T') \subseteq \vn{reachables}(H, T)$ and $id_a(T) = id_a(T')$, it follows that $\vn{isolated}(H, TS', WS'')$.
+
+\paragraph{E-SWAP}
+Analogous to E-CAPTURE. Although $o''$ is a box root after applying E-SWAP, it was already in the reachables set before E-SWAP.
+
+\paragraph{E-INVOKE}
+Assume that \cref{iso-prem-reduc} uses rule E-INVOKE and that $TS = \{ T \} \uplus TS''$, $TS' = \{ T' \} \uplus TS''$ and $WS' = WS$. Let $T = (i_f, i_a, F \circ FS)$, $T' = (i_f, i_a, F' \circ \sframe{t} \circ FS)$, $F = \sframe{\text{let } x = y.m(z) \text{ in } t}$ and $F' = \sframe[L']{t'}[P][x]$.
+
+We distinguish two cases: First, assume that $i_a = 0$, i.e.:
+\[
+    L' = [this \rightarrow L(y), x \rightarrow L(z)]
+\]
+
+It follows that $roots(F') \subseteq roots(F)$ as $F'$ only contains two of the variables of $L$. Isolation is preserved.
+
+For the second case, assume that $i_a \neq 0$, i.e.:
+\[
+    L' = L_0 [this \rightarrow L(y), x \rightarrow L(z)]
+\]
+
+Due to \cref{iso-prem-ok} we know that all tasks $(j_a, j_f, FS)$ with $j_a \neq 0$ are checked as $\vn{ocap}$, i.e. $H; \vn{ocap} \vdash FS \bn{ok}$ which in turn implies $\vn{globalOcapSep}$ for every frame in $FS$. Thus, $\forall o \in \vn{reachables}(H, FS), x \rightarrow o' \in L_0.\ \vn{sep}(H, o, o')$.
+
+For all tasks $U'$ with $id_a(U') = 0$ we obtain through $\vn{asyncTaskUniqueness}$ and $\vn{asyncGroupUniqueness}$ that $awaits(H, WS, U', T)$. Together with the previous paragraph, this implies $\vn{isolated}(H, TS', WS')$.
+
+\subsection{E-STACK}
+In this section, we analyse E-STACK and all the possible rules that can reduce the stack of a single task. The following rules have in common that they only affect a single tasks frame stack and the heap. The ids and the waiting task set $WS$ are fixed and thus the only property in isolation that can possibly be violated by E-STACK is the isolation of two frame stacks.
+
+Assume that \cref{iso-prem-reduc} uses rule E-STACK and that $TS = \{ (i, d, FS) \} \uplus TS''$, $TS' = \{ (i, d, FS') \} \uplus TS''$ and $WS' = WS$. We continue by analysing the frame stack evaluation rules.
+
+%\paragraph{E-OPEN}
+%Let $FS = F \circ GS$ and $FS' = F' \circ F'' \circ GS$. $reachables(F'') \subseteq reachables(F)$ and $reachables(F') \subseteq reachables(F)$ as $o$ is the only root of $F'$ but also a root of $F$. Additionally, the variable environment of $F''$ is inherited from $F$. Thus, $reachables(FS') \subseteq reachables(FS)$ and isolation is preserved.
+
+\paragraph{E-BOX}
+$reachables(H, FS') \subseteq reachables(H, FS) \cup \{o\}$. As $o \not \in dom(H)$ it follows that $o$ is not in any reachables set before E-BOX is applied. Consequently, isolation is preserved.
+
+\paragraph{E-RETURN1}
+$reachables(H, FS') \subseteq reachables(H, FS)$ as $L(x)$ already was a root.
+
+\paragraph{E-RETURN2}
+$reachables(H, FS') \subseteq reachables(H, FS)$ as $L$ is completely discarded.
+
+\subsection{E-FRAME}
+We continue with the frame evaluation rules. Let $FS = F \circ FS''$ and $FS' = F' \circ FS''$.
+
+\paragraph{E-NULL}
+$reachables(H, FS') \subseteq reachables(H, FS)$ as $L(x)$ might be an object which is now no longer reachable.
+
+\paragraph{E-VAR}
+$reachables(H, FS') \subseteq reachables(H, FS)$ as $L(y)$ already was a root.
+
+\paragraph{E-SELECT}
+$reachables(H, FS') \subseteq reachables(H, FS)$ as $FM(f)$ already was a root.
+
+\paragraph{E-ASSIGN}
+$reachables(H, FS') \subseteq reachables(H, FS)$ as $L(z)$ already was a root. Note that $H'$ differs from $H$ only in $o$ and that $o$ is not in the reachables set of any other task besides ancestors due to isolation. As such, isolation is preserved.
+
+\paragraph{E-NEW}
+$reachables(H, FS') = reachables(H, FS) \cup \{o\}$. As $o \not \in dom(H)$ it follows that $o$ is not in any reachables set before E-NEW is applied. Consequently, isolation is preserved.
+
+\end{proof} %isolation
+
+\section{Preservation}
+\subsection{Frame Reduction}
+\begin{theorem}
+    \begin{alignat}{3}
+    & \vdash H : \star \label{pres-prem-1}\\
+    &\wedge\ H \vdash F : \sigma \label{pres-prem-2}\\
+    &\wedge\ H; a \vdash F\ \bn{ok}\\
+    &\wedge\ \reducframe{F}*[H']{F'}*\\
+    &\Longrightarrow \vdash H' : \star\\
+    &\wedge\ H' \vdash F' : \sigma\\
+    &\wedge\ H'; a \vdash F'\ \bn{ok}
+    \end{alignat}
+\end{theorem}
+\begin{proof}
+By induction on the reduction relation $\reducframe{F}*[H']{F'}*$.
+\todo{is this really an induction or just a case distinction?}
+
+\paragraph{E-NULL}
+TODO based on LaCasa
+We define the following variables:
+\begin{alignat}{3}
+    F = \langle L, \text{let } x = \mn{null} \text{ in } t, P \rangle^l \label{pres-null-def-f}\\
+    L' := L[x \rightarrow \mn{null}] \label{pres-null-def-l'}\\
+    F' = \langle L', t, P \rangle^l \label{pres-null-def-f'}\\
+    \Gamma' := \Gamma, x : \tau \label{pres-null-def-g'}\\
+\end{alignat}
+\begin{alignat}{3}
+    &\Gamma; b \vdash \text{let } x = \mn{null} \text{ in } t : \sigma\\
+    &\wedge l \neq \epsilon \Longrightarrow \sigma <: C \label{pres-null-2b}\\
+    &\wedge H \vdash \Gamma; L \label{pres-null-2c}\\
+    &\wedge \vdash \Gamma; L; P \label{pres-null-2d}
+        && \text{ by T-FRAME1, \cref{pres-prem-2,pres-null-def-f}}\\
+    %\Gamma; b \vdash \mn{null} : \tau
+    &\Gamma'; b \vdash t : \sigma \label{pres-null-3b}
+        && \text{ by T-LET, previous}\\
+    %&\text{Define } \Gamma' := \Gamma, x : \tau \text{ and } L' := L[x \rightarrow \mn{null}] \label{pres-null-4}\\
+    &H \vdash \Gamma'; L', x \label{pres-null-5}
+        && \text{ by WF-VAR, \cref{pres-null-def-g',pres-null-def-l'}}\\
+    &H \vdash \Gamma'; L' \label{pres-null-6}
+        && \text{ by WF-ENV, previous, \cref{pres-null-2c,pres-null-def-g',pres-null-def-l'}}\\
+    &\vn{permTypes}(\Gamma') = \vn{permTypes}(\Gamma)\\
+    &\wedge \Gamma'(x) = Q \vartriangleright \mn{Box}[C] \Longrightarrow \Gamma(x) = Q \vartriangleright \mn{Box}[C]\\
+    &\wedge \forall y.\ L'(y) = b(o,p) \Longrightarrow L(y) = b(o,p)
+        && \text{ by \cref{pres-null-def-l',pres-null-def-g'}}\\
+    &\vdash \Gamma'; L'; P
+        && \text{ by WF-PERM, previous, \cref{pres-null-2d}}\\
+    &H \vdash F' : \sigma
+        && \text{ by T-FRAME1, previous, \cref{pres-null-6,pres-null-2b,pres-null-3b,pres-null-def-f'}}\\
+    &H; a \vdash F' \bn{ok}
+        && \text{ by 1c, 1e, 1f, F-OK (TODO details)}
+\end{alignat}
+TODO mention $H : \star$
+
+\paragraph{E-VAR}
+Analogous to E-NULL.
+
+\paragraph{E-ASSIGN}
+TODO based on LaCasa
+
+Definitions by E-ASSIGN:
+\begin{alignat}{3}
+    &F = \langle L, \text{let } x = y.f = z \text{ in } t, P \rangle^l \label{pres-as-def-f}\\
+    &L(y) = o \label{pres-as-def-ly}\\
+    &H(o) = \langle C, FM \rangle \label{pres-as-def-ho}\\
+    &H' = H[o \rightarrow \langle C, FM[f \rightarrow L(z)]\rangle] \label{pres-as-def-h'}\\
+    &F' = \langle L, \text{let } x = z \text{ in } t, P \rangle^l \label{pres-as-def-f'}
+\end{alignat}
+
+$H' \vdash F' : \sigma$
+\begin{proof}
+\begin{alignat}{3}
+    &\Gamma; b \vdash \text{let } x = y.f = z \text{ in } t : \sigma \label{pres-as-3a}\\
+    &\wedge l \neq \epsilon \Longrightarrow \sigma <: E' \label{pres-as-3b}\\
+    &\wedge H \vdash \Gamma; L \label{pres-as-3c}\\
+    &\wedge \vdash \Gamma; L; P \label{pres-as-3d}
+        && \text{ by T-FRAME1, \cref{pres-as-def-f,pres-prem-2}}\\
+    &\Gamma; b \vdash y.f = z : \tau \label{pres-as-4a}\\
+    &\wedge \Gamma, x : \tau; b \vdash t : \sigma \label{pres-as-4b}
+        && \text{ by T-LET, \cref{pres-as-3a}}\\
+    &\Gamma; b \vdash y : D \label{pres-as-5a}\\
+    &\wedge \Gamma; b \vdash z : E \label{pres-as-5b}\\
+    &\wedge E <: \vn{ftype}(D, f) \label{pres-as-5c}\\
+    &\wedge \tau = E \label{pres-as-5d}
+        && \text{ by T-ASSIGN, \cref{pres-as-4a}}\\
+    &\Gamma; b \vdash \text{let } x = z \text{ in } t \label{pres-as-6}
+        && \text{ by T-LET, \cref{pres-as-4b,pres-as-5b,pres-as-5d}}\\
+    &H' \vdash \Gamma; L
+        && \text{ by WF-ENV, \cref{pres-as-def-ho,pres-as-def-h',pres-as-3c}}\\
+    &H' \vdash F' : \sigma
+        && \text{ by T-FRAME1, previous, \cref{pres-as-3b,pres-as-3d,pres-as-6}}\\
+\end{alignat}
+\end{proof}
+
+TODO
+\begin{alignat}{3}
+    &\Gamma(z) = E
+        && \text{ by T-VAR, \cref{pres-as-5b}}\\
+    &H \vdash \Gamma; L; z
+        && \text{ by WF-ENV, previous, \cref{pres-as-3c}}\\
+    &L(z) = \mn{null} \vee L(z) = o' \wedge \vn{typeof}(H, o') <: E \label{pres-as-11}
+        && \text{ by WF-VAR 9 10}\\
+    &12 by F-OK 1c\\
+    &13 by 11 12\\
+    &14 by 2b 12\\
+    &15 by 2c 2d 13 14\\
+    &16 by 2c 2d 13\\
+    &17 by 12 15 16\\
+    &18 by F-OK 1c\\
+    &19 by 2c 2d 18\\
+    &20 by F-OK 1c\\
+    &21 by 2b 20\\
+    &22 by 11 20\\
+    &23 by 2b 2c 2d 21 22\\
+    &24 by 2b 2c 2d 20 23\\
+    &25 by F-OK 1c 2a 2b 2c 2d 2e 17 19 24\\
+\end{alignat}
+
+$\vdash H' : \star$
+\begin{proof}
+\begin{alignat}{3}
+    &\L(z) = \mn{null} \vee \vn{typeof}(H, L(z)) <: \vn{ftype}(D, f) \label{pres-as-26}
+        && \text{ by <:-TRANS, \cref{pres-as-5c,pres-as-11}}\\
+    &\Gamma(y) = D \label{pres-as-27}
+        && \text{ by T-VAR, \cref{pres-as-5a}} \\
+    &H \vdash \Gamma; L; y
+        && \text{ by WF-ENV, previous, \cref{pres-as-3c}}\\
+    &\vn{typeof}(H, o) <: D
+        && \text{ by WF-VAR, previous, \cref{pres-as-def-ly,pres-as-27}}\\
+    &C <: D
+        && \text{ by previous, \cref{well-typed-heap,pres-as-def-ho}}\\
+    &\vn{ftype}(C, f) = \vn{ftype}(D, f) 
+        && \text{ by <:-EXT, WF-CLASS, previous TODO how is ftype defined? Why is f necessarily in D?}\\
+    &L(z) = \mn{null} \vee \vn{typeof}(H', L(z)) <: \vn{ftype}(C, f)
+        && \text{ by previous, \cref{pres-as-def-ho,pres-as-def-h',pres-as-26}}\\
+    &\vdash H' : \star
+        && \text{ by previous, \cref{well-typed-heap,pres-prem-1,pres-as-def-ho,pres-as-def-h'}}
+\end{alignat}
+\end{proof}
+
+\paragraph{E-SELECT}
+Analogous to E-ASSIGN.
+TODO proof exists in LaCasa but is not that interesting?
+
+\paragraph{E-NEW}
+TODO
+
+\end{proof}
+
+\subsection{Frame Stack Reduction}
+\begin{theorem}
+    \begin{alignat}{3}
+    & \vdash H : \star\\
+    &\wedge\ H \vdash FS\\
+    &\wedge\ H; a \vdash FS\ \bn{ok}\\
+    &\wedge\ \reducstack{}*[H']{}[FS']*\\
+    &\Longrightarrow \vdash H' : \star\\
+    &\wedge\ H' \vdash FS'\\
+    &\wedge\ H'; a \vdash FS'\ \bn{ok}
+    \end{alignat}
+\end{theorem}
+\begin{proof}
+By induction on the reduction relation $\reducstack{}*[H']{}[FS']*$.
+\todo{is this really an induction or just a case distinction?}
+
+\paragraph{E-INVOKE}
+
+\begin{alignat}{3}
+    &1 \label{pres-inv-xxxxxxx}
+        && \text{ by }\\
+    &2 \label{pres-inv-xxxxxxx}
+        && \text{ by }\\
+    &3 \label{pres-inv-xxxxxxx}
+        && \text{ by }\\
+    &4 \label{pres-inv-xxxxxxx}
+        && \text{ by }\\
+    &5 \label{pres-inv-xxxxxxx}
+        && \text{ by }\\
+    &H \vdash^\tau_x G : \sigma \label{pres-inv-xxxxxxx}
+        && \text{ by }\\
+    &H \vdash^\tau_x G \circ GS \label{pres-inv-7}
+        && \text{ by }\\
+    &8 \label{pres-inv-xxxxxxx}
+        && \text{ by }\\
+    &\Gamma(y) = D \label{pres-inv-xxxxxxx}
+        && \text{ by }\\
+    &C <: D \label{pres-inv-xxxxxxx}
+        && \text{ by }\\
+    &\vn{mtype}(C, m) = \vn{mtype}(D, m) = \tau' \rightarrow \tau \label{pres-inv-xxxxxxx}
+        && \text{ by }\\
+    &12 define Gamma' \label{pres-inv-xxxxxxx}
+        && \text{ by }\\
+    &\Gamma'; a' \vdash t' : \tau \label{pres-inv-xxxxxxx}
+        && \text{ by }\\
+    &\Gamma(z) = \sigma' \label{pres-inv-xxxxxxx}
+        && \text{ by }\\
+    &H \vdash \Gamma; L; z \label{pres-inv-xxxxxxx}
+        && \text{ by }\\
+    &16 \label{pres-inv-xxxxxxx}
+        && \text{ by }\\
+    &17 \label{pres-inv-xxxxxxx}
+        && \text{ by }\\
+    &H \vdash \Gamma'; L'; x \label{pres-inv-xxxxxxx}
+        && \text{ by }\\
+    &H \vdash \Gamma; L; y \label{pres-inv-xxxxxxx}
+        && \text{ by }\\
+    &L(y) = \mn{null} \vee \Gamma(y) = D \wedge L(y) = o' \wedge \vn{typeof}(H, o') <: D \label{pres-inv-xxxxxxx}
+        && \text{ by }\\
+    &L(y) = \mn{null} \vee \Gamma(y) = D \wedge L(y) = o' \wedge \vn{typeof}(H, o') <: C \label{pres-inv-xxxxxxx}
+        && \text{ by }\\
+    &L'(\mn{this}) = \mn{null} \vee \Gamma'(\mn{this}) = C \wedge L'(\mn{this}) = o' \wedge \vn{typeof}(H, o') <: C \label{pres-inv-xxxxxxx}
+        && \text{ by }\\
+    &H \vdash \Gamma'; L'; \mn{this} \label{pres-inv-xxxxxxx}
+        && \text{ by }\\
+    &\vn{dom}(\Gamma') \subseteq \vn{dom}(L') \label{pres-inv-xxxxxxx}
+        && \text{ by }\\
+    &H \vdash \Gamma'; L' \label{pres-inv-xxxxxxx}
+        && \text{ by }\\
+    &H \vdash G' : \tau \label{pres-inv-xxxxxxx}
+        && \text{ by T-Frame1, WF-Method1, WF-Method2, previous, \cref{pres-inv-4d,pres-inv-8b,pres-inv-13} TODO break up. What does WF-Method do here?}\\
+    &H \vdash FS' \label{pres-inv-xxxxxxx}
+        && \text{ by T-FS-A, previous, \cref{pres-inv-7}}\\
+TODO&28 and onwards \label{pres-inv-xxxxxxx}
+        && \text{ by }\\
+    &H; a \vdash G \circ GS \bn{ok} \label{pres-inv-xxxxxxx}
+        && \text{ by }\\
+    &H; a \vdash G' \bn{ok} \label{pres-inv-xxxxxxx}
+        && \text{ by }\\
+    &H;a \vdash FS' \bn{ok} \label{pres-inv-xxxxxxx}
+        && \text{ by }\\
+\end{alignat}
+
+\paragraph{E-BOX}
+
+\paragraph{E-RETURN1}
+
+\paragraph{E-RETURN2}
+
+\paragraph{E-FRAME}
+
+\end{proof}
+
+\subsection{Task Set Reduction}
+\begin{theorem}
+    \begin{alignat}{3}
+    & \vdash H : \star \label{pres-ts-prem-hstar}\\
+    &\wedge\  H \vdash TS, WS \label{pres-ts-prem-tsws}\\
+    &\wedge\  H \vdash TS, WS\ \bn{ok} \label{pres-ts-prem-tswsok}\\
+    &\wedge\  \reductasks{}*[H']{}[TS', WS']* \label{pres-ts-prem-reduc}\\
+    &\Longrightarrow \vdash H' : \star \label{pres-ts-concl-hstar}\\
+    &\wedge\  H' \vdash TS', WS' \label{pres-ts-concl-tsws}\\
+    &\wedge\  H' \vdash TS', WS'\ \bn{ok} \label{pres-ts-concl-tswsok}
+    \end{alignat}
+\end{theorem}
+
+\paragraph{E-INVOKE}
+TODO move frame stack proof here because its now a task set proof
+
+\paragraph{E-CAPTURE}
+
+\paragraph{E-SWAP}
+
+\paragraph{E-ASYNC}
+
+\begin{alignat}{3}
+    &H' = H \label{pres-asy-def-h}\\
+    &TS' = TS \cup \{T_1, T_2\} \setminus \{T\} \label{pres-asy-def-ts'}\\
+    &WS' = WS \label{pres-asy-def-ws'}\\
+    &T = (i_f, i_a, F \circ FS) \label{pres-asy-def-t}\\
+    &F = \langle L; \vn{async}(b, x \Rightarrow t) \{s\}, P \rangle^l \label{pres-asy-def-f}\\
+    &T_1 = (i_f, j_a, G \circ \epsilon) \label{pres-asy-def-t1}\\
+    &G = \langle [x \rightarrow o], t, \emptyset \rangle^\epsilon \label{pres-asy-def-g}\\
+    &T_2 = (i_f, i_a, G' \circ \epsilon)  \label{pres-asy-def-t2}\\
+    &G' = \langle L, s, P \setminus \{p\} \rangle^\epsilon \label{pres-asy-def-g'}\\
+    &\Gamma' = x : C  \label{pres-asy-def-xxxxx}\\
+    &  \label{pres-asy-def-xxxxx}\\
+\end{alignat}
+
+\begin{alignat}{3}
+    & H' \vdash \star \label{pres-asy-zzzzz}
+        && \text{ by \cref{pres-asy-def-h,pres-ts-prem-hstar}}\\
+\end{alignat}
+
+\begin{alignat}{3}
+    &L(b) = b(o,p)
+        && \text{ by E-ASYNC}\\
+    &H \vdash x : C; [x \rightarrow o]; x
+        && \text{ by WF-VAR, previous}\\
+    &H \vdash x : C; [x \rightarrow o] \label{pres-asy-1}
+        && \text{ by WF-ENV, previous}\\
+    &x : C; \vn{ocap} \vdash t : \tau \label{pres-asy-2}
+        && \text{ by T-ASYNC, \cref{pres-ts-prem-tsws,pres-asy-def-t,pres-asy-def-f}}\\
+    &\vdash x : C; [x \rightarrow o]; \emptyset \label{pres-asy-3}
+        && \text{ by WF-PERM}\\
+    &H \vdash G : \tau \label{pres-asy-4}
+        && \text{ by T-FRAME1, \cref{pres-asy-1,pres-asy-2,pres-asy-3,pres-asy-def-g}}\\
+    &H \vdash G \circ \epsilon \label{pres-asy-4a}
+        && \text{ by T-FS-NA, T-EMPFS, previous}\\
+    &\Gamma \setminus \vn{Perm}[Q]; a \vdash s : \sigma \label{pres-asy-5}
+        && \text{ by T-ASYNC, \cref{pres-ts-prem-tsws,pres-asy-def-t,pres-asy-def-f}}\\
+    &H \vdash \Gamma \setminus \vn{Perm}[Q]; L \label{pres-asy-6}
+        && \text{ by WF-ENV, assumptions TODO}\\
+    &H \vdash \Gamma \setminus \vn{Perm}[Q]; L; P \setminus \{p\} \label{pres-asy-7}
+        && \text{ by WF-PERM TODO perm[q] <-> p correspondence}\\
+    &H \vdash G' : \sigma \label{pres-asy-8}
+        && \text{ by T-FRAME1, \cref{pres-asy-def-g',pres-asy-5,pres-asy-6,pres-asy-7}}\\
+    &H \vdash G' \circ \epsilon \label{pres-asy-8a}
+        && \text{ by T-FS-NA, T-EMPFS, previous}\\
+    &H' \vdash TS', WS' \label{pres-asy-zzzzz}
+        && \text{ by T-TS, \cref{pres-asy-def-ws',pres-ts-prem-tsws,pres-asy-4a,pres-asy-8a}}\\
+\end{alignat}
+
+\begin{alignat}{3}
+    & yyyy \label{pres-asy-zzzzz}
+        && \text{ by xxxxx}\\
+    & yyyy \label{pres-asy-zzzzz}
+        && \text{ by xxxxx}\\
+    & yyyy \label{pres-asy-zzzzz}
+        && \text{ by xxxxx}\\
+    & yyyy \label{pres-asy-zzzzz}
+        && \text{ by xxxxx}\\
+    & yyyy \label{pres-asy-zzzzz}
+        && \text{ by xxxxx}\\
+    & yyyy \label{pres-asy-zzzzz}
+        && \text{ by xxxxx}\\
+    & yyyy \label{pres-asy-zzzzz}
+        && \text{ by xxxxx}\\
+    & H' \vdash TS', WS' \bn{ok} \label{pres-asy-zzzzz}
+        && \text{ by xxxxx}\\
+\end{alignat}
+
+\paragraph{E-FINISH}
+
+\paragraph{E-RESUME}
+
+\paragraph{E-TASK-DONE}
+
+\paragraph{E-STACK}
+
+\begin{theorem}
+    \begin{alignat}{3}
+    & \vdash H : \star \label{pres-ts-prem-hstar}\\
+    &\wedge\  H \vdash TS, WS \label{pres-ts-prem-tsws}\\
+    &\wedge\  H \vdash TS, WS\ \bn{ok} \label{pres-ts-prem-tswsok}\\
+    &\wedge\  \reductasks{}*[H']{}[TS', WS']* \label{pres-ts-prem-reduc}\\
+    &\Longrightarrow \vdash H' : \star \label{pres-ts-concl-hstar}\\
+    &\wedge\  H' \vdash TS', WS' \label{pres-ts-concl-tsws}\\
+    &\wedge\  H' \vdash TS', WS'\ \bn{ok} \label{pres-ts-concl-tswsok}
+    \end{alignat}
+\end{theorem}
+\paragraph{ID Ordering}
+$\vn{idOrdering}(WS)$ is a property on a specific waiting task set $WS$. As such, we only need to examine rules that modify $WS$, i.e. E-RESUME, E-CAPTURE, E-SWAP, E-FINISH. Of these, the first three only remove tasks from $WS$, that is $\reductasks{}*{}[TS, WS']*$ where $WS' \subseteq WS$. It follows that $\vn{idOrdering}(WS) \Longrightarrow \vn{idOrdering}(WS')$. E-FINISH also preserves ID ordering as the ID $j_f$ is fresh and thus larger than all other defined IDs. \todo{define fresh outside of proof}
+
+\paragraph{Finish Uniqueness}
+$\vn{finishUniqueness}(WS)$ is also a property defined only on a waiting task set $WS$. As such, we examine the same four rules E-RESUME, E-CAPTURE, E-SWAP and E-FINISH. The first three only remove tasks from $WS$ and we apply the same argument as in the previous paragraph. E-FINISH creates a new waiting task with a fresh, and therefore unique, ID $j_f$ which immediately leads to $\vn{finishUniqueness}$.
+
+\paragraph{Async Task Uniqueness}
+$\vn{asyncTaskUniqueness}(TS)$ is a property of the async ids of an active task set $TS$. While almost every rule modifies $TS$, only E-ASYNC, E-FINISH, E-RESUME and E-TASK-DONE add or remove tasks from $TS$.
+
+TODO E-ASYNC removes T, adds T1 with ida(T) = ida(T1). T2 has fresh ida.
+
+E-FINISH has same argument for T1, T2 is inactive.
+
+E-RESUME adds a task. Based on Async Group uniqueness: We have one chain of tasks.
+We can reduce T -> T has no successor -> No task with higher idf and same ida exists as it wouldn't be part of the same chain (induction argument: its successor would also have a predecessor until we obtain T. But we don't because it has no successor)
+
+\& and from asyncGroupUniq no active task with lower idf and same ida exists (Ts predecessor etc. until we hit this active tasks idf+1 -> its predeccesor is not in WS -> violated asyncGroupUniq)
+
+Thus, no active task with same ida exists -> safe to resume.
+
+E-TASk-DONE removes a task trivial.
+
+\paragraph{Async Group Uniqueness}
+TODO
+
+defined on the ids of TS, WS. Rules that modify these are: E-CAPTURE, E-SWAP, E-ASYNC, E-FINISH, E-RESUME, E-TASK-DONE
+
+E-CAPTURE, E-SWAP: Drop all tasks with a specific ida -> async group only has one element afterwards. Trivially forms chain
+
+E-ASYNC: T replaced by T1. T2 starts a new group
+
+E-FINISH: Extends chain by one. T replaced by T2. T1 successor to T2.
+
+E-RESUME: T has no successor -> T end of chain -> Resuming T is fine
+
+
+
+
+
+
+
+
+
+    
+
+\subsection{Frame}
+\begin{definition}[Box Separation: Frame]
+    For heap $H$ and frame $F = \sframe{t}$, $\vn{boxSep}(H, F)$ holds iff
+
+    $\forall x \rightarrow b(o,p), y \rightarrow b(o', p') \in L.\ p \neq p' \wedge p, p \in P \Rightarrow \vn{sep}(H, o, o')$
+\end{definition}
+
+\begin{definition}[Box-Object Separation]
+    Frame $F = \sframe{t}$ satisfies the \textit{box-object separation} invariant in $H$, written $\vn{boxObjSep}(H, F)$, iff
+
+    $\forall x \rightarrow b(o, p), y \rightarrow o' \in L.\ \vn{sep}(H, o, o')$
+\end{definition}
+
+\begin{definition}[Box Ocap Invariant]
+    Frame $F = \sframe{t}$ satisfies the \textit{box ocap} invariant in $H$, written $\vn{boxOcap}(H, F)$, iff
+
+    $\forall x \rightarrow b(o, p) \in L, o' \in \vn{dom}(H).\ p \in P \wedge \vn{reach}(H, o, o') \Longrightarrow \vn{ocap}(\vn{typeof}(H, o'))$
+\end{definition}
+
+\begin{definition}[Global Ocap Separation]
+    Frame $F = \sframe{t}$ satisfies the \textit{global ocap separation} invariant in $H$, written $\vn{globalOcapSep}(H, F)$, iff
+
+    $\forall x \rightarrow o \in L, y \rightarrow o' \in L_0.\ \vn{ocap}(\vn{typeof}(H, o)) \wedge \vn{sep}(H, o, o')$
+\end{definition}
+
+\begin{definition}[Dominating Edge]
+    Field $f$ of $\hat{o}$ is a dominating edge for paths from $o$ to $o'$ in $H$, written $\vn{domedge}(H, \hat{o}, f, o, o')$, iff
+
+    $\forall P \in \vn{path}(H, o, o').\ P = o \dots \hat{o}, FM(f) \dots o'$ where $H(\hat{o}) = \langle C, FM \rangle$ and $f \in \vn{dom}(FM)$.
+\end{definition}
+
+\begin{definition}[Field Uniqueness]
+   For heap $H$ and frame $F = \sframe{t}$, $\vn{fieldUniqueness}(H, F)$ holds iff
+   
+   $\forall x \rightarrow b(o, p) \in L, o', \hat{o} \in \vn{dom}(H).\\
+   p \in P \wedge \vn{reach}(H, o, \hat{o}) \wedge H(\hat{o}) = \langle C, FM \rangle \wedge \vn{ftype}(C, f) = \text{ Box}[D] \wedge \vn{reach}(H, FM(f), o') \Longrightarrow \vn{domedge}(H, \hat{o}, f, o, o')$
+\end{definition}
+
+
+\subsection{Stack}
+\begin{definition}[Box Separation: Stack]
+    For heap $H$, frame $F$, and frame stack $FS$, $\vn{boxSeparation}(H, F, FS)$ holds iff
+    
+    $\forall o, o' \in \vn{dom}(H).\ \vn{boxRoot}(o, F, p) \wedge \vn{boxRoot}(o', FS, p') \wedge p \neq p' \Longrightarrow \vn{sep}(H, o, o')$
+    
+    $\forall o \in \vn{boxRoots}(F), o' \in \vn{boxRoots}(FS).\ o \neq o' \Longrightarrow \vn{sep}(H, o, o')$
+    \todo{use boxRoots or boxRoot? Be careful about permissions being identical}
+\end{definition}
+
+\begin{definition}[Unique Open Box]
+    For heap $H$, frame $F$, and frame stack $FS$, $\vn{uniqueOpenBox}(H, F, FS)$ holds iff $\forall o, o' \in \vn{dom}(H).\ \vn{openBox}(H, o, F, FS) \wedge \vn{openBox}(H, o', F, FS) \Longrightarrow o = o'$
+\end{definition}
+
+\begin{definition}[Open Box Propagation]
+    For heap $H$, frame $F^l$, and frame stack $FS = G' \circ\ GS$, $\vn{openBoxPropagation}(H, F^l, FS)$ holds iff
+    
+    $l \neq \epsilon \wedge \vn{openBox}(H, o, F, FS) \Longrightarrow \vn{openBox}(H, o, G, GS)$
+    \todo{An open box implies that the whole stack has the same box (E-OPEN removed, all other ways to get an open box drop the stack)}
+\end{definition}
+
+
+
+
+\begin{definition}[Separation]
+  Two object identifiers $o$ and $o'$ are separate in heap $H$, written $sep(H, o, o')$, iff
+\[
+  \forall q, q' \in dom(H).\ reach(H, o, q) \wedge reach(H, o', q') \Longrightarrow q \neq q'
+\]
+\end{definition}
+
+\begin{definition}[Roots]
+    The set of objects that are pointed to by the variables of a frame stack are called the roots of this stack as they represent the roots of the reference graphs of their respective object.
+    \[
+        \vn{roots}(\sframe{t}) = \{ o\ |\ x \rightarrow o \in L \vee (x \rightarrow b(o,p) \in L \wedge p \in P)\}
+    \]
+    \[
+        \vn{roots}(F \circ FS) = \vn{roots}(F) \cup \vn{roots}(FS)
+    \]
+\end{definition}
+
+\begin{definition}[Box roots]
+    For heap $H$ and frame $\sframe{t}$, $\vn{boxRoots}(H, \sframe{t}) = \{o\ |\ x \rightarrow b(o,p) \in L \wedge p \in P\}$
+\end{definition}
+
+\infrule[]
+    {\vn{boxRoot}(o, FS) \andalso x \rightarrow o' \in L \andalso \vn{reach}(H, o, o')}
+    {\vn{openBox}(H, o, \sframe{t}, FS)}
+
+
+
+E-TASK-DONE: Active task must be end of chain -> Removing T is fine
+
+\begin{definition}[Finish Uniqueness]
+    A set of inactive tasks $WS$ has unique finishes iff all tasks await a different ID.
+    
+    \[\vn{finishUniqueness}(WS) := \forall (T,i_f), (T',j_f) \in WS.\ i_f = j_f \Rightarrow T = T'\]
+\end{definition}
+
+\begin{definition}[Async Task Uniqueness]
+Only one task within an async group is active at once.
+\begin{alignat}{5}
+    \vn{asyncTaskUniqueness}(TS) := &\forall T, T' \in TS.\ id_a(T) = id_a(T') \Rightarrow T = T'
+\end{alignat}
+\end{definition}
+
+\begin{definition}[Async Group Uniqueness]
+\todo{We need to enforce that one async group is a single sequence of tasks chained by finish. If no task proceeds an element, this element is the start of the chain. No other chain can be started if we are limited to one successor. Second half: If some predecessor exists, a direct one exists too.}
+\todo{one predecessor is defined by finish uniqueness btw}
+\todo{successor check necessary?}
+\begin{alignat}{5}
+    \vn{asyncGroupUniqueness}(TS, WS) := &\forall T \in TS \cup tasks(WS).\ 
+        %&&\nexists T' \in TS \cup tasks(WS).\ id_a(T) = id_a(T') \wedge id_f(T') < id_f(T)\\
+        &&\nexists T' \in TS \cup tasks(WS).\ id_a(T) = id_a(T') \wedge id_f(T') < id_f(T)\\
+        & && \vee \exists (T', i_f) \in WS.\ id_a(T) = id_a(T') \wedge i_f = id_f(T)
+        %&\forall (T, i_f) \in WS.\ 
+        %&&\nexists T' \in TS \cup tasks(WS).\ id_a(T) = id_a(T') \wedge i_f < id_f(T')\\
+        %& && \vee \exists T' \in TS \cup tasks(WS).\ id_a(T) = id_a(T') \wedge i_f = id_f(T)
+\end{alignat}
+\end{definition}

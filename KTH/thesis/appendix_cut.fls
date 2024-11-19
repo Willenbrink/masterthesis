@@ -1,0 +1,5 @@
+PWD /home/sewi/Nextcloud/Studium/MA/KTH/thesis
+INPUT /gnu/store/7lnzz1cxxv46l8q0a4n7q59h2b8jf9s0-texlivetexmf-20240312/share/texmf-dist/web2c/texmf.cnf
+INPUT /gnu/store/7lnzz1cxxv46l8q0a4n7q59h2b8jf9s0-texlivetexmf-20240312/share/texmf-var/web2c/pdftex/latex.fmt
+INPUT appendix_cut.tex
+OUTPUT appendix_cut.log

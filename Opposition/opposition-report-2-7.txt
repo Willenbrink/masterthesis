@@ -1,0 +1,172 @@
+OPPOSITION REVIEW (*)
+
+    I annotated the thesis extensively and almost all annotations contain a comment. Please take a look at them for more information. Note also that due to an issue with my annotator some annotations overlap. If one doesn't have a comment try deleting it to see if it overlapped with another. Please excuse the inconvenience.
+
+---------	
+
+OPPOSITION INFORMATION
+
+The author of the thesis: Louise Tidestav
+The title of the thesis: A domain-specific language for geospatial computations on the GPU
+The name of the opponent: Sebastian Willenbrink
+The date of the opposition: 10/06/2024
+
+----------
+
+EVALUATION -- GUIDING QUESTIONS
+N.B. Please remember to justify your answers to the questions below, in particular providing detailed remarks (in this protocol or as comments in the thesis pdf) for potential issues that you have identified.
+
+
+I. SUMMARY
+
+Briefly summarise the work in one or two paragraphs.
+    This thesis develops an embedded DSL for geospatial computations using CUDA and Thrust, a library built on top of CUDA. It explores a handful of simple operators such as reduce(/fold), transform(/map) and one specific to raster data, local which is similar to a convolution.
+
+    The thesis includes details on both the process and the final result of the thesis before evaluating both its performance and usability. The performance is evaluated by comparing a sequential CPU implementation with a parallel CPU and a GPU implementation. The parallel CPU and GPU implementations are built using Thrust which ensures that implementation details do not significantly distort the result. The speedups obtained are on average about 2-3x compared to the parallel CPU implementation.
+
+
+II. TITLE, INTRODUCTION, BACKGROUND
+
+Do the report title and abstract justly reflect the contents of the report?
+    The abstract reflects the contents generally well but does not mention important decisions for the DSL (embedded, interpreted) and the results of the measurements are missing. I think including both would improve the abstract.
+
+Are the project background and underlying interest adequately described? 
+    Yes, the motivation is clear. The background is extensive and covers all topics touched by the thesis.
+
+Is the introduction with general survey of the area clear and complete? 
+    Generally yes, although previous solutions and why they are not applicable is not discussed in enough detail. Why do geospatial computations (that happen on image data, either raster or vector) need their own DSL?
+
+Is the research question/aim/purpose clear (**)?
+    Yes, developing a DSL for geospatial computations and evaluating its performance and usability.
+
+
+III. THEORY AND PREVIOUS WORK
+
+Is the theory description sufficient to understand the project and is it explicitly connected to the project (***)?
+    In general yes although some explanations might be unnecessary. For example compilers are explained as consisting of lexers parser etc. But is this really relevant? The details of how a compiler works are not necessary to understand the thesis. Still, having too much rather than too little information is good (at least in the background where a reader skipping parts is expected)
+
+Is the description of related work complete enough and synthesised to describe how the project relates to previous research?
+    Generally yes, though it is not fully explained why other approaches are insufficient, e.g. image processing DSLs or libraries. I assume it is because vector images are rarely used and might not be supported by other DSLs?
+
+
+IV. METHOD
+
+Is the choice of method for tackling the problem justified (including discussing alternative methods)? 
+    No, I think discussing the choice for a DSL instead of a simple library is a must. Why is a library not enough? Why two interpreters for the CPU? Shouldn't a single parallel one with a configurable number of threads be enough? I find the domain analysis partially too vague.
+
+Are the prerequisites for applying the method considered? 
+    Not explicitly but I don't think that the "method" approach fits a development project anyway. The availability of hardware and libraries on which to build is obviously necessary but doesn't need explicit stating as "prerequisite", instead it is a choice: NVidia and CUDA.
+
+Is the method adequately explained?
+    Generally yes although the implementation is only described very shortly. I did not get a good intuition for the complexity of the implementation. What were the pain points? How easy was it to implement each interpreter? Did you try something beside Thrust before deciding on it? What are the key data structures? How does Thrust actually work in detail? Are there synchronization issues?
+
+
+V. RESULTS, DISCUSSION AND CONCLUSIONS
+
+Are the results clearly described?
+    Yes, the performance and usability were evaluated separately and described appropriately.
+
+Is the evaluation performed to assess the results adequate to answer the research question/aim?
+    Yes, the usability is evaluated fairly (table 4.1, 4.2) and performance is fairly assessed. Table 4.4 on the other hand is questionable. I believe there is a bias or misunderstandings at work: The DSL is classified as having some support for good-looking symbols but it doesn't introduce any symbols. I also have doubts about the chosen FQAD questionaire: "good-looking symbols" seems out-of-place and whether the shortcomings of the DSL can be circumvented is not even a topic. It is unclear how the DSL interacts with hand-written CUDA or thrust code. What do I do if I want a local operator with more than 8 neighbors? What happens if I want to query something? How did you choose the four characteristics (4.1.2)? Why not reliability or maintainability?
+
+    I also believe that the performance measurement is understating the DSLs results. It includes the transfer times in the measurement which is likely not realistic for a real-world scenario. Instead, it should transfer the data once (and maybe benchmark that separately) and then run the chosen operator in a loop maybe a 1000 times. That way, the single-digit speedups compared to a parallel CPU implementation should show significant improvements. I expect a GPU with thousands of cores to be more than 1.08 times faster when adding a constant to an array of values.
+
+Does the author discuss the limitations, possible future work and compare the achieved results to those of related work?
+    Yes although the limitations do not mention the above issues with the evaluation. 
+
+Are the conclusions credible and supported by the results?
+    Yes, the results are summarized correctly and without over- or understating the results.
+
+
+VI. FIGURES, TABLES AND BIBLIOGRAPHY
+
+Are the Figures/Tables clear (e.g., graphical quality, units and axis labels provided, caption sufficiently informative to make the Table/Figure self-contained)?
+    Yes. Some figures are inserted as screenshot which makes the text inaccessible to e.g. screen readers but is not a major issue. I would not choose a bar graph for e.g. figure 4.8 as a table could summarize the results better but that is a personal preference.
+
+Are the Figures/Tables a valuable support to the main text (e.g., are they referenced in the text, do they provide new or more accessible information, are none superfluous)?
+    All figures are referenced and show important information. Some figures in the background (e.g. 3.2) are not that useful: Stating that it is a 2d array with each row having the same number of elements (as opposed to the jagged array in fig 3.1) would have explained it just as clearly. It is also unclear whether the arrays are contiguous in memory which would affect performance.
+
+Is no Figure/Table necessary for understanding the text missing?
+    All figures necessary are present in my opinion.
+
+Is the source of information and origin of graphics in Figures clear (e.g., if it is based on an external reference) and is copyrighted or CC material handled adequately?
+    Yes, no external figures were used.
+
+Rate the bibliography in terms of coverage and quality of references included. 
+    I did not look at all references. In general, it seems appropriate. I only noticed one missing reference (I think to Thrust in the background? See annotations in pdf).
+
+
+VII. STRENGTHS, WEAKNESSES AND STRUCTURE
+
+What are the strong aspects of the work/report?
+    Evaluating both a parallel CPU and GPU implementation gives the results a lot of credibility, especially as they are both implemented using Thrust: It is fair as the full capabilities of the CPU are used and trustworthy as your implementation is the same for both. I only have to trust Thrust that it supports both equally well (which is not a given but at least its not a problem in your thesis but in Thrust if this is not the case)
+
+    Evaluating both performance but also usability (called level of functionality in the thesis) is very important. Table 4.1 and 4.2 show the shortcomings fairly and it is stated that this is expected: Only simple operators are supported in the DSL. In general, the evaluation is done fairly, even including an algorithm (Ramer-Douglas-Peucker) that is a bad fit for the GPU: Showing that the GPU is not perfect but still usable for a recursive algorithm enhances the credibility. The DSL is thus not a one-trick-pony and can be used for more than just simple operators.
+
+    The background is quite extensive and gives a good overview of the geospatial domain. This is important for understanding the rest of the thesis and it is nice to get that necessary background in a wellphrased manner.
+
+What are the weak aspects of the work/report? 
+    I have three main criticisms.
+    
+    Firstly, including the transfer times in the benchmarks harms your results. If you exclude those (and provide some reasoning for this, e.g. you expect a 1000 operations to happen on a vector, reducing the need for transfers) you would obtain significantly better results. This should be relatively simple to address by looping when applying the operator and will make the results more impressive (and rightly so!)
+
+    Secondly, alternatives such as image DSLs are not discussed adequately. What is so specific about the geospatial domain? I assume it is related to the vector data as rasters should be well supported by image DSLs.
+
+    Thirdly, naming your work a DSL embedded into C++ might be misleading: I would rather phrase it as a library/extension to Thurst/CUDA which is the DSL. As you do not introduce new symbols or any syntax extension I think that DSL is a bit of a misnomer. Though I guess the line becomes blurry between embedded DSLs and libraries due to e.g. overriding operators for classes. So perhaps this point is completely void. (Also giving a name to your DSL might be nice, both for better referencing but also because you created something new: It should have a name)
+
+
+Which sections of the report were difficult to understand? Why? And what could be done to improve this? 
+    I think the phrase "semantic model" in background is confusing. I've never heard of it and it seems to be about the datastructure?
+
+Other general comments on the report and its structure, including if there is a logical "storyline" from Introduction to Conclusions.
+    I personally feel that the thesis adheres to strictly to some predetermined structure. E.g. evaluation is mentioned in method without results and then the results are mentioned in the following chapter. Why do you not describe the method for obtaining the results in that chapter? You also have a "Development of a DSL" section in the background before having it once more in method. Or background in the introduction and as a separate chapter. To a degree, this is fine. But I would remove the evaluation in method and development of dsl in background to reduce redundancy.
+    Looking back on the thesis now I think it was quite easy to read. I may misjudge this as I'm familiar with CUDA and image processing.
+ 
+
+VIII. OUTLOOK AND CONCLUDING ASSESSMENT
+
+What is your view of the news value of the work?
+    Difficult to judge. I think that other DSLs/libraries exist providing much of the same functionality, at least for raster data. I think the comparison of CPU and GPU Thrust is valuable and, in the context of geospatial computations, novel. (Mostly) Unified handling of raster and vector data is also novel.
+
+Does the report put the project into a larger perspective, considering e.g., societal impact, (economical, ecological and/or societal) sustainability, ethics?
+    Briefly. I recommend a discussion about climate modeling and how it benefits the field.
+
+What is your concluding assessment of this Master thesis project?
+    Overall, the Master thesis is good. I think if the criticisms are adressed (especially the first two) the thesis will be excellent and provide a valuable foundation for future work in the area of geospatial DSLs.
+
+
+IX. SEMINAR QUESTIONS
+
+List ca. six questions that you would like to ask the presenter at the seminar
+- Do DSLs for vector data exist?
+- Have you considered measuring the transfer time separately in the benchmarks?
+- The DSL does not support all operations. How easy is it to circumvent these shortcomings? How does it interact with handwritten Thrust or CUDA code? Can the DSL be used in its current state?
+- If not, what more must be done so that the DSL is usable? Which operations are required by your users?
+- How easy would it be to add support for queries, neighbors etc? Do you think such operations are well-suited to GPUs?
+- Can you compare the performance of your DSL with handwritten code from Carmenta? Can you convert this handwritten code to your DSL and compare complexity/lines of code?
+- Where do you draw the line between a DSL and a library? Why is your work a DSL and not a library built with Thrust?
+
+Additional questions:
+- How easy to combine DSL construct with general purpose constructs?
+- Are there any operations that combine entities with fields? Your operators only consume one or the other.
+- Have you considered adding any symbols to the language?
+
+
+--------
+(*) Adapted from Kerstin Frenckner's original template. 
+
+(**) Since Master thesis projects differ, it is common, but not compulsory, to include an explicit research question. Regardless, the author should clearly state what the focus of the project is, in the form of a question, aim or purpose.
+
+(***) rather than merely being a general description of the area of research without clear links to the project
+
+---------
+
+INSTRUCTIONS TO THE OPPONENT
+
+The aim of the opposition review is two-fold: 
+As an opponent, you should demonstrate that you fulfill the learning outcome that you are able to "reflect on and critically review [...] others' scientific achievements".
+For the presenter, the feedback provided by the opponent is an opportunity firstly to improve the report further and secondly to demonstrate their ability to address constructive criticism by considering your remarks when preparing the final version of the thesis.
+This means that the opposition review should focus on both identifying strengths of the work and suggesting -- in relative detail -- improvements that you deem would make the report better (in terms of completeness, ease of understanding, readability etc).
+
+The above evaluation questions serve as a guide to your opposition review, but you are not required to follow the question-answer structure, if you prefer a different review outline. What matters is that you provide enough remarks and details in your opposition review to allow the presenter to consider your suggestions for improvement. If you prefer, details may instead be provided as comments in an annotated pdf of the report. If you do provide comments in the actual report, please briefly state in this protocol where relevant comments regarding the different questions below are provided.
+

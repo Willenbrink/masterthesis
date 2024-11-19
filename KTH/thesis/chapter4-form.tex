@@ -1,0 +1,636 @@
+\chapter{Formalization}\label{formal}
+In this section, we formalize the core concepts of this extension. For this, we use a typed object-oriented core language with subtyping based on LaCasa called Parallel LaCasa or \plc. First, we describe the syntax. Then, we describe the operational semantics in three steps, starting with the reduction of single frames, then frame stacks and finally sets of tasks. Lastly, we describe the static semantics, i.e. the typing rules and wellformedness.
+
+We formulate our language using small-step semantics and syntax-directed typing rules. We base our language directly on $CLC_2$ of the LaCasa paper. Nontrivial differences are highlighted with a gray background.
+
+\section{Syntax}
+\begin{figure}
+    \centering
+    \begin{alignat*}{4}
+        \rho &::=\ && && \graybox{\text{return type}}\\
+        & && C, D && \text{class type}\\
+        & && |\ \mn{Null} && \text{null type}\\
+        & && |\ \bot && \text{bottom type}\\
+        \sigma, \tau &::=\ && && \text{surface type}\\
+        & && \rho && \text{return type}\\
+        & && |\ \text{Box}[C] && \text{box type}\\
+        \pi &::=\ && && \text{type}\\
+        & && \sigma, \tau && \text{surface type}\\
+        & && |\ Q \vartriangleright \text{Box}[C] && \text{guarded type}\\
+        p  &::=\ && \overline{cd}\ \overline{\vn{cfd}}\ t && \text{program} \\
+        cd &::=\ && \text{class}\ C\ \text{extends}\ D\ \{ \overline{fd}\ \overline{md} \}\ \ && \text{class}\\
+        & && |\ \vn{AnyRef} && \text{anyref}\\
+        %&vd &&::= && \text{var}\ f : C &&\text{variable}\\
+        \vn{cfd} &::=\ && \text{var}\ f : C &&\text{class field}\\
+        \vn{ufd} &::=\ && \text{var}\ f :\ \text{Box}[C] && \text{unique field}\\
+        fd &::=\ && \vn{cfd} \ |\ \vn{ufd} && \text{field}\\
+        md &::=\ && \text{def}\ m(x : \tau) : \rho = t && \text{method}\\
+    \end{alignat*}
+    
+    \caption{Syntax of \plc}
+    \label{fig:syntax}
+\end{figure}
+
+\Cref{fig:syntax} shows the syntax of programs and types in \plc.
+A type is either a surface type, which can occur in the surface syntax, or a guarded type, which can only be inferred. Guarded types consist of some $Q$ and some $\mn{Box}[C]$ where each $Q$ is associated with a permission during type-checking to ensure that guarded boxes are only accessed in the presence of their corresponding permission. Surface types encompass return types and boxes. Return types consist of class types, the null type and bottom.
+Type \mn{Null} is a subtype of all classes and used to assign a type to the \textit{null} value.
+The bottom type $\bot$ is used as the return type of continuation terms and indicates that they do not return.
+
+The type system has only classes as primitive types as we focus on the behaviour of references in an execution environment with shared memory. We do not include, for example, integers to simplify the formalization.
+
+A program consists of a sequence of class definitions and global variable definitions, followed by the \say{main} term, the entry point of the program. Classes themselves define a name $C$, a superclass $D$ (which might be the superclass of all classes, \textit{AnyRef}, which does not contain any methods or fields) followed by a sequence of fields and methods. Both the sequences in the program and the classes can be empty.
+
+A class field can only store class types. A field storing a box is called a unique field and provides externally unique references to boxes. Externally unique references are the only references pointing from outside a heap area into it. This means that without this reference the pointed-to area would be fully separated from the remaining heap. Unique fields are only externally unique as the object referenced by the field may contain an (indirect) reference to itself. External uniqueness is required to ensure that a box stored in a unique field remains isolated.
+
+Methods have a term as body and take a single argument of arbitrary surface type. The argument object can contain an arbitrary number of fields, simulating multiple arguments.
+Methods can only return a subset of types, so-called return types. 
+Preventing the return of boxes is not a significant limitation as either the box originated in the callers context or was created inside the method.
+In the former case, returning the box isn't necessary.
+In the latter case, the permission to the box is not available to the caller, thus making the box inaccessible and therefore meaningless to return.
+Both the restriction on the number of arguments and the return type exist to simplify the formalization.
+
+\begin{figure}
+    \centering
+    \begin{alignat*}{3}
+        &t ::= && && \text{terms}\\
+        & &&x && \text{variable}\\
+        & && |\ \text{let}\ x = e\ \text{in}\ t\ \ && \text{let binding}\\
+        & && |\ t^c && \text{continuation term}\\
+        &\\
+        &e ::= && && \text{expressions}\\
+        & && \mn{null} && \text{null reference}\\
+        & &&|\ x && \text{variable}\\
+        & &&|\ x.f && \text{selection}\\
+        & &&|\ x.f = y && \text{assignment}\\
+        & &&|\ \text{new}\ C && \text{instance creation}\\
+        & &&|\ x.m(y) && \text{invocation}\\
+%        & &&|\ x.\text{open} \{y \Rightarrow t \} && \text{open box}\\
+        & &&|\ \graybox*{\text{finish} \{ t \}} && \text{finish}\\
+        &\\
+        &t^c ::= && && \text{continuation terms}\\
+        & && \text{box}[C] \{ x \Rightarrow t \} && \text{box creation}\\
+        & &&|\ \text{capture}(x.f, y) \{ z \Rightarrow t \} && \text{capture}\\
+        & &&|\ \text{swap}(x.f, y) \{ z \Rightarrow t \} && \text{swap}\\
+        & &&|\ \graybox*{\text{async}(x, y \Rightarrow t) \{ s \}} && \text{async}\\
+    \end{alignat*}
+    
+    \caption{Terms and expressions of \plc}
+    \label{fig:terms_and_expressions}
+\end{figure}
+
+\Cref{fig:terms_and_expressions} shows the terms and expressions of \plc. All terms are in the administrative normal form (ANF), that is, all arguments to methods must be constants or variables and the results of expressions must be immediately bound by a variable. The terms are divided into three categories: variables, expressions and continuation terms. Variables and expressions are mostly standard. Due to the ANF, each expression is immediately bound to a variable. This can lead to confusing syntax such as \say{$\text{let }x = y.f = z \text{ in }t$} which assigns the value of $z$ to $y.f$ and stores the result of the assignment (defined as y) in the variable x.
+
+Continuation terms represent terms that do not return, i.e. have type bottom. Expressions and terms that come after a continuation term will thus never be evaluated, e.g. \say{$\vn{capture}(...)\{...\}; \text{new } C$} where \say{$\text{new } C$} is never executed. While the syntax of \plc does not allow this specific construct as continuation terms are always in the final position of a term, bottom is still relevant as method calls might not return. 
+
+$\vn{capture}(x.f,y)\{z \Rightarrow t\}$ takes a field $f$ of box $x$ and a box $y$, storing the content of box $y$ inside the field $x.f$. This consumes the permission of $y$ as the box was captured and is no longer isolated from the box $x$. Therefore, accessing box $y$ must be impossible to ensure that the contents of $x$ are only accessed through $x$'s permission. $t$ is a continuation that is evaluated without the permission of $y$ and with the variable $z$ containing the same box as $x$. $z$ is not strictly necessary but kept for consistency with $CLC^2$. As $\vn{capture}$ returns bottom, the permission for $y$ remains inaccessible.
+
+$\vn{capture}$ is an irreversible action. After capturing $y$, $x$ and $y$ are no longer isolated. Alternatively, $\vn{swap}(x.f, y)\{z \Rightarrow t\}$ stores the content of a box $y$ inside of a unique field $f$ of another box $x$ while simultaneously returning the previous content of $x.f$ wrapped in a new box $z$. The content of $y$ can then later be retrieved by another swap. Due to the creation and consumption of boxes $\vn{swap}$ also returns bottom and a continuation $t$.
+
+$\vn{async}(x, y \Rightarrow t)\{ s \}$ takes a box $x$, a term $t$ and a continuation $s$. $t$ is evaluated in isolation from the variable environment of $\vn{async}$; instead it only has access to the content of box $x$, made available as variable $y$. As the name implies, the term $t$ is evaluated in parallel to $s$. $\vn{async}$ consumes the permission for box $x$ to ensure that no two terms can simultaneously access the contents of $x$. $s$ is evaluated in this environment without the permission for $x$.
+
+While $\vn{async}$ returns bottom, it functions differently from $\vn{capture}$ and $\vn{swap}$. Instead of terminating after the continuation is fully evaluated, $\vn{async}$ only skips the evaluation of terms between itself and the immediately enclosing $\vn{finish}$, similar to an exception skipping evaluation until reaching an exception handler. This $\vn{finish}$ will then block until its argument term has finished evaluation, ensuring that the parallel task is done before continuing. The permission for the box $x$, temporarily consumed by $\vn{async}$, might still be available after $\vn{finish}$ is evaluated. This makes it possible to access the produced result of $t$. This assumes of course that box $x$ was created outside of the $\vn{finish}$
+
+Note that LaCasa provided an expression called $x.\vn{open}(y \Rightarrow t \}$, used for evaluating a term $t$ on $y$, the contents of box $x$. In \plc, this is just syntactic sugar for an async wrapped in a finish, i.e. \say{$\vn{finish}\{ \vn{async}(x, y \Rightarrow t)\{ \text{let } z = \mn{null} \text{ in } z \}\}$}. Note that the continuation of $\vn{async}$ is irrelevant here as no value is returned by async. $\text{let } z = \mn{null} \text{ in } z$ is simply the shortest possible continuation in ANF.
+
+\section{Dynamic Semantics}
+We formalize the dynamic semantics through three small-step reduction relations. The simplest, $H, F \rightarrow H', F'$, reduces a single stack frame $F$ and heap $H$ and is used for standard rules that only modify the current frame. $H, FS \twoheadrightarrow H', FS'$ reduces a complete frame stack $FS$. Lastly, $H, TS, WS \leadsto H', TS', WS'$ reduces a set of active tasks $\TS$ and a set of waiting tasks $\WS$ together with heap $H$ to $H', TS', WS'$.
+
+A heap $H$ represents a mapping of references $o$ to objects $\langle C, \vn{FM} \rangle$, where $C$ is a class type and $\vn{FM}$ a mapping of fields $f$ to their values. Fields may only contain other heap values or null, i.e. the domain of $\vn{FM}$ is $dom(H) \cup \{\text{null}\}$.
+
+A box $x = b(o,p)$ encapsulates its content and prevents ordinary access to $o$ by requiring special expressions to supply a matching permission $p$. For example $\vn{async}(x, y \Rightarrow t)\{s\}$ makes the content $o$ available as $y$ in a limited scope $t$ in a separate task while continuing to evaluate $s$ in a scope where $p$ is no longer available. $capture(x.f, y)\{ z \Rightarrow t\}$ stores the content $o'$ of another box $y = b(o',p')$ in the field $f$ of box $b(o,p)$, that is $o.f$. It then evaluates $t$ in an environment without the permission $p'$. Permissions can be temporarily or permanently consumed, depending on the expression, to prevent concurrent access to the same box or to permanently destroy a box.
+
+
+\subsection{Single Frame Reduction}
+\begin{figure}
+\begin{multicols}{2}
+\break
+\end{multicols}
+\infax[E-NULL]
+    {\reducframe
+        {\sframe{\text{let } x = \text{null in } t}}
+        {\sframe[L[x \rightarrow \text{null}]]{t}}
+    }
+\vspace{3mm}
+\infrule[E-SELECT]
+    {H(L(y)) = \langle C, \vn{FM} \rangle
+        \andalso f \in dom(\vn{FM})}
+    {\reducframe
+        {\sframe{\text{let } x = y.f \text{ in } t}}
+        {\sframe[L[x \rightarrow \vn{FM}(f)]]{t}}
+    }
+\vspace{3mm}
+\infax[E-VAR]
+    {\reducframe
+        {\sframe{\text{let } x = y \text{ in } t}}
+        {\sframe[L[x \rightarrow L(y)]]{t}}
+    }
+\vspace{3mm}
+\infrule[E-ASSIGN]
+    {L(y) = o
+        \andalso H(o) = \langle C, \vn{FM} \rangle \\
+    H' = H[o \rightarrow \langle C, \vn{FM}[f \rightarrow L(z)] \rangle ]
+    }
+    {\reducframe
+        {\sframe{\text{let } x = y.f = z \text{ in } t}}
+        [H']
+        {\sframe{\text{let } x = z \text{ in } t}}
+    }
+\vspace{3mm}
+\infrule[E-NEW]
+    {o \notin dom(H) 
+        \andalso fields(C) = \overline{f}\\
+    H' = H[o \rightarrow \langle C, \overline{f \rightarrow \text{null}} \rangle]}
+    {\reducframe
+        {\sframe{\text{let } x = \text{new } C \text{ in } t}}
+        [H']
+        {\sframe[L[x \rightarrow o]]{t}}
+    }
+    \caption{Single frame evaluation rules}
+    \label{fig:single-frame-evaluation}
+\end{figure}
+
+A frame $F = \sframe{t}$ consists of a variable environment $L$, a term $t$, a set of permissions $P$ and a return annotation $l$. In detail:
+\begin{itemize}
+    \item 
+    $L$ is a mapping of variables to heap values or boxes, i.e. $L(x) \in dom(H) \cup \{\text{null}\} \cup \{b(o, p)\ |\ o \in dom(H)\}$. We write an updated mapping that maps $x$ to $v$ and $y\neq x$ to $L(y)$ as $L[x \rightarrow v]$.
+    \item $t$ is the term that is being reduced by the evaluation rules.
+    \item $P$ is a set of permissions available within this frame. A permission $p$ represents the ability to access a box $b(o,p)$.
+    \item The return annotation $l$ is used when returning to another frame $G = \sframe[L']{s}[P'][m]$ to indicate in which variable of $G$, if any, the return value of $F$ should be stored. $l$ is either a variable or $\epsilon$ to indicate the lack of a return value.
+\end{itemize}
+
+\Cref{fig:single-frame-evaluation} shows the single frame evaluation rules. As they are identical to the ones presented in LaCasa and standard, we will not discuss them further.
+
+
+\subsection{Frame Stack Reduction}
+\begin{figure}
+%\infrule[E-OPEN]
+%    {L(y) = b(o,p) \andalso p \in P \andalso L'= [z \rightarrow o]}
+%    {\reducstack
+%        {\sframe{\text{let } x = y.open \{ z \Rightarrow s\} \text{ in } t}}
+%        {\sframe[L']{s}[\emptyset][\epsilon] \circ \sframe[L[x \rightarrow L(y)]]{t}}
+%    }
+% \vspace{3mm}
+\infrule[E-RETURN1]{}
+    {\reducstack
+        {\sframe{x}[P][y] \circ \sframe[L']{t'}[P']}
+        {\sframe[L'[y \rightarrow L(x)]]{t'}[P']}
+    }
+\vspace{3mm}
+\infrule[E-RETURN2]{}
+    {\reducstack
+        {\sframe{x}[P][\epsilon] \circ \sframe[L']{t'}[P']}
+        {\sframe[L']{t'}[P']}
+    }
+\vspace{3mm}
+\infrule[E-FRAME]
+    {\reducframe{F}[H']{F'}*}
+    {\reducstack{F}*[H']{F'}*}
+    \caption{Frame stack evaluation rules}
+    \label{fig:frame-stack-evaluation}
+\end{figure}
+
+A frame stack $FS$ is a stack of frames representing a call stack. We write $FS = F \circ FS'$ to indicate that $FS$ consists of a top-most frame $F$ and a remaining stack $FS'$. The empty stack is written as $FS = \epsilon$
+
+As in LaCasa, $\vn{fields}(C)$ is the set of fields of class C. Similarly, $\vn{mbody}(C, m)$ is the body $x \rightarrow t$ of method $m(x : \sigma) = t : \rho$ of class $C$.
+
+\Cref{fig:frame-stack-evaluation} shows the evaluation rules for frame stacks. E-RETURN1 removes the top-most stack frame by assigning its result to the variable $y$ in the second top-most frame as described earlier. E-RETURN2 discards the value instead. E-FRAME applies the frame evaluation rules to the top frame of a frame stack, thereby connecting the two reduction relations.
+
+
+\subsection{Task Set Reduction}
+\begin{figure}
+\infrule[\graybox{E-ASYNC}]
+        {T_1 = (i_f, j_a, \sframe[[x \rightarrow o]]{t}[\emptyset][\epsilon]) \andalso L(b) = b(o,p) \andalso j_a \vn{fresh}\\
+        T_2 = (i_f, i_a, \sframe{s}[P\setminus \{p\}][\epsilon]) \andalso p \in P \\
+        }
+        {\reductasks
+            {(i_f, i_a, \sframe{\vn{async}(b, x \Rightarrow t)\{s\}} \circ FS)}
+            { T_1, T_2 }
+        }
+\vspace{3mm}
+\infrule[\graybox{E-FINISH}]
+        {T_1 = (j_f, i_a, \sframe{t}[P][\epsilon]) \andalso j_f \vn{fresh}\\
+        T_2 = (i_f, i_a, \sframe{ \text{let }\ x = \mn{null} \text{ in } s } \circ FS)}
+        {\reductasks
+            {(i_f, i_a, \sframe{ \text{let }\ x = \vn{finish} \{\ t\ \}\ \text{ in }\ s} \circ FS)}
+            {T_1}
+            [TS, \{(T_2, j_f)\} \uplus WS]
+        }
+\vspace{3mm}
+\infrule[\graybox{E-RESUME}]
+        {\nexists (i_f, i_a, FS) \in \TS \cup \vn{tasks}(WS)}
+        {\reductasks
+            {}
+            [TS, \{(T, i_f)\} \uplus WS]
+            {T}*
+        }
+\vspace{3mm}
+\infrule[\graybox{E-TASK-DONE}]
+        {FS = \sframe{x} \circ \epsilon \vee FS = \epsilon}
+        {\reductasks{(i_f, i_a, FS)}{}*}
+\vspace{3mm}
+\infrule[\graybox{E-STACK}]
+        {\reducstack{}*[H']{}[FS']*}
+        {\reductasks{(i_f, i_a, FS)}*[H']{(i_f, i_a, FS')}*}
+
+    \caption{Task set evaluation rules introduced by \plc}
+    \label{fig:task-set-evaluation}
+\end{figure}
+
+\begin{figure}
+\infrule[E-INVOKE]
+    {H(L(y)) = \langle C, \vn{FM} \rangle \andalso mbody(C, m) = x \rightarrow t'\\
+    \graybox*
+        {L' = \begin{cases}
+            L_0 [\text{this} \rightarrow L(y), x \rightarrow L(z)] & \text{if } i_a = i_{a0}\\
+            [\text{this} \rightarrow L(y), x \rightarrow L(z)] & \text{otherwise}\\
+        \end{cases}}
+    }
+    {\reductasks
+        {(i_f, i_a, \sframe{\text{let } x = y.m(z) \text{ in } t} \circ FS)}
+        {(i_f, i_a, \sframe[L']{t'}[\graybox{P}][x] \circ \sframe{t} \circ FS)}
+    }
+\vspace{3mm}
+\infrule[E-BOX]
+    {o \notin dom(H) \andalso fields(C) = \overline{f}\\
+    H' = H[ o \rightarrow \langle C, \overline{f \rightarrow \mn{null}} \rangle ] \andalso p\ \vn{fresh}\\
+    \graybox*{WS' = \vn{dropAncestorsFrames}(WS, i_a)}
+    }
+    {\reductasks
+        {(i_f, i_a, \sframe{box[C]\{x \Rightarrow t\}} \circ FS)}
+        *[H']
+        {(i_f, i_a, \sframe[L[x \rightarrow b(o,p)]]{t}[P \cup \{p\}] \circ \epsilon)}
+        [TS, WS']
+    }
+\vspace{3mm}
+\infrule[E-CAPTURE]
+    {L(x) = b(o,p) \andalso L(y) = b(o', p') \andalso \{p, p'\} \subseteq P\\
+    H(o) = \langle C, \vn{FM} \rangle \andalso H' = H[ o \rightarrow \langle C, \vn{FM}[ f \rightarrow o' ] \rangle ]\\
+    \graybox*{WS' = \vn{dropAncestorsFrames}(WS, i_a)}
+    }
+    {\reductasks
+        {(i_f, i_a, \sframe{capture(x.f, y) \{ z \Rightarrow t\}} \circ FS)}
+        *[H']
+        {(i_f, i_a, \sframe[L[z \rightarrow L(x)]]{t}[P \setminus \{p'\}][\epsilon] \circ \epsilon)}
+        [TS, WS']
+    }
+\vspace{3mm}
+\infrule[E-SWAP]
+    {L(x) = b(o,p) \andalso L(y) = b(o', p') \andalso \{p, p'\} \subseteq P\\
+    H(o) = \langle C, \vn{FM} \rangle \andalso \vn{FM}(f) = o'' \andalso p''\ \vn{fresh}\\
+    H' = H[o \rightarrow \langle C, \vn{FM}[f \rightarrow o'] \rangle ]\\
+    \graybox*{WS' = \vn{dropAncestorsFrames}(WS, i_a)}
+    }
+    {\reductasks
+        {(i_f, i_a, \sframe{swap(x.f,y) \{ z \Rightarrow t\}} \circ FS)}
+        *[H']
+        {(i_f, i_a, \sframe
+                    [L[z \rightarrow b(o'', p'')]]
+                    {t}
+                    [(P \setminus \{ p' \}) \cup \{p''\}]
+                    [\epsilon]
+                \circ \epsilon)}
+        [TS, WS']
+    }
+
+    \caption{Task set evaluation rules adapted from LaCasa}
+    \label{fig:task-set-evaluation-lacasa}
+\end{figure}
+
+Tasks represent an isolated computation on a separate thread. A task $T = (i_f, i_a, FS)$ consists of a frame stack $FS$ being evaluated, a finish id $i_f$ to track from which \textit{finish} a task originated from and an async id $i_a$ to track which tasks share permissions with $T$.
+Each \textit{finish} introduces a fresh $i_f$ different from all previous finish ids.
+An asynchronous task spawned by an \textit{async} has a fresh id $j_a \neq i_a$ as it does not inherit the context or permissions from its parent.
+The continuation term of an $\vn{async}$ shares the id with its parent as it inherits the context and with it the permissions.
+
+The tasks are grouped into two sets $TS$ and $WS$. $TS$ contains active tasks $T$ while $WS$ contains waiting tasks together with a finish id. A pair $(U, i_f) \in WS$ indicates that task $U$ can only be resumed, that is, moved to $TS$, once all tasks with id $i_f$ are finished. Note that finish ids are not unique to tasks; a single task might spawn multiple tasks with finish id $i_f$ which are awaited by a single finish.
+
+\Cref{fig:task-set-evaluation} shows the evaluation rules for task sets introduced in \plc. \plc adds four additional rules to create tasks, await their completion, resume them and complete their reduction. E-ASYNC reduces one task by replacing it by two new tasks $T_1, T_2$. The first one evaluates the function $x \Rightarrow t$ using only the content of box $b$ without any additional variables or permissions. The second task evaluates the continuation $s$ and inherits the variables and permissions (with the exception of box permission $p$) from the original task. As $T_1$ does not inherit any permissions from the parent, it is assigned a fresh async id $j_a$; every permission consumed within $T_1$ originated in $T_1$ and is thus not present in other tasks. $T_2$, on the other hand, does inherit permissions and thus must remove all tasks potentially holding the same permission when consuming one. It inherits the async id $i_a$.
+
+Both tasks start active and may be immediately reduced. The waiting set $WS$ is not modified by E-ASYNC. Both tasks also inherit the same finish id $i_f$ from the original task. This ensures that the immediately enclosing finish awaits the completion of both tasks. Note that this is the core difference between the async-finish model and the fork-join model as joins only await one specific task.
+
+E-ASYNC replaces $T$ by two new tasks, essentially skipping the frames created between the \textit{async} and the most recent \textit{finish}. This is a form of non-local control flow, similar to an exception skipping to a handler. Async skips to the most recent finish, as the permission it consumes only has to be unavailable as long as the asynchronously started task is running. After this parent task resumes, this is no longer the case.
+
+E-FINISH creates a new task $T_1$ with a new id $j_f$ evaluating the term $t$ and a suspended task $T_2$ waiting on the completion of all $j_f$-tagged tasks. This way, any async within $t$ inherits this id $j_f$ and $T_2$ will only be resumed once $T_1$ and all its spawned tasks are done. As $T_1$ shares $P$ with $T_2$, it has to remove $T_2$ upon permission consumption; thus $i_a$ is inherited.
+
+E-RESUME resumes a waiting task blocking on id $i_f$. For this it checks that no task with this id is currently being executed or itself waiting on another task. This ensures no descendant is alive.
+
+E-TASK-DONE completes the execution of a task. Once a task has been fully evaluated to an empty stack or its term is an irreducible variable, it can simply be dropped. Tasks cannot directly return values, instead they must use the box passed as argument to store the result for later retrieval. Note that the only irreducible term in a wellformed program of \plc is a variable.
+
+E-STACK reduces the frame stack of one task according to the frame stack evaluation rules, thereby embedding that reduction relation in the task set reduction relation.
+
+\plc also modifies E-INVOKE, E-BOX, E-CAPTURE and E-SWAP as their semantics must be adapted to the presence of tasks. The adapted rules are shown in \cref{fig:task-set-evaluation-lacasa}.
+
+E-INVOKE calls method $m$ of an object $y$ with argument $z$, creating a new frame within which the methods body is evaluated. It differs from its LaCasa equivalent in two ways: Instead of passing only the necessary subset of permissions, it now copies the permissions from the previous frame. This avoids a case distinction on whether the argument is a box or not. It is sound because all permissions valid in the caller are also valid in the callee, the relevant variables are simply not available making the permissions superfluous.
+
+The other difference is that E-INVOKE in LaCasa always created the new frame with the variable environment $L_0$, which includes the global variables. This allows \textit{ocap} methods to access global variables. This is nevertheless sound in LaCasa as \textit{ocap} methods are type-checked without global variables, ensuring that they do not access them at runtime. We instead only pass $L_0$ if $m$ is allowed to access them; this will later become necessary for the isolation proof which requires that certain tasks share no variables.
+
+E-BOX creates a new box of class $C$ and continues execution in a continuation $t$ with the newly created box $b(o,p)$ being available in variable $x$. In theory, it would be sound to not drop any frames. But encoding permissions in Scala is done using implicits which cannot be introduced by a variable binding, preventing $\mn{let } x = \vn{box}[C] \mn{ in } t$ as a construct, and instead requiring the creation of a new scope via the continuation $t$. We decide to retain this limitation.
+
+E-CAPTURE stores the content of box $y$ in the field $x.f$ and is analogous to assignment. To do so, it requires permission for both $x$, which is modified, and $y$, which is unwrapped, permanently consuming the permission for box $y$ in the process.
+
+E-SWAP similarly takes a box $y$ and a unique field $x.f$. It stores $y$ in $x.f$, returning the previous content of $x.f$ in a new box $z$. While E-CAPTURE and E-SWAP are similar in evaluation, E-SWAP acts only on unique fields. As unique fields cannot be accessed or modified by any expression besides \textit{swap}, the content of the unique field will stay isolated and must be retrieved via another \textit{swap} before it can be interacted with.
+
+\textit{box}, \textit{capture} and \textit{swap} are continuation terms and do not return, which is equivalent to dropping all frames below the current one, i.e. $FS$ in $(i_f, i_a, F \circ FS)$. This is done to ensure that the consumed permissions are permanently unavailable. But this is not sufficient in the presence of tasks: if a task inherited permissions from its parent, it must also drop this parent and in general all ancestors that may have the same permission. This is indicated by the async id $i_a$ as the parent of a task has exactly then the same async id as its child when it handed down permissions to its child. This yields the set $WS'$.
+
+Another complication prevents us from simply removing $WS'$ from $WS$: A task not only stores a frame stack but encodes also the relationship between tasks. We illustrate the problem with an example: Assume that task $T$ spawned an asynchronous task $U$. $U$ then calls \textit{finish} followed by \textit{async}, creating a task $U'$ with $id_f(T) \neq id_f(U')$ and another asynchronous task $V$. If $U'$ now calls \textit{capture}, it erases the frame stacks of $U$ and $U'$. Because $U'$ remains, even with an empty frame stack, $T$ cannot be resumed before $U$ is resumed which in turn cannot be resumed before $V$ is resumed. Preserving this relation is important because $V$ might not be completely isolated from $T$, for example if $T$ created $U$ with box $x$ and $U$ created $V$ with box $y = x.f$.
+
+To satisfy these constraints, we define a function \textit{dropAncestorsFrames} that replaces the frame stacks of all ancestors of an id $i_a$ with the empty frame stack $FS$:
+\[
+    \vn{dropAncestorsFrames}(WS, i_a) = (WS \setminus WS') \cup \{((j_f, j_a, \epsilon), k_f)\ |\ ((j_f, j_a, FS'), k_f) \in WS' \wedge j_a = i_a\}
+\]\[
+    \text{ where } WS' = \{ (T, j_f) \in WS \mid id_a(T) = i_a\}
+\]
+
+
+\subsection{Initial state}
+For a program $p = \overline{cd}\ \overline{\vn{cfd}}\ t$ the initial state is defined as $H_0, \{(i_{f0}, i_{a0}, \sframe[L_0]{t}[\emptyset][\epsilon])\}, \emptyset$.
+
+Global variables are encoded through a special global object $o_g$ with a field for every variable and the single element of the initial heap: $H_0 = \{o_g \rightarrow \langle C_g, FM_g \rangle\}$ where $FM_g = \{x \rightarrow \text{null} \ |\ \text{var } x : C \in \overline{\vn{cfd}}\}$ and $\text{class } C_g \text{ extends } \mn{AnyRef} \{ \overline{\vn{cfd}} \}$.
+
+$L_0 = [global \rightarrow o_g]$ describes the initial variable environment and is used both for the main term and in E-INVOKE.
+
+As the initial task is not awaited by any other task, the value of $i_{f0}$ is arbitrary as long as it is fixed. The actual value of $i_{a0}$ is similarly arbitrary as it only influences E-INVOKE which checks for equality.
+
+\section{Static Semantics}\label{sec:static-semantics}
+\subsection{Type Checking}
+A statement of the form $\Gamma; a \vdash t : \tau$ states that term $t$ is assigned type $\tau$ in type environment $\Gamma$ and effect $a$. $a$ might either be $\epsilon$, representing no effect, or $\vn{ocap}$ which requires that all classes $C$ in $t$ satisfy $\vn{ocap}(C)$ which later will be described in more detail.
+
+\subsection{Well-Formed Programs}
+\begin{figure}
+\infrule[WF-CLASS]
+    {C \vdash \overline{md} \andalso D = \mn{AnyRef} \vee p \vdash \text{class } D \ldots \\
+    \forall (\text{def } m \ldots) \in \overline{md}.\ override(m, C, D) \\
+    \forall \text{var } f : \sigma \in \overline{fd}.\ f \notin fields(D)
+    }
+    {p \vdash \text{class } C \text{ extends } D\ \{\overline{fd}\ \overline{md}\}}
+\vspace{3mm}
+\infrule[WF-OVERRIDE]
+    {\vn{mtype}(m, D) \text{ not defined} \vee \vn{mtype}(m, D) = \vn{mtype}(m, C)}
+    {\vn{override}(m, C, D)}
+\vspace{3mm}
+\infrule[WF-METHOD1]
+    {\Gamma_0, \vn{this} : C, x : D; \epsilon \vdash t : E' \andalso E' <: E}
+    {C \vdash \text{def } m(x : D) : E = t}
+\vspace{3mm}
+\infrule[WF-METHOD2]
+    {\Gamma = \Gamma_0, \vn{this} : C, x : Q \vartriangleright Box[D], Perm[Q] \andalso Q\ \vn{fresh} \andalso \Gamma; \epsilon \vdash t : E' \andalso E' <: E
+    }
+    {C \vdash \text{def } m(x : \mn{Box}[D]) : E = t}
+\vspace{3mm}
+\infrule[WF-PROGRAM]
+    {p \vdash \overline{cd} \andalso p \vdash \Gamma_0 \andalso \Gamma_0; \epsilon \vdash t : \sigma}
+    {p \vdash \overline{cd}\ \overline{vd}\ t}
+
+    \caption{Rules for well-formed programs}
+    \label{fig:wellformed-programs}
+\end{figure}
+
+\Cref{fig:wellformed-programs} shows the rules for well-formed programs. A program $p$ is well-formed under WF-PROGRAM if the class definitions $\overline{cd}$ are well-typed and the main term $t$ under the type environment $\Gamma_0 = \{ \text{global} : C_g \}$ with $C_g$ being the global object encompassing all global variables: \say{$\mn{class $C_g$ extends AnyRef} \{\overline{\vn{cfd}}\}$}.
+
+WF-CLASS describes classes $C$ that extend $\mn{AnyRef}$ or another well-formed class $D$. The methods of the class must be well-formed. In addition, all methods must have well-formed overrides as defined by WF-OVERRIDE. Fields defined within $C$ must not be defined in $D$ as overriding fields is not possible.
+
+WF-OVERRIDE states that a method $m$ defined in $C$ is a valid override if it either is not defined in $D$ or has the same type in both classes.
+
+WF-METHOD1 states that a method $m$ is well-formed if its body is well-typed under an environment consisting of only globals, the class containing the method and its argument.
+The type of the term must furthermore be a subtype of the stated return type. WF-METHOD2 differs from WF-METHOD1 in the method argument being a box. The argument $x$ is annotated by the programmer with type $\mn{Box}[D]$. WF-METHOD2 introduces a guarded type $Q \vartriangleright \mn{Box}[D]$ based on this, in addition to a fresh permission $\mn{Perm}[Q]$ corresponding to the guarded box. As stated earlier, guarded types do not appear in the surface syntax and are only introduced during type-checking, specifically this rule.
+
+\subsection{Guarded Types and Permissions}
+To help ensure that no expressions break the isolation of boxes we use guarded types. A guarded type $Q \vartriangleright \mn{Box}[C]$ consists of a $Q$, an abstract type taken from a countably infinite supply, and the to-be-guarded box. In addition, we have permission types $\mn{Perm}[Q]$ that give permission to access the guarded box. All operations on guarded types require that this associated permission type $\mn{Perm}[Q]$ is available in the environment $\Gamma$.
+
+We will later show that each permission type $\mn{Perm}[Q]$ corresponds to one permission $p$ in the evaluation semantics. We will also show that the corresponding permission is always available at evaluation if the term is well-typed, thereby showing that the permissions in the evaluation semantics need not actually be tracked. They are thus only an aid for the proofs.
+
+\subsection{Object Capabilities}
+The rules in \cref{fig:ocap-rules} define how the object capabilities constraint affects class and method definitions. They are quite similar to their corresponding well-formedness rules. OCAP-ANYREF states that the class containing no methods and fields obeys the constraints, i.e. $\mn{AnyRef}$, is $\vn{ocap}$. OCAP-CLASS requires that the parent class $D$ is $\vn{ocap}$ as well as all methods. In addition, fields may only contain $\vn{ocap}$ objects or boxes. OCAP-METHOD1 and OCAP-METHOD2 differ only slightly from WF-METHOD1 respective 2. They remove the global variables $\Gamma_0$ from the type environment in which $t$ is checked, in addition to using effect $\vn{ocap}$ instead of $\epsilon$. The first change prevents $t$ from accessing global variables directly whereas checking under effect $\vn{ocap}$ is later used in the typing rules to ensure that $t$ does not call non-ocap methods, thereby gaining indirect access to the global variables.
+
+\begin{figure}
+\vspace{3mm}
+\infrule[OCAP-ANYREF]{}{\vn{ocap}(\mn{AnyRef})}
+\vspace{3mm}
+\infrule[OCAP-CLASS]
+    {p \vdash \text{class } C \text{ extends } D\ \{\overline{fd}\ \overline{md}\}\\
+    C \vdash_{\vn{ocap}} \overline{md} \andalso \vn{ocap}(D)\\
+    \forall \text{var } f : \sigma \in \overline{fd}.\ \vn{ocap}(\sigma) \vee \sigma = \text{Box}[E] \wedge \vn{ocap}(E)\\
+    }
+    {\vn{ocap}(C)}
+\vspace{3mm}
+\infrule[OCAP-METHOD1]
+    {\Gamma = \text{this} : C, x : D\\
+    \Gamma; \text{ocap} \vdash t : E'
+        \andalso E' <: E
+    }
+    {C \vdash_{\vn{ocap}} \text{def } m(x : D) : E = t}
+\vspace{3mm}
+\infrule[OCAP-METHOD2]
+    {\Gamma = \text{this} : C, x : Q \vartriangleright \text{Box}[D], \text{Perm}[Q]
+        \andalso Q\ \vn{fresh} \\
+    \Gamma; \text{ocap} \vdash t : E'
+        \andalso E' <: E
+    }
+    {C \vdash_{\vn{ocap}} \text{def } m(x : \text{Box}[D]) : E = t}
+    \caption{Object capability rules}
+    \label{fig:ocap-rules}
+\end{figure}
+
+
+\subsection{Term and Expression Typing}
+\begin{figure}
+\vspace{3mm}
+\infrule[T-NULL]{}
+    {\Gamma; a \vdash \text{null} : \mn{Null}}
+\vspace{3mm}
+\infrule[T-VAR]
+    {x \in dom(\Gamma)}
+    {\Gamma; a \vdash x : \Gamma(x)}
+\vspace{3mm}
+\infrule[T-LET]
+    {\Gamma; a \vdash e : \tau \andalso \Gamma, x : \tau; a \vdash t : \sigma}
+    {\Gamma; a \vdash \text{let } x = e \text{ in } t : \sigma}
+\vspace{3mm}
+\infrule[T-SELECT]
+    {\Gamma; a \vdash x : C \andalso \vn{ftype}(C, f) = D}
+    {\Gamma; a \vdash x.f : D}
+\vspace{3mm}
+\infrule[T-ASSIGN]
+    {\Gamma; a \vdash x : C \andalso \vn{ftype}(C, f) = D \\ \Gamma; a \vdash y : D' \andalso D' <: D}
+    {\Gamma; a \vdash x.f = y : D}
+    \caption{Standard term typing rules}
+    \label{fig:typing-standard-terms}
+\end{figure}
+
+\begin{figure}
+\vspace{3mm}
+%\infrule[T-OPEN]
+    %{\Gamma; a \vdash x : Q \vartriangleright Box[C] \andalso Perm[Q] \in \Gamma \andalso y : C; \vn{ocap} \vdash t : \sigma}
+    %{\Gamma; a \vdash x.open \{y \Rightarrow t\} : Q \vartriangleright Box[C]}
+\vspace{3mm}
+\infrule[T-NEW]
+    {a = \vn{ocap} \Longrightarrow \vn{ocap}(C) \andalso \forall \vn{var}\ f : \sigma \in \overline{fd}.\ \exists D.\ \sigma = D}
+    {\Gamma; a \vdash \text{new } C : C}
+\vspace{3mm}
+\infrule[T-INVOKE]
+    {\Gamma; a \vdash x : C \andalso \vn{mtype}(C,m) = \sigma \rightarrow \tau \andalso \Gamma; a \vdash y : \sigma' \\
+    \sigma' <: \sigma\ \vee (\sigma = Box[D] \wedge \sigma' = Q \vartriangleright Box[E] \wedge Perm[Q] \in \Gamma \wedge E <: D)}
+    {\Gamma; a \vdash x.m(y) : \tau}
+\vspace{3mm}
+\infrule[T-BOX]
+    {\vn{ocap}(C) \andalso Q\ \vn{fresh} \andalso \Gamma, x : Q \vartriangleright Box[C], Perm[Q]; a \vdash t : \sigma}
+    {\Gamma; a \vdash box[C] \{x \Rightarrow t \} : \bot}
+\vspace{3mm}
+\infrule[T-CAPTURE]
+    {\Gamma; a \vdash x : Q \vartriangleright Box[C] \andalso \Gamma; a \vdash y : Q' \vartriangleright Box[D] \\
+    \{Perm[Q], Perm[Q']\} \subseteq \Gamma \andalso D <: \vn{ftype}(C,f) \\
+    \Gamma \setminus \{Perm[Q']\}, z : Q \vartriangleright Box[C]; a \vdash t : \sigma}
+    {\Gamma; a \vdash capture(x.f,y) \{z \Rightarrow t\} : \bot}
+\vspace{3mm}
+\infrule[T-SWAP]
+    {\Gamma; a \vdash x : Q \vartriangleright Box[C] \andalso \Gamma; a \vdash y : Q' \vartriangleright Box[D'] \\
+    \{Perm[Q], Perm[Q']\} \subseteq \Gamma \andalso \vn{ftype}(C,f) = Box[D] \\
+    D' <: D \andalso R\ \vn{fresh} \\
+    \Gamma \setminus \{Perm[Q']\}, z : R \vartriangleright Box[D], Perm[R]; a \vdash t : \sigma}
+    {\Gamma; a \vdash swap(x.f, y) \{z \Rightarrow t\} : \bot}
+\vspace{3mm}
+\infrule[\graybox{T-ASYNC}]
+    {
+    \Gamma; a \vdash x : Q \vartriangleright Box[C]
+    \andalso
+    \vn{Perm}[Q] \in \Gamma
+    \\
+    y : C; \vn{ocap} \vdash t : \tau
+    \andalso
+    \Gamma \setminus \vn{Perm}[Q]; a \vdash s : \sigma
+    \\
+    }
+    {\Gamma; a \vdash \vn{async}(x, y \Rightarrow t) \{ s \} : \bot}
+\vspace{3mm}
+\infrule[\graybox{T-FINISH}]
+    {\Gamma; a \vdash t : \tau}
+    {\Gamma; a \vdash \vn{finish} \{ t \} : null}
+    
+    \caption{Non-standard term typing rules}
+    \label{fig:typing-cps-terms}
+\end{figure}
+
+\Cref{fig:typing-standard-terms} shows the typing rules for standard terms. As they are not further interesting, we do not describe them in detail.
+Instead, we focus on \cref{fig:typing-cps-terms} which shows the typing rules related to the changes in \plc.
+
+T-NEW requires the object to contain only class typed fields. If it is typed under effect \textit{ocap} it requires the instantiated object $C$ to satisfy $\vn{ocap}(C)$.
+
+T-INVOKE calls a method, passing it an argument $y$. If this argument has a guarded type $Q \vartriangleright \mn{Box}[D]$, T-INVOKE checks that the method takes a box with matching class as argument and that permission $\mn{Perm}[Q]$ corresponding to the guarded type is available in the callers environment.
+
+T-BOX creates a new box, requiring that its content is $\vn{ocap}$ (as it would otherwise defeat the purpose of an isolated box). It also creates a new permission and checks the continuation term with both box and permission in the environment. As it changes the set of available permissions, it has to create a new environment using the continuation term $t$. Note that it returns bottom for the sake of simplicity, all permissions in $\Gamma$ are still valid and could be accessed without soundness issues.
+
+T-CAPTURE checks that both arguments are boxes, requires that both their permissions are available and that the target field $x.f$ has the correct type to contain the content of box $y$. The target field must be class field and cannot be a box. It also checks the continuation term in an environment that does not contain the permission for $y$ is it was captured by $x.f$.
+
+T-SWAP similarly checks both arguments, their permissions and the target field. In contrast to T-CAPTURE, the target field must be a unique field. A new permission is also created as the previous content of the field is made available in the continuation term.
+
+T-ASYNC checks that the first argument is a box with available permission and that the term $t$ is well-typed in an $\vn{ocap}$ environment containing only the contents of that box. We require $\vn{ocap}$ as all parallel tasks must be isolated from each other. It also checks the continuation term without the permission of the box. The continuation term is checked under the same effect as $\vn{async}$ itself.
+
+T-FINISH requires only that the term is valid in the same environment. Note that it returns type $\mn{null}$ instead of $\tau$, the type of the enclosed term. Due to $\vn{async}$ returning bottom and jumping directly to the immediately enclosing finish, similar to an exception jumping to its handler, type checking becomes significantly more difficult.
+
+
+\subsection{Subtyping}
+\begin{figure}
+\vspace{3mm}
+\infrule[\textless:-ID]{}{C <: C}
+
+\vspace{3mm}
+\infrule[\textless:-EXT]{\text{class $C$ extends $D$ \{...\}}}{C <: D}
+
+\vspace{3mm}
+\infrule[\textless:-TRANS]{C <: D \andalso D <: E}{C <: E}
+
+\vspace{3mm}
+\infrule[\textless:-BOT]{}{\bot <: \tau}
+
+\vspace{3mm}
+\infrule[\textless:-BOX]{C <: D}{\mn{Box}[C] <: \mn{Box}[D]}
+
+\vspace{3mm}
+\infrule[\textless:-NULL]{}{\mn{Null} <: \tau}
+    \caption{Subtyping rules}
+    \label{fig:subtyping}
+\end{figure}
+\Cref{fig:subtyping} shows the subtyping rules used in \plc. They are based on Featherweight Java with \textless:-ID, \textless:-EXT and \textless:-TRANS being directly based on it and \textless:-BOT, \textless:-BOX and \textless:-NULL being introduced in LaCasa. The \plc extension does not add any additional subtyping rules and is unaffected by subtyping besides subtypes of boxes. We include them as they are a standard feature of object oriented languages and were included in $CLC^2$.
+
+
+\subsection{Well-Formedness}
+
+\begin{figure}
+\vspace{3mm}
+\infrule[WF-VAR]
+    {L(x) = \vn{null}\ \vee \\
+    L(x) = o \wedge \vn{typeof}(H,o) <: \Gamma(x)\ \vee \\
+    L(x) = b(o,p) \wedge \Gamma(x) = Q \vartriangleright Box[C] \wedge \vn{typeof}(H,o) <: C
+    }
+    {H \vdash \Gamma ; L; x}
+\vspace{3mm}
+\infrule[WF-PERM]
+    {\gamma : \vn{permTypes}(\Gamma) \longrightarrow P\ \vn{injective} \\
+    \forall x \in \vn{dom}(\Gamma).\ \\
+    \Gamma(x) = Q \vartriangleright Box[C] \wedge L(x) = b(o,p) \wedge \mn{Perm}[Q] \in \Gamma \Longrightarrow \gamma(Q) = p
+    }
+    {\vdash \Gamma; L; P}
+\vspace{3mm}
+\infrule[WF-ENV]
+    {\vn{dom}(\Gamma) \subseteq \vn{dom}(L) \\
+    \forall x \in \vn{dom}(\Gamma).\ H \vdash \Gamma; L; x
+    }
+    {H \vdash \Gamma; L}
+    
+    \caption{Well-formedness rules}
+    \label{fig:wellformedness}
+\end{figure}
+
+\Cref{fig:wellformedness} show the rules for wellformed variable environments and permissions. WF-VAR requires that a variable is either $\mn{null}$, an object for which the actual value on the heap is a subtype of the type assigned by $\Gamma$. Lastly, the variable can be a box with a guarded type in the environment $\Gamma$.
+
+We obtain the type of an object as follows:
+\begin{definition}[Object Type]
+  For an object identifier $o \in dom(H)$ where $H(o) = \langle C, FM \rangle$, $\vn{typeof}(H, o) \coloneq C$
+\end{definition}
+    
+WF-PERM defines a mapping $\gamma$ of static permission types to runtime permissions. It requires firstly that the permission types present in $\Gamma$, defined by $\vn{permTypes}(\Gamma) = \{Q\ |\ \mn{Perm}[Q] \in \Gamma \}$, only map to at most one permission in $P$ each. Furthermore, for each box $x$ defined in $\Gamma$ with available permission $\mn{Perm}[Q]$, we map the permission type $Q$ to the runtime permission $p$ that guards the box, i.e. $L(x) = b(o, p)$.
+
+\begin{figure}
+\vspace{3mm}
+\infrule[T-EMPFS]{}
+    {H \vdash \epsilon}
+\vspace{3mm}
+\infrule[T-FRAME1]
+    {\Gamma; a \vdash t : \sigma \andalso l \neq \epsilon \Longrightarrow \sigma <: C \\%
+    H \vdash \Gamma; L \andalso \vdash \Gamma; L; P}
+    {H \vdash \sframe{t} : \sigma}
+\vspace{3mm}
+\infrule[T-FRAME2]
+    {\Gamma, x : \tau; a \vdash t : \sigma \andalso l \neq \epsilon \Longrightarrow \sigma <: C \\
+    H \vdash \Gamma; L \andalso \vdash \Gamma; L; P}
+    {H \vdash^\tau_x \sframe{t} : \sigma}
+\vspace{3mm}
+\infrule[T-FS-NA]
+    {H \vdash F^\epsilon : \sigma \andalso H \vdash FS}
+    {H \vdash F^\epsilon \circ FS}
+\vspace{3mm}
+\infrule[T-FS-NA2]
+    {H \vdash^\tau_x F^\epsilon : \sigma \andalso H \vdash FS}
+    {H \vdash^\tau_x F^\epsilon \circ FS}
+\vspace{3mm}
+\infrule[T-FS-A]
+    {H \vdash F^y : \sigma \andalso H \vdash^\sigma_y FS}
+    {H \vdash F^y \circ FS}
+\vspace{3mm}
+\infrule[T-FS-A2]
+    {H \vdash^\tau_x F^y : \sigma \andalso H \vdash^\sigma_y FS}
+    {H \vdash^\tau_x F^y \circ FS}
+\vspace{3mm}
+\infrule[\graybox{T-TS}]
+        {\forall (i_f, i_a, FS) \in \TS.\ H \vdash FS\\
+        \forall ((i_f, d_a, FS), j_f) \in \WS.\ H \vdash FS\\}
+        {H \vdash \TS, \WS}
+    \caption{Frame typing rules}
+    \label{fig:frame-typing}
+\end{figure}
+
+\Cref{fig:frame-typing} shows the rules for wellformed frames, framestacks and task sets. 
+T-FS-NA checks a frame that does not return a value in addition to recursively checking the rest of the frame stack. If a frame does return a value, i.e. $l \neq \epsilon$, we check the frame below it in the stack with the variable in which it will be stored and the type of the expected argument. This shown by T-FS-A that takes a frame with label $l = y$ and type $\sigma$ and checks the remaining frame stack with the annotation $\vdash_y^\sigma$. T-FS-NA2 and T-FS-A2 handle the remaining two combinations of argument and no argument.
+
+T-FRAME1 states that a frame $\langle L, t, P \rangle^l$ is wellformed if its term $t$  is welltyped. Furthermore, if the return label $l$ is a variable, the return type must be a class type as we do not allow e.g. boxes to be returned. Finally, the variable environment and the permissions must be wellformed. T-FRAME2 is similar but adds the return value of expected type $\tau$ in variable $x$ to the environment $\Gamma$ when checking $t$.
+
+Finally, T-EMPFS handles the empty frame stack and T-TS extends the wellformedness rules to task sets.

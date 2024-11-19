@@ -1,0 +1,467 @@
+%\selectlanguage{swedish}
+%
+\selectlanguage{english}
+
+%%% Set the numbering for the title page to a numbering series not in the preface or body
+\pagenumbering{alph}
+\kthcover
+\clearpage\thispagestyle{empty}\mbox{} % empty back of front cover
+\titlepage
+
+% If you do not want to have a bookinfo page, comment out the line saying \bookinfopage and add a \cleardoublepage
+% If you want a bookinfo page: you will get a copyright notice, unless you have used the doclicense package in which case you will get a Creative Commons license. To include the doclicense package, uncomment the configuration of this package above and configure it with your choice of license.
+\bookinfopage
+
+% Frontmatter includes the abstracts and table-of-contents
+\frontmatter
+\setcounter{page}{1}
+\begin{abstract}
+% The first abstract should be in the language of the thesis.
+% Abstract fungerar på svenska också.
+  \markboth{\abstractname}{}
+\begin{scontents}[store-env=lang]
+eng
+\end{scontents}
+%%% The contents of the abstract (between the begin and end of scontents) will be saved in LaTeX format
+%%% and output on the page(s) at the end of the thesis with information for DiVA facilitating the correct
+%%% entry of the meta data for your thesis.
+%%% These page(s) will be removed before the thesis is inserted into DiVA.
+\begin{scontents}[store-env=abstracts,print-env=true]
+Write an abstract that is about 250 and 350 words (1/2 A4-page)  with the following components:
+% key parts of the abstract
+\begin{itemize}
+  \item What is the topic area? (optional) Introduces the subject area for the project.
+  \item Short problem statement
+  \item Why was this problem worth a Bachelor's/Master’s thesis project? (\ie, why is the problem both significant and of a suitable degree of difficulty for a Bachelor's/Master’s thesis project? Why has no one else solved it yet?)
+  \item How did you solve the problem? What was your method/insight?
+  \item Results/Conclusions/Consequences/Impact: What are your key results/\linebreak[4]conclusions? What will others do based upon your results? What can be done now that you have finished - that could not be done before your thesis project was completed?
+\end{itemize}
+
+\end{scontents}
+\engExpl{The following are some notes about what can be included (in terms of LaTeX) in your abstract.}
+Choice of typeface with \textbackslash textit, \textbackslash textbf, and \textbackslash texttt:  \textit{x}, \textbf{x}, and \texttt{x}.
+
+Text superscripts and subscripts with \textbackslash textsubscript and \textbackslash textsuperscript: A\textsubscript{x} and A\textsuperscript{x}.
+
+Some symbols that you might find useful are available, such as: \textbackslash textregistered, \textbackslash texttrademark, and \textbackslash textcopyright. For example, 
+the copyright symbol: \textbackslash textcopyright Maguire 2022 results in \textcopyright Maguire 2022. Additionally, here are some examples of text superscripts (which can be combined with some symbols): \textbackslash textsuperscript\{99m\}Tc, A\textbackslash textsuperscript\{*\}, A\textbackslash textsuperscript\{\textbackslash textregistered\}, and A\textbackslash texttrademark resulting in \textsuperscript{99m}Tc, A\textsuperscript{*}, A\textsuperscript{\textregistered}, and A\texttrademark. Two examples of subscripts are: H\textbackslash textsubscript\{2\}O and CO\textbackslash textsubscript\{2\} which produce  H\textsubscript{2}O and CO\textsubscript{2}.
+
+Simple environments with begin and end: itemize and enumerate and within these \textbackslash item.
+
+The following commands can be used: \textbackslash eg, \textbackslash Eg, \textbackslash ie, \textbackslash Ie, \textbackslash etc, and \textbackslash etal: \eg, \Eg, \ie, \Ie, \etc, and \etal.
+
+The following commands for numbering with lower case Roman numerals: \textbackslash first, \textbackslash Second, \textbackslash third, \textbackslash fourth, \textbackslash fifth, \textbackslash sixth, \textbackslash seventh, and \textbackslash eighth: \first, \Second, \third, \fourth, \fifth, \sixth, \seventh, and \eighth. Note that the second case is set with a capital 'S' to avoid conflicts with the use second of as a unit in the \texttt{siunitx} package.
+
+\subsection*{Keywords}
+\begin{scontents}[store-env=keywords,print-env=true]
+% If you set the EnglishKeywords earlier, you can retrieve them with:
+\InsertKeywords{english}
+% If you did not set the EnglishKeywords earlier then simply enter the keywords here:
+% comma separate keywords, such as: Canvas Learning Management System, Docker containers, Performance tuning
+\end{scontents}
+\engExpl{\textbf{Choosing good keywords can help others to locate your paper, thesis, dissertation, \ldots and related work.}}
+Choose the most specific keyword from those used in your domain, see for example: the ACM Computing Classification System ({\small \url{https://www.acm.org/publications/computing-classification-system/how-to-use})},
+the IEEE Taxonomy ({\small \url{https://www.ieee.org/publications/services/thesaurus-thank-you.html}}), PhySH (Physics Subject Headings)\linebreak[4] ({\small \url{https://physh.aps.org/}}), \ldots or keyword selection tools such as the  National Library of Medicine's Medical Subject Headings (MeSH)  ({\small \url{https://www.nlm.nih.gov/mesh/authors.html}}) or Google's Keyword Tool ({\small \url{https://keywordtool.io/}})\\
+\clearpage
+\textbf{Formatting the keywords}:
+\begin{itemize}
+  \item The first letter of a keyword should be set with a capital letter and proper names should be capitalized as usual.
+  \item Spell out acronyms and abbreviations.
+  \item Avoid "stop words" - as they generally carry little or no information.
+  \item List your keywords separated by commas (",").
+\end{itemize}    
+Since you should have both English and Swedish keywords - you might think of ordering them in corresponding order (\ie, so that the n\textsuperscript{th} word in each list correspond) - this makes it easier to mechanically find matching keywords.
+\end{abstract}
+\cleardoublepage
+\babelpolyLangStart{swedish}
+\begin{abstract}
+    \markboth{\abstractname}{}
+\begin{scontents}[store-env=lang]
+swe
+\end{scontents}
+\begin{scontents}[store-env=abstracts,print-env=true]
+\generalExpl{Enter your Swedish abstract or summary here!}
+\sweExpl{Alla avhandlingar vid KTH \textbf{måste ha} ett abstrakt på både \textit{engelska} och \textit{svenska}.\\
+Om du skriver din avhandling på svenska ska detta göras först (och placera det som det första abstraktet) - och du bör revidera det vid behov.}
+
+\engExpl{If you are writing your thesis in English, you can leave this until the draft version that goes to your opponent for the written opposition. In this way you can provide the English and Swedish abstract/summary information that can be used in the announcement for your oral presentation.\\If you are writing your thesis in English, then this section can be a summary targeted at a more general reader. However, if you are writing your thesis in Swedish, then the reverse is true – your abstract should be for your target audience, while an English summary can be written targeted at a more general audience.\\This means that the English abstract and Swedish sammnfattning  
+or Swedish abstract and English summary need not be literal translations of each other.}
+
+\warningExpl{Do not use the \textbackslash glspl\{\} command in an abstract that is not in English, as my programs do not know how to generate plurals in other languages. Instead you will need to spell these terms out or give the proper plural form. In fact, it is a good idea not to use the glossary commands at all in an abstract/summary in a language other than the language used in the \texttt{acronyms.tex file} - since the glossary package does \textbf{not} support use of more than one language.}
+
+\engExpl{The abstract in the language used for the thesis should be the first abstract, while the Summary/Sammanfattning in the other language can follow}
+\end{scontents}
+\subsection*{Nyckelord}
+\begin{scontents}[store-env=keywords,print-env=true]
+% SwedishKeywords were set earlier, hence we can use alternative 2
+\InsertKeywords{swedish}
+\end{scontents}
+\sweExpl{Nyckelord som beskriver innehållet i uppsatsen eller rapporten}
+\end{abstract}
+\babelpolyLangStop{swedish}
+
+\cleardoublepage
+% note that a command is used to avoid Overleaf parsing problems
+\babelpolyLangStart{ngerman}
+\begin{abstract}
+    \markboth{\abstractname}{}
+\begin{scontents}[store-env=lang]
+ger
+\end{scontents}
+\begin{scontents}[store-env=abstracts,print-env=true]
+Zusammenfassung in Deutsch.
+\end{scontents}
+\subsection*{Schlüsselwörter}
+\begin{scontents}[store-env=keywords,print-env=true]
+5-6 Schlüsselwörter
+\end{scontents}
+\end{abstract}
+\babelpolyLangStop{ngerman}
+\cleardoublepage
+
+\section*{Acknowledgments}
+\markboth{Acknowledgments}{}
+I would like to thank xxxx for having yyyy. Or in the case of two authors:\\
+We would like to thank xxxx for having yyyy.
+
+\acknowlegmentssignature
+
+\fancypagestyle{plain}{}
+\renewcommand{\chaptermark}[1]{ \markboth{#1}{}} 
+\tableofcontents
+  \markboth{\contentsname}{}
+
+\cleardoublepage
+\listoffigures
+
+\cleardoublepage
+
+\listoftables
+\cleardoublepage
+\lstlistoflistings\engExpl{If you have listings in your thesis. If not, then remove this preface page.}
+\cleardoublepage
+% Align the text expansion of the glossary entries
+\newglossarystyle{mylong}{%
+  \setglossarystyle{long}%
+  \renewenvironment{theglossary}%
+     {\begin{longtable}[l]{@{}p{\dimexpr 2cm-\tabcolsep}p{0.8\hsize}}}% <-- change the value here
+     {\end{longtable}}%
+ }
+%\glsaddall
+%\printglossaries[type=\acronymtype, title={List of acronyms}]
+\printglossary[style=mylong, type=\acronymtype, title={List of acronyms and abbreviations}]
+%\printglossary[type=\acronymtype, title={List of acronyms and abbreviations}]
+
+%\printnoidxglossary[style=mylong, title={List of acronyms and abbreviations}]
+\engExpl{The list of acronyms and abbreviations should be in alphabetical order based on the spelling of the acronym or abbreviation.
+}
+
+% if the nomenclature option was specified, then include the nomenclature page(s)
+\ifnomenclature
+    \cleardoublepage
+    % Output the nomenclature list
+    \printnomenclature
+\fi
+
+%% The following label is essential to know the page number of the last page of the preface
+%% It is used to computer the data for the "For DIVA" pages
+\label{pg:lastPageofPreface}
+% Mainmatter is where the actual contents of the thesis goes
+\mainmatter
+\glsresetall
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+\selectlanguage{english}
+\chapter{Background}
+\label{ch:background}
+\sweExpl{Bakgrund}
+
+\generalExpl{When you do your literature study, you should have a nearly complete Chapters 1 and 2.\\
+You may also find it convenient to introduce the future work section into your report early – so that you can put things that you think about but decide not to do now into this section.\\
+Note that later you can move things between this future work section and what you have done as you may change your mind about what to do now versus what to put off to future work.
+}
+\generalExpl{What does a reader (another x student -- where x is your study line) need to know to understand your report?
+What have others already done? (This is the “related work”.) Explain what and
+how prior work/prior research will be applied on or used in the degree
+project/work (described in this thesis). Explain why and what is not used in
+the degree project and give valid reasons for rejecting the work/research.}
+
+This chapter provides basic background information about xxx. Additionally, this chapter describes xxx. The chapter also describes related work xxxx.
+
+
+
+\sweExpl{Vilken viktig litteratur och
+  (forsknings-)artiklar har du studerat inom området (litteraturstudie)? }
+
+\section{Major background area 1}
+\sweExpl{Viktigt bakgrundsområde 1}
+There are xxx characteristics that distinguish yyy from other information and communication technology (ICT) system, as shown in Figure~\ref{fig:lotsofstars}. Table \ref{tab:tablecaracteristics} summarizes these characteristics.
+
+ 
+\begin{figure}[!ht]
+  \begin{center}
+    \includegraphics[width=0.5\textwidth]{figures/lots_of_stars.png}
+  \end{center}
+  \caption{Lots of stars  (Inspired by Figure x.y on page z of [xxx])}
+  \label{fig:lotsofstars}
+\end{figure}
+\sweExpl{Massor av stärnor (Inspirerad av figur x.y på sidan z i [xxx])}
+
+
+\begin{table}[!ht]
+  \begin{center}
+    \caption{xxx characteristics}
+    \label{tab:tablecaracteristics}
+    \begin{tabular}{l|S[table-format=4.6]} % <-- Alignments: 1st column left, 2nd middle, with vertical lines in between
+      \textbf{Characteristics} & \textbf{Description}\\
+      $\alpha$ & $\beta$ \\
+      \hline
+      1 & 1110.1\\
+      2 & 10.1\\
+      3 & 23.113231\\
+    \end{tabular}
+  \end{center}
+\end{table}
+\sweExpl{Egenskaper}
+\sweExpl{Beskrivning}
+
+\cleardoublepage
+\chapter{Method or Methods}
+\label{ch:methods}
+\sweExpl{Metod eller Metodval}
+\generalExpl{This chapter is about Engineering-related
+  content, Methodologies and Methods.  Use a self-explaining title.\\The
+  contents and structure of this chapter will change with your choice of
+  methodology and methods.}
+
+
+
+\generalExpl{Describe the engineering-related contents (preferably with models) and the research methodology and methods that are used in the degree project.\\
+Give a theoretical description of the scientific or engineering methodology  you are going to use and why have you chosen this method. What other methods did you consider and why did you reject them.\\
+In this chapter, you describe what engineering-related and scientific skills you are going to apply, such as modeling, analyzing, developing, and evaluating engineering-related and scientific content. The choice of these methods should be appropriate for the problem . Additionally, you should be consciousness of aspects relating to society and ethics (if applicable). The choices should also reflect your goals and what you (or someone else) should be able to do as a result of your solution - which could not be done well before you started.}
+
+The purpose of this chapter is to provide an overview of the research method
+used in this thesis. Section~\ref{sec:researchProcess} describes the research
+process. Section~\ref{sec:researchParadigm} details the research
+paradigm. Section~\ref{sec:dataCollection} focuses on the data collection
+techniques used for this research. Section~\ref{sec:experimentalDesign}
+describes the experimental design. Section~\ref{sec:assessingReliability}
+explains the techniques used to evaluate the reliability and validity of the
+data collected. Section~\ref{sec:plannedDataAnalysis} describes the method
+used for the data analysis. Finally, Section~\ref{sec:evaluationFramework}
+describes the framework selected to evaluate xxx.
+
+\sweExpl{Vilka vetenskaplig eller ingenjörs-metodik ska du använda och varför har du valt den här metoden. Vilka andra metoder gjorde du övervägde du och varför du avvisar dem.
+Vad är dina mål? (Vad ska du kunna göra som ett resultat av din lösning - vilken inte kan göras i god tid innan du började)
+Vad du ska göra? Hur? Varför? Till exempel, om du har implementerat en artefakt vad gjorde du och varför? Hur kommer du utvärdera den.
+Syftet med detta kapitel är att ge en översikt över forsknings metod som
+används i denna avhandling. Avsnitt~\ref{sec:researchProcess} beskriver forskningsprocessen. Avsnitt~\ref{sec:researchParadigm} beskriver forskningsparadigmen detaljerat. Avsnitt~\ref{sec:dataCollection} fokuserar på datainsamlingstekniker som används för denna forskning. Avsnitt~\ref{sec:experimentalDesign} beskriver experimentell
+design. Avsnitt~\ref{sec:assessingReliability} förklarar de tekniker som används för att utvärdera
+tillförlitligheten och giltigheten av de insamlade uppgifterna. Avsnitt~\ref{sec:plannedDataAnalysis}
+beskriver den metod som används för dataanalysen. Slutligen, Avsnitt~\ref{sec:evaluationFramework}
+beskriver ramverket som valts för att utvärdera xxx.\\
+Ofta kan man koppla ett antal följdfrågor till undersökningsfrågan och problemlösningen t ex\\
+(1) Vilken process skall användas för konstruktion av lösningen och vilken process skall kopplas till denna för att svara på undersökningsfrågan?\\
+(2) Hur och vilket resultat (storheter) skall presenteras både för att redovisa svar på undersökningsfrågan (resultatkapitlet i denna rapport) och redovisa resultat av problemlösningen (prototypen, ofta dokument som bilagor men vilka dokument och varför?).\\
+(3) Vilken teori/teknik skall väljas och användas både för undersökningen (taxonomi, matematik, grafer, storheter mm)  och  problemlösning (UML, UseCases, Java mm) och varför?\\
+(4) Vad behöver du som student leverera för att uppnå hög kvaliet (minimikrav) eller mycket hög kvalitet på examensarbetet?\\
+(5) Frågorna kopplar till de följande underkapitlen.\\
+(6) Resonemanget bygger på att studenter på hing-programmet ofta skall konstruera något åt problemägaren och att man till detta måste koppla en intressant ingenjörsfråga. Det finns hela tiden en dualism mellan dessa aspekter i exjobbet.
+}
+
+\section{Research Process}
+\label{sec:researchProcess}
+
+\sweExpl{Undersökningsrocess och utvecklingsprocess}
+
+Figure~\ref{fig:researchprocess} shows the steps conducted in order to carry out this research. 
+
+\sweExpl{Figur~\ref{fig:researchprocess} visar de steg som utförs för att genomföra\\
+Beskriv, gärna med ett aktivitetsdiagram (UML?), din undersökningsprocess och utvecklingsprocess.  Du måste koppla ihop det akademiska intresset (undersökningsprocess) med ursprungsproblemet (utvecklingsprocess)
+denna forskning.\\
+Aktivitetsdiagram från t ex UML-standard}
+
+
+ 
+\begin{figure}[!ht]
+  \begin{center}
+    \includegraphics[width=0.5\textwidth]{figures/researchprocess.png}
+  \end{center}
+  \caption{Research Process}
+  \label{fig:researchprocess}
+\end{figure}
+
+\generalExpl{Example of using customize item labels.}
+Some steps in the process:
+\begin{enumerate}[leftmargin=*, label=\textbf{Step \arabic*}, ref=Step \arabic*] %labelindent=1em for indent
+    \itemsep0em
+    \item \label{x:s1} plan experiment,
+    \item \label{x:s2} conduct experiment,
+    \item \label{x:s3} analyze data from the experiment, and
+    \item \label{x:s4} discuss the results of the analysis.
+\end{enumerate}
+
+\sweExpl{Forskningsprocessen}
+
+
+\section{Research Paradigm}
+\label{sec:researchParadigm}
+\sweExpl{Undersökningsparadigm\\
+Exempelvis\\
+Positivistisk (vad/hur fungerar det?) kvalitativ fallstudie med en deduktivt (förbestämd) vald ansats och ett induktivt(efterhand uppstår dataområden och data) insamlade av data och erfarenheter.}
+
+
+\section{Data Collection}
+\label{sec:dataCollection}
+\sweExpl{Datainsamling\\
+(Detta bör också visa att du är medveten om de sociala och etiska frågor som
+kan vara relevanta för dina data insamlingsmetod.)}
+\generalExpl{This should also show that you are aware of the social and ethical concerns that might be relevant to your data collection method.}
+
+
+
+\subsection{Sampling}
+\sweExpl{Stickprovsundersökning}
+
+\subsection{Sample Size}
+\sweExpl{Provstorleken}
+
+\subsection{Target Population}
+\sweExpl{Målgruppen}
+
+\section[Experimental design/Planned Measurements]{Experimental design and\\Planned Measurements}
+\label{sec:experimentalDesign}
+\sweExpl{Experimentdesign/Mätuppställning}
+
+\subsection{Test environment/test bed/model}
+\engExpl{Describe everything that someone else would need to reproduce your test environment/test bed/model/… .}
+\sweExpl{Testmiljö/testbädd/modell\\
+Beskriv allt att någon annan skulle behöva återskapa din testmiljö / testbädd / modell / …}
+
+\subsection{Hardware/Software to be used}
+\sweExpl{Hårdvara / programvara som ska användas}
+
+
+\section{Assessing reliability and validity of the data collected}
+\label{sec:assessingReliability}
+\sweExpl{Bedömning av validitet och reliabilitet hos använda metoder och insamlade data }
+
+
+\subsection{Validity of method}
+\label{sec:validtyOfMethod}
+\sweExpl{Giltigheten av metoder\\
+  Har dina metoder gett dig de rätta svaren och lösningarna? Var metoderna korrekta?}
+
+\engExpl{How will you know if your results are valid?}
+\engExpl{Remember that validity is about the \textit{accuracy} of a measurement while reliability is about the \textit{consistency} of the measurement values under the same conditions (\ie repeatability).}
+
+\subsection{Reliability of method}
+\label{sec:reliabilityOfMethod}
+\sweExpl{Tillförlitlighet av för metoder\\
+Hur bra är dina metoder, finns det bättre metoder? Hur kan du förbättra dem?}
+\engExpl{How will you know if your results are reliable?}
+
+\subsection{Data validity}
+\label{sec:dataValidity}
+\sweExpl{Giltigheten av uppgifter\\
+Hur vet du om dina resultat är giltiga? Är ditt resultat rättvisande?}
+
+\subsection{Reliability of data}
+\label{sec:reliabilityOfData}
+\sweExpl{Tillförlitlighet av data\\
+Hur vet du om dina resultat är tillförlitliga? Hur bra är dina resultat?}
+
+
+\section{Planned Data Analysis}
+\label{sec:plannedDataAnalysis}
+\sweExpl{Metod för analys av data}
+
+
+\subsection{Data Analysis Technique}
+\label{sec:dataAnalysisTechnique}
+\sweExpl{Dataanalysteknik}
+
+\subsection{Software Tools}
+\label{sec:softwareTools}
+\sweExpl{Mjukvaruverktyg}
+
+
+\section{Evaluation framework}
+\label{sec:evaluationFramework}
+\sweExpl{Utvärdering och ramverk\\
+Metod för utvärdering, jämförelse mm. Kopplar till kapitel~\ref{ch:resultsAndAnalysis}.}
+
+\section{System documentation}
+\label{sec:systemDocumentation}
+\sweExpl{Systemdokumentation\\
+Med vilka dokument och hur skall en konstruerad prototyp dokumenteras? Detta blir ofta bilagor till rapporten och det som problemägaren till det ursprungliga problemet (industrin) ofta vill ha.\\
+Bland dessa bilagor återfinns ofta, och enligt någon angiven standard, kravdokument, arkitekturdokument, designdokumnet, implementationsdokument, driftsdokument, testprotokoll mm.}
+\generalExpl{If this is going to be a complete document consider putting it in as an appendix, then just put the highlights here.}
+
+
+\cleardoublepage
+\subsection{Some examples of coding}
+\engExpl{This section is simply to show some example of how you can include code in your thesis - this is not a section you would have in your thesis.}
+\sweExpl{Det här avsnittet är helt enkelt för att visa ett exempel på hur du kan inkludera kod i ditt examensarbete - det här är inte ett avsnitt du skulle ha i ditt examensarbete.}
+
+Listing~\ref{lst:helloWorldInC} shows an example of a simple program written
+in C code.
+
+\begin{lstlisting}[language={C}, caption={Hello world in C code}, label=lst:helloWorldInC]
+int main() {
+printf("hello, world");
+return 0;
+}
+\end{lstlisting}
+
+
+In contrast, Listing~\ref{lst:programmes} is an example of code in Python to
+get a list of all of the programs at KTH.
+
+\lstset{extendedchars=true}  %% This allows characters codes in the range 128-255
+\begin{lstlisting}[language={Python}, caption={Using a python program to
+    access the KTH API to get all of the programs at KTH}, label=lst:programmes]
+KOPPSbaseUrl = 'https://www.kth.se'
+
+def v1_get_programmes():
+    global Verbose_Flag
+    #
+    # Use the KOPPS API to get the data
+    # note that this returns XML
+    url = "{0}/api/kopps/v1/programme".format(KOPPSbaseUrl)
+    if Verbose_Flag:
+        print("url: " + url)
+    #
+    r = requests.get(url)
+    if Verbose_Flag:
+        print("result of getting v1 programme: {}".format(r.text))
+    #
+    if r.status_code == requests.codes.ok:
+        return r.text           # simply return the XML
+    #
+    return None
+\end{lstlisting}
+
+\section{Reflections}
+\label{sec:reflections}
+\sweExpl{Reflektioner}
+\sweExpl{Vilka är de relevanta ekonomiska, sociala, miljömässiga och etiska aspekter av ditt arbete?}
+\engExpl{What are the relevant economic, social,
+  environmental, and ethical aspects of your work?
+}
+
+
+
+One of the most important results is the reduction in the amount of
+energy required to process each packet while at the same time reducing the
+time required to process each packet.
+
+The thesis contributes to the \gls{UN}\enspace\glspl{SDG} numbers 1 and 9 by
+xxxx. 
+
+
+
+
+\noindent\rule{\textwidth}{0.4mm}
+\engExpl{In the references, let Zotero or other tool fill this in for you. I suggest an extended version of the IEEE style, to include URLs, DOIs, ISBNs, etc., to make it easier for your reader to find them. This will make life easier for your opponents and examiner. \\IEEE Editorial Style Manual: \url{https://www.ieee.org/content/dam/ieee-org/ieee/web/org/conferences/style_references_manual.pdf}}
+\sweExpl{Låt Zotero eller annat verktyg fylla i det här för dig. Jag föreslår en utökad version av IEEE stil - att inkludera webbadresser, DOI, ISBN etc. - för att göra det lättare för läsaren att hitta dem. Detta kommer att göra livet lättare för dina opponenter och examinator.}
+

@@ -1,0 +1,27 @@
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024/GNU Guix) (preloaded format=latex 2024.10.31)  19 NOV 2024 13:30
+entering extended mode
+ \write18 enabled.
+ %&-line parsing enabled.
+**chapter1-3.tex
+(./chapter1-3.tex
+LaTeX2e <2023-11-01> patch level 1
+L3 programming layer <2024-02-20>
+! Undefined control sequence.
+l.1 \chapter
+            {Introduction}
+? 
+! Emergency stop.
+l.1 
+    
+End of file on the terminal!
+
+ 
+Here is how much of TeX's memory you used:
+ 16 strings out of 474117
+ 404 string characters out of 5719560
+ 1925184 words of memory out of 5000000
+ 22476 multiletter control sequences out of 15000+600000
+ 558069 words of font info for 36 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 12i,0n,13p,68b,8s stack positions out of 10000i,1000n,20000p,200000b,200000s
+No pages of output.

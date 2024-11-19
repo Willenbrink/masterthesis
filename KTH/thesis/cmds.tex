@@ -1,0 +1,94 @@
+% Variable name vn, monospaced name mn, boldfaced name bn
+\NewDocumentCommand{\vn}{m}{\mathop{\mathit{#1}}}
+\NewDocumentCommand{\mn}{m}{\texttt{#1}}
+\NewDocumentCommand{\bn}{m}{\mathop{\textbf{#1}}}
+
+% TODO spaces afterwards don't really work
+\NewDocumentCommand{\plc}{}{\textbf{PLC}\xspace}
+
+\NewDocumentCommand{\FS}{}{\vn{FS}}
+\NewDocumentCommand{\TS}{}{\vn{TS}}
+\NewDocumentCommand{\WS}{}{\vn{WS}}
+
+\newcommand{\reducedstrut}{\vrule width 0pt height .9\ht\strutbox depth .9\dp\strutbox\relax}
+\NewDocumentCommand
+    {\graybox}
+    { s m s }
+    {\begingroup%
+    \IfBooleanT{#3}{\setlength{\fboxsep}{1pt}}%
+    \colorbox%
+        {lightgray}%
+        {\reducedstrut\IfBooleanT{#1}{$}#2\IfBooleanT{#1}{$}\/}%
+    \endgroup%
+    }
+
+% We have two kind of frames: The normal stack frames (sframe) and finish frames (fframe). They take a number of arguments:
+% s:aligned? OL:variable assignments m:term OP:Permissions Ol:label
+\NewDocumentCommand{\sframe}{ s O{L} m O{P} O{l} }{\langle #2,\ \IfBooleanT{#1}{&&} #3,\ \IfBooleanT{#1}{&&} #4 \IfBooleanT{#1}{&&}\rangle^#5 \IfBooleanT{#1}{&&} }
+%s:aligned? m:id
+%\NewDocumentCommand{\fframe}{ s m O{l} }{\IfBooleanT{#1}{&&} \langle \mathit{FINISH} #2 \rangle ^#3 }
+
+% We have three kinds of reductions: frame, stack and tasks. Each come with sensible defaults
+\NewDocumentCommand{\reducframe}{O{H} m s O{H} m s}{%
+  \begin{alignedat}{7}
+    &#1, #2\IfBooleanF{#6}{\\} \rightarrow\ &#4, #5
+  \end{alignedat}%
+}
+\NewDocumentCommand{\reducstack}{O{H} m O{FS} s O{H} m O{FS} s}{%
+  \begin{alignedat}{7}
+    &#1, \IfBlankF{#2}{#2 \circ} #3\IfBooleanF{#8}{\\} \twoheadrightarrow\ &#5, \IfBlankF{#6}{#6 \circ} #7
+  \end{alignedat}%
+}
+% task, taskset+waitset, s, heap, new task, new taskset+waitset, linebreak
+\NewDocumentCommand{\reductasks}{m O{\TS, \WS} s O{H} m O{\TS, \WS} s}{%
+  \begin{alignedat}{7}
+    &H, \IfBlankF{#1}{\{#1\} \uplus} #2 \IfBooleanF{#7}{\\} \leadsto\ &#4, \IfBlankF{#5}{\{#5\} \uplus} #6
+  \end{alignedat}
+}
+
+\NewDocumentCommand{\IfReport}{m}{#1}
+%\NewDocumentCommand{\IfReport}{m}{}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+
+\newtheorem*{futuretheoreminner}{Theorem~\thefuturetheoreminner}
+\newcommand{\thefuturetheoreminner}{} % initialize
+
+\ExplSyntaxOn
+
+\prop_new:N \g_alevel_future_prop
+
+\NewDocumentEnvironment{futuretheorem}{ m o +b }
+ {% #1 is the label to be also used in the body for restating
+  % #2 is the standard optional argument for a theorem
+  % #3 is the body
+  \renewcommand{\thefuturetheoreminner}{\ref{#1}}
+  \IfNoValueTF{#2}
+   {\futuretheoreminner}
+   {\futuretheoreminner[#2]}
+  #3
+ }
+ {
+  \endfuturetheoreminner
+  \prop_gput:Nnn \g_alevel_future_prop { #1 } { #3 }
+  \IfValueT{#2}{ \prop_gput:Nnn \g_alevel_future_prop { #1-attr } { #2 } }
+ }
+
+\NewDocumentCommand{\pasttheorem}{m}
+ {
+  \prop_if_in:NnTF \g_alevel_future_prop { #1-attr }
+   {
+    \begin{theorem}[\prop_item:Nn \g_alevel_future_prop { #1-attr }]
+   }
+   {
+    \begin{theorem}
+   }
+  \label{#1}
+  \prop_item:Nn \g_alevel_future_prop { #1 }
+  \end{theorem}
+ }
+
+\ExplSyntaxOff
