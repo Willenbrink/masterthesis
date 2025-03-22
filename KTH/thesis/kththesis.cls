@@ -54,20 +54,20 @@
   \ifinswedish
     \setmainlanguage{swedish}
     \setotherlanguage[variant=us]{english}
-    \setotherlanguages{french,spanish,italian,norsk,german,danish,dutch,estonian}
+    \setotherlanguages{german}
   \else
     \setmainlanguage[variant=us]{english}
-    \setotherlanguages{swedish,french,spanish,italian,norsk,german,danish,dutch,estonian}
+    \setotherlanguages{swedish,german}
     %\setotherlanguage{swedish}
   \fi
 \else
   \RequirePackage[utf8]{inputenc}
   \ifinswedish
     % can replace USenglish with UKenglish if desired
-    \RequirePackage[main=swedish,english,french,italian,norsk,ngerman,danish,dutch,estonian]{babel}
+    \RequirePackage[main=swedish,english,german]{babel}
   \else
     % can replace USenglish with UKenglish if desired
-    \RequirePackage[main=english,swedish,french,italian,norsk,ngerman,danish,dutch,estonian]{babel}
+    \RequirePackage[main=english,swedish,german]{babel}
   \fi
 \fi
 
