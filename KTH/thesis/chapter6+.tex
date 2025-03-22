@@ -1,169 +1,3 @@
-\chapter{Properties}\label{proper}
-
-\section{Progress}
-The progress theorem states that we can always take a step as long as we are in a well-formed state or that we have reached a final state. A consequence of progress is that there are no deadlocks as a \textit{finish} never blocks forever. One exception to progress are \textit{null} values as calling the method or assigning to fields of a null object is not well-defined. We define the final state as both the active and waiting task sets $TS$ and $WS$ being empty. We can thus state Progress follows:
-
-\begin{futuretheorem}{progress}[Progress]
-\begin{alignat}{2}
-    &\vdash H : \star \label{prog-prem-1}\\
-    &\wedge\ H \vdash TS, WS \label{prog-prem-2}\\
-    &\wedge\ H \vdash TS, WS \bn{ok} \label{prog-prem-3}\\
-    &\Rightarrow \reductasks{}*[H']{}[TS', WS']* \label{prog-concl-1}\\
-    &\vee\ TS = \emptyset \wedge WS = \emptyset \label{prog-concl-2}\\
-    &\vee\ \exists (i_f, i_a, FS) \in TS.\ FS = F \circ FS' \text{where $F = \langle L, \text{let $x = t$ in $t'$}, P \rangle^l$ and}\\
-\nonumber& \text{$t \in \{y.f, y.f = z, y.m(z),
-y.\vn{async}(b, z \rightarrow s)\{t''\},$}\\
-\nonumber& \text{$\vn{capture}(y.f, x)\{z \Rightarrow t''\}, \vn{swap}(y.f, x)\{z \Rightarrow t''\}\}$ and $L(y) = \mn{null}$.}\label{prog-concl-3} 
-\end{alignat}
-\end{futuretheorem}
-
-To prove this, we first must have a task in $TS$ that can be reduced or that we can resume a waiting task to obtain one. To resume a waiting task, we must show that, assuming $TS$ is empty, at least one task in $WS$ can be resumed. This is equivalent to stating that at least one task in $WS$ has no task it waits on. We call this property deadlock freedom as it states that there cannot be a cycle of tasks waiting on each other.
-
-To show this, we rely on the \textit{idOrdering} invariant which states that a waiting task always waits on tasks created after it or equivalently: $i_f < j_f$ for a waiting task $((i_f, i_a, FS), j_f) \in WS$.
-\begin{definition}[ID Ordering]
-    We say that a set of waiting tasks $WS$ has ordered IDs iff all tasks await IDs created after their own ID, that is:
-
-    \[\vn{idOrdering}(WS) := \forall ((i_f, i_a, FS),j_f) \in WS.\ i_f < j_f\]
-\end{definition}
-
-\begin{lemma}[Deadlock Freedom] \label{resumable-task}
-\begin{alignat}{2}
-&H \vdash \TS, \WS \bn{ok} \label{resumable-prem-1}\\
-\wedge\ &\vn{idOrdering}(WS) \label{resumable-prem-2}\\
-\wedge\ &\WS \neq \emptyset \label{resumable-prem-3}\\
-\wedge\ &\TS = \emptyset \label{resumable-prem-4}\\
-\Rightarrow\ &\exists (T, i_f) \in \WS.\ \reductasks{}[TS, \{(T,i_f)\} \uplus \WS]{T}* \label{resumable-concl}
-\end{alignat}
-\end{lemma}
-\begin{proof}[Proof: Deadlock Freedom]
-We proceed with a proof by contradiction:
-
-Assume that no such $(T,i_f) \in \WS$ exists. It follows that every task in $\WS$ is waiting on another task in either $\TS$ or $\WS$:
-\begin{equation}
-    \forall (T,i_f) \in WS.\ \exists (j_f, i_a, FS) \in TS \cup \vn{tasks}(WS).\ i_f = j_f
-\end{equation}
-From \cref{resumable-prem-2,resumable-prem-4} we obtain that every task awaits a task with a higher id:
-\begin{equation}
-    \forall (T,i_f) \in WS.\ \exists ((i_f,i_a,FS),j_f) \in WS.\ i_f < j_f
-\end{equation}
-
-At the same time, \cref{resumable-prem-3} and the fact that $WS$ is finite implies that there must exist a maximal element. Assuming finiteness of $WS$ is valid as a finite program can only create a finite number of tasks:
-\begin{equation}
-    \exists (T_{\vn{max}},i_f) \in WS.\ \forall (T',j_f) \in WS.\ j_f \leq i_f
-\end{equation}
-We obtain a contradiction as this maximal element $(T_{\vn{max}}, i_f)$ has an id $i_f$ larger than the id of all other tasks.
-\end{proof}
-
-We can now proceed with progress.
-\begin{proof}[Proof: Progress]
-We distinguish three cases for $TS$ and $WS$:
-\begin{enumerate}
-    \item $TS = \emptyset$ and $WS = \emptyset$: We can immediately conclude with \cref{prog-concl-2}.
-    \item $TS = \emptyset$ and $WS \neq \emptyset$: We apply E-RESUME to one of the waiting tasks obtained via \cref{resumable-task}.
-    \item $TS \neq \emptyset$: We continue with an arbitrary task $(i_f, i_a, FS) \in TS$
-\end{enumerate}
-
-We distinguish three cases for $FS$:
-\begin{enumerate}
-    \item $FS = \epsilon$: We can apply rule E-TASK-DONE
-    \item $FS = \sframe{x} \circ \epsilon$: We can apply rule E-TASK-DONE
-    \item $FS = F \circ FS'$ where $F = \sframe{t}$
-\end{enumerate}
-
-For the last case, we continue with a case distinction on $t$. This is relatively straightforward as the evaluation rules are syntax directed. A detailed proof for the premises of each rule with all intermediate steps can be found in the appendix.
-\end{proof}
-
-\section{Isolation}
-The isolation theorem states that no two active tasks can access the same object in the heap. Intuitively, this ensures that no data race can occur as a prerequisite for data races is two tasks concurrently accessing the same object. Note that waiting tasks are not strictly required to be isolated from the active tasks as they are not able to access the memory while waiting. One issue with this is the resumption of waiting tasks. If a waiting task is not isolated from all active tasks, resuming it will break isolation. We thus require each waiting task to be isolated from, or awaiting the termination of, each active task.
-
-\begin{figure}
-    \centering
-\infrule[\graybox{ISO-TS}]
-    { \forall T, T' \in TS \cup tasks(WS).\ \vn{isolated}(H, WS, T, T')}
-    {\vn{isolated}(H, TS, WS)}
-\vspace{3mm}
-\infrule[\graybox{ISO-T}]
-    {T = (i_f, i_a, FS) \andalso T' = (j_f, j_a, FS')\\
-    \vn{reachables}(H, FS) \cap \vn{reachables}(H, FS') = \emptyset \vee awaits(WS, T, T') \vee awaits(WS, T', T)
-    }
-    {\vn{isolated}(H, WS, T, T')}
-\vspace{3mm}
-\infrule[Awaits-Base]
-    {(T, i_f) \in WS \wedge id_f(T') = i_f}
-    {awaits(WS, T, T')}
-\vspace{3mm}
-\infrule[Awaits-Step]
-    {(U, k_f) \in WS \andalso awaits(WS, T, U) \andalso awaits(WS, U, T')}
-    {awaits(WS, T, T')}
-
-    \caption{Definitions for isolation}
-    \label{fig:isolation-def}
-\end{figure}
-
-Based on these requirements, we can define isolation as shown in \cref{fig:isolation-def}. ISO-TS states that the current program state is isolated, $\vn{isolated}(H, TS, WS)$, if each pair of tasks, whether active or waiting, is isolated from each other. ISO-T, in turn, defines two tasks to be isolated from each other if the set of objects they can reach is disjoint or one awaits the other. Finally, AWAITS-BASE and AWAITS-STEP define the transitive $\vn{awaits}(WS, T, T')$ relation. Either $T$ directly awaits the termination of $T'$ by its id or $T$ awaits a task $U$ that in turn awaits the task $T$.
-
-The initial state is trivially isolated as we only have one task. By showing that isolation is preserved when taking a reduction step we can show that any reachable program state is isolated.
-
-We define the isolation preservation as follows: Assuming we take a step from a state $H, TS, WS$ to $H', TS', WS'$ and that the initial state is well-typed, fulfills all invariants and is isolated the final state will also be isolated. This can be formulated as follows: 
-
-\begin{theorem}[Isolation]
-\begin{alignat}{3}
-    &\reductasks{}*[H']{}[TS',WS']* \label{iso-prem-reduc}\\
-    \wedge\ & H \vdash TS, WS\\
-    \wedge\ & H \vdash TS, WS \bn{ok} \label{iso-prem-ok}\\
-    \wedge\ & \vn{isolated}(H, TS, WS) \label{iso-prem-iso}\\
-    \Rightarrow\ & \vn{isolated}(H', TS', WS') \label{iso-concl}
-\end{alignat}
-\end{theorem}
-
-Before we can prove the theorem, we make three observation about \textit{isolated}. Firstly, removing a task $T$ that does not await any other task preserves \textit{isolated}. This follows from the definition of \textit{isolated} and \textit{awaits} as a task $U$ awaiting a task $U'$ before removing $T$ will also await $U'$ after $T$ has been removed and the \textit{reachables} of other tasks unaffected by $T$.
-
-Secondly, if a task $T$ is \textit{isolated} from all other tasks in $TS$ and $WS$, adding this task to either $TS$ or $WS$, with some finish id $i_f$, preserves \textit{isolated}. This follows immediately from the definition of \textit{isolated}.
-
-We can now prove isolation by analysing the reduction rules individually. The rules can affect the proof in two ways: (a) adding or removing tasks from either $TS$ or $WS$ and (b) affect the \textit{reachables} set of a preexisting task. The first is covered by the two observations about task sets. The second is, for the most part, trivial as the \textit{reachables} set is preserved by most rules. We provide a detailed analysis of the rules in the appendix.
-
-\section{Preservation}
-Preservation states that welltyped terms and tasks retain the same type after a reduction step. Furthermore, a set of invariants is preserved by the reduction. Due to time constraints, we do not provide a proof of preservation.
-Preservation can be stated as three theorems, one for each reduction relation:
-
-\begin{theorem}[Preservation: Frame Reduction]
-    \begin{alignat}{3}
-    & \vdash H : \star \label{pres-prem-1}\\
-    &\wedge\ H \vdash F : \sigma \label{pres-prem-2}\\
-    &\wedge\ H; a \vdash F\ \bn{ok}\\
-    &\wedge\ \reducframe{F}*[H']{F'}*\\
-    &\Longrightarrow \vdash H' : \star\\
-    &\wedge\ H' \vdash F' : \sigma\\
-    &\wedge\ H'; a \vdash F'\ \bn{ok}
-    \end{alignat}
-\end{theorem}
-
-\begin{theorem}[Preservation: Frame Stack Reduction]
-    \begin{alignat}{3}
-    & \vdash H : \star\\
-    &\wedge\ H \vdash FS\\
-    &\wedge\ H; a \vdash FS\ \bn{ok}\\
-    &\wedge\ \reducstack{}*[H']{}[FS']*\\
-    &\Longrightarrow \vdash H' : \star\\
-    &\wedge\ H' \vdash FS'\\
-    &\wedge\ H'; a \vdash FS'\ \bn{ok}
-    \end{alignat}
-\end{theorem}
-
-\begin{theorem}[Preservation: Task Set Reduction]
-    \begin{alignat}{3}
-    & \vdash H : \star \label{pres-ts-prem-hstar}\\
-    &\wedge\  H \vdash TS, WS \label{pres-ts-prem-tsws}\\
-    &\wedge\  H \vdash TS, WS\ \bn{ok} \label{pres-ts-prem-tswsok}\\
-    &\wedge\  \reductasks{}*[H']{}[TS', WS']* \label{pres-ts-prem-reduc}\\
-    &\Longrightarrow \vdash H' : \star \label{pres-ts-concl-hstar}\\
-    &\wedge\  H' \vdash TS', WS' \label{pres-ts-concl-tsws}\\
-    &\wedge\  H' \vdash TS', WS'\ \bn{ok} \label{pres-ts-concl-tswsok}
-    \end{alignat}
-\end{theorem}
-
-Most of the invariants we require are identical to those of LaCasa and can be found in the appendix. We define only a single additional invariant for the progress theorem, \textit{idOrdering}$(WS)$, which is a property on a specific waiting task set $WS$. As such, to show that it is preserved, we only need to examine rules that modify $WS$, i.e. E-RESUME, E-CAPTURE, E-SWAP, E-FINISH. Of these, the first three only remove tasks from $WS$, that is $\reductasks{}*{}[TS, WS']*$ where $WS' \subseteq WS$. It follows that $\vn{idOrdering}(WS) \Longrightarrow \vn{idOrdering}(WS')$. E-FINISH also preserves ID ordering as the ID $j_f$ is fresh and therefore larger than all other defined IDs. 
-
 \chapter{Related Work}\label{related}
 \begin{figure}
     \centering
@@ -174,7 +8,7 @@ Most of the invariants we require are identical to those of LaCasa and can be fo
         & \makecell{Requires \\ annotations}\\
         \hline
  \plc & Yes & Yes & Yes & No \\
- LaCasa & Yes & No & No & No \\  
+ LaCasa & Yes & No & No & No \\
  X10 & Yes & Yes & No & Yes   \\
  Habanero-Java/Scala & Diagnostic & Yes* & Yes* & No \\
  DPJ & Yes & Yes & Yes & Yes \\
@@ -185,7 +19,7 @@ Most of the invariants we require are identical to those of LaCasa and can be fo
 \end{figure}
 
 In this chapter, we compare \plc with a selected number of different approaches. \Cref{related-work} summarizes the differences. Note that Habanero-Java is only deadlock-free if a limited set of constructs is used and only deterministic if it is data race free.
- 
+
 \section{LaCasa}
 LaCasa~\cite{haller_lacasa_2016} is an extension to the Scala programming language that uses object capabilities, unique pointers and affine types to provide encapsulation and data-race freedom in an actor-based concurrency model. LaCasa focuses on being a minimal extension to the Scala language, requiring only a single bit of information per class to encode whether it follows the object capability model or not. In addition, it interacts soundly with the local type inference and requires no annotations of existing code, supporting a gradual transition. It has also been implemented as a compiler plugin.
 
@@ -200,7 +34,7 @@ X10~\cite{charles_x10_2005} is a programming language designed for systems with 
 
 X10 uses a partitioned global address space, separating the heap into different areas, called \textit{places}, each associated with a different compute node. Each asynchronous expression also takes a place in which it should be executed. By running asynchronous tasks in the same area as the memory they access performance can be increased at the cost of a few annotations.
 
-Note that places have some similarity with boxes in that both partition the heap. But in contrast to boxes, places do not enforce strict isolation and separation as they are primarily a tool for ensuring that a program accesses data in an efficient manner. Furthermore, the number of places is arbitrary but fixed on program start and objects residing in one place permanently reside there. 
+Note that places have some similarity with boxes in that both partition the heap. But in contrast to boxes, places do not enforce strict isolation and separation as they are primarily a tool for ensuring that a program accesses data in an efficient manner. Furthermore, the number of places is arbitrary but fixed on program start and objects residing in one place permanently reside there.
 
 \section{Habanero-Java}
 Habanero-Java~\cite{cave_habanero-java_2011} is a programming language based on X10 which transpiles to standard Java classfiles. It focuses on safe concurrent programming with flexible constructs. It supports the Async-Finish model and some additional constructs such as \textit{futures} in addition to integrating actors. A Habanero Scala version also exists \cite{imam_integrating_2012,imam_habanero-scala_2012}.
