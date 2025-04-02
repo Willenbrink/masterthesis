@@ -1,7 +1,9 @@
 \chapter{Properties}\label{proper}
 
 \section{Progress}
-The progress theorem states that we can always take a step as long as we are in a well-formed state or that we have reached a final state. A consequence of progress is that there are no deadlocks as a \textit{finish} never blocks forever. One exception to progress are \textit{null} values as calling the method or assigning to fields of a null object is not well-defined. We define the final state as both the active and waiting task sets $TS$ and $WS$ being empty. We can thus state Progress follows:
+The progress theorem states that, as long as we are in a well-formed state, we either can take a step or have reached a final state. A consequence of progress is that there are no deadlocks which is defined by not being able to take a step\footnote{Livelocks are not covered by this proof.}. We define the final state as both the active and waiting task sets $TS$ and $WS$ being empty.
+
+There is one exception to progress: We can't take a step if the object whose field or method we are trying to access is \textit{null} as this is not well-defined. We thus handle this case separately and state Progress as follows:
 
 \begin{futuretheorem}{progress}[Progress]
 \begin{alignat}{2}
@@ -10,18 +12,17 @@ The progress theorem states that we can always take a step as long as we are in 
     &\wedge\ H \vdash TS, WS \bn{ok} \label{prog-prem-3}\\
     &\Rightarrow \reductasks{}*[H']{}[TS', WS']* \label{prog-concl-1}\\
     &\vee\ TS = \emptyset \wedge WS = \emptyset \label{prog-concl-2}\\
-    &\vee\ \exists (i_f, i_a, FS) \in TS.\ FS = F \circ FS' \text{where $F = \langle L, \text{let $x = t$ in $t'$}, P \rangle^l$ and}\\
-\nonumber& \text{$t \in \{y.f, y.f = z, y.m(z),
-y.\vn{async}(b, z \rightarrow s)\{t''\},$}\\
-\nonumber& \text{$\vn{capture}(y.f, x)\{z \Rightarrow t''\}, \vn{swap}(y.f, x)\{z \Rightarrow t''\}\}$ and $L(y) = \mn{null}$.}\label{prog-concl-3} 
+    &\vee\ \exists (i_f, i_a, FS) \in TS.\ FS = F \circ FS'\\
+    &\text{where $F = \langle L, \text{let $x = t$ in $t'$}, P \rangle^l$ and $L(y) = \mn{null}$}\\
+\nonumber&\text{and $t \in \{y.f,\ y.f = z,\ y.m(z),\ y.\vn{async}(b, z \rightarrow s)\{t''\},$}\\
+\nonumber& \text{$\vn{capture}(y.f, x)\{z \Rightarrow t''\},\ \vn{swap}(y.f, x)\{z \Rightarrow t''\}\}$.}
+\label{prog-concl-3}
 \end{alignat}
 \end{futuretheorem}
 
-To prove this, we first must have a task in $TS$ that can be reduced or that we can resume a waiting task to obtain one. To resume a waiting task, we must show that, assuming $TS$ is empty, at least one task in $WS$ can be resumed. This is equivalent to stating that at least one task in $WS$ has no task it waits on. We call this property deadlock freedom as it states that there cannot be a cycle of tasks waiting on each other.
-
-To show this, we rely on the \textit{idOrdering} invariant which states that a waiting task always waits on tasks created after it or equivalently: $i_f < j_f$ for a waiting task $((i_f, i_a, FS), j_f) \in WS$.
+Before we can prove progress, we first need to show that we always have a task available. In other words, assuming $TS$ is empty, at least one task in $WS$ can be resumed. This is equivalent to stating that at least one task in $WS$ has no task it waits on. We call this property deadlock freedom as it states that there cannot be a cycle of tasks waiting on each other. To show this, we first introduce the \textit{idOrdering} invariant.
 \begin{definition}[ID Ordering]
-    We say that a set of waiting tasks $WS$ has ordered IDs iff all tasks await IDs created after their own ID, that is:
+    A set of waiting tasks $WS$ has ordered IDs iff all waiting tasks await only tasks older than themselves. As a tasks finish ID is always larger than its parents ID, it is equivalent to say that all tasks await IDs larger than their own ID:
 
     \[\vn{idOrdering}(WS) := \forall ((i_f, i_a, FS),j_f) \in WS.\ i_f < j_f\]
 \end{definition}
@@ -42,7 +43,7 @@ Assume that no such $(T,i_f) \in \WS$ exists. It follows that every task in $\WS
 \begin{equation}
     \forall (T,i_f) \in WS.\ \exists (j_f, i_a, FS) \in TS \cup \vn{tasks}(WS).\ i_f = j_f
 \end{equation}
-From \cref{resumable-prem-2,resumable-prem-4} we obtain that every task awaits a task with a higher id:
+From \cref{resumable-prem-2,resumable-prem-4} we obtain that every task awaits a task with a higher id that itself is waiting:
 \begin{equation}
     \forall (T,i_f) \in WS.\ \exists ((i_f,i_a,FS),j_f) \in WS.\ i_f < j_f
 \end{equation}
@@ -51,7 +52,7 @@ At the same time, \cref{resumable-prem-3} and the fact that $WS$ is finite impli
 \begin{equation}
     \exists (T_{\vn{max}},i_f) \in WS.\ \forall (T',j_f) \in WS.\ j_f \leq i_f
 \end{equation}
-We obtain a contradiction as this maximal element $(T_{\vn{max}}, i_f)$ has an id $i_f$ larger than the id of all other tasks.
+We obtain a contradiction as this maximal element $(T_{\vn{max}}, i_f)$ has an id $i_f$ larger than the id of all other tasks and thus cannot be blocked.
 \end{proof}
 
 We can now proceed with progress.

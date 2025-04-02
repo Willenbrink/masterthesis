@@ -199,7 +199,7 @@ As in LaCasa, $\vn{fields}(C)$ is the set of fields of class C. Similarly, $\vn{
 \subsection{Task Set Reduction}
 \begin{figure}
 \infrule[\graybox{E-ASYNC}]
-        {T_1 = (i_f, j_a, \sframe[[x \rightarrow o]]{t}[\emptyset][\epsilon]) \andalso L(b) = b(o,p) \andalso j_a \vn{fresh}\\
+        {T_1 = (i_f, j_a, \sframe[[x \rightarrow o]]{t}[\emptyset][\epsilon]) \andalso L(b) = b(o,p) \andalso j_a\  \vn{fresh}\\
         T_2 = (i_f, i_a, \sframe{s}[P\setminus \{p\}][\epsilon]) \andalso p \in P \\
         }
         {\reductasks
@@ -208,7 +208,7 @@ As in LaCasa, $\vn{fields}(C)$ is the set of fields of class C. Similarly, $\vn{
         }
 \vspace{3mm}
 \infrule[\graybox{E-FINISH}]
-        {T_1 = (j_f, i_a, \sframe{t}[P][\epsilon]) \andalso j_f \vn{fresh}\\
+        {T_1 = (j_f, i_a, \sframe{t}[P][\epsilon]) \andalso j_f\ \vn{fresh} \andalso j_f > i_f\\
         T_2 = (i_f, i_a, \sframe{ \text{let }\ x = \mn{null} \text{ in } s } \circ FS)}
         {\reductasks
             {(i_f, i_a, \sframe{ \text{let }\ x = \vn{finish} \{\ t\ \}\ \text{ in }\ s} \circ FS)}
@@ -309,7 +309,7 @@ Both tasks start active and may be immediately reduced. The waiting set $WS$ is 
 
 E-ASYNC replaces $T$ by two new tasks, essentially skipping the frames created between the \textit{async} and the most recent \textit{finish}. This is a form of non-local control flow, similar to an exception skipping to a handler. Async skips to the most recent finish, as the permission it consumes only has to be unavailable as long as the asynchronously started task is running. After this parent task resumes, this is no longer the case.
 
-E-FINISH creates a new task $T_1$ with a new id $j_f$ evaluating the term $t$ and a suspended task $T_2$ waiting on the completion of all $j_f$-tagged tasks. This way, any async within $t$ inherits this id $j_f$ and $T_2$ will only be resumed once $T_1$ and all its spawned tasks are done. As $T_1$ shares $P$ with $T_2$, it has to remove $T_2$ upon permission consumption; thus $i_a$ is inherited.
+E-FINISH creates a new task $T_1$ with a new id $j_f$ evaluating the term $t$ and a suspended task $T_2$ waiting on the completion of all $j_f$-tagged tasks. This way, any async within $t$ inherits this id $j_f$ and $T_2$ will only be resumed once $T_1$ and all its spawned tasks are done. As $T_1$ shares $P$ with $T_2$, it has to remove $T_2$ upon permission consumption; thus $i_a$ is inherited. $j_f$ is fresh and larger than $i_f$. This property will later be used to determine the relative age of tasks.
 
 E-RESUME resumes a waiting task blocking on id $i_f$. For this it checks that no task with this id is currently being executed or itself waiting on another task. This ensures no descendant is alive.
 
